@@ -1,0 +1,160 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Copyright 2016-2080 evilbinary.
+;作者:evilbinary on 12/24/16.
+;邮箱:rootdebug@163.com
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(library (imgui)
+         (export
+            imgui-init
+            imgui-exit
+            imgui-test
+            imgui-test2
+            imgui-touch-event
+            imgui-key-event
+            imgui-resize
+            imgui-scale
+            imgui-render-start
+            imgui-render-end
+            imgui-disable-default-color
+            imgui-get-default-color
+            imgui-make-vec2
+            imgui-make-text-edit-callback
+
+            imgui-get-io
+            imgui-text
+            imgui-new-frame
+            imgui-render
+            imgui-color-edit3
+            imgui-set-next-window-size
+            imgui-set-next-window-pos
+            imgui-begin
+            imgui-end
+            imgui-button
+            imgui-small-button
+            imgui-input-text
+            imgui-input-text-multiline
+            imgui-checkbox
+            imgui-get-text-line-height
+            imgui-get-mouse-cursor
+            imgui-is-mouse-clicked
+            imgui-is-mouse-down
+
+            ;consts
+            imgui-set-cond-always
+            imgui-set-cond-once
+            imgui-set-cond-first-use-ever
+            imgui-set-cond-appearing
+
+            <<
+            >>
+
+          )
+
+          (import  (scheme) (utils libutil) )
+
+         (define (string-replace! old new str)
+           (let loop
+             ((len (- (string-length str) 1))
+              (i 0))
+              ;(display (format "len=~a i=~a old=~a new=~a~%" len i old (string-ref str i)))
+             (cond
+               ((< i len )
+                 (begin
+                   (if (eq? (string-ref str i) old)
+                      (string-set! str i new)  str))
+                 (loop len (+ i 1)))
+
+               ((>= i len) str)
+               )))
+         (define (split str)
+               (let f ((i 0) (n (string-length str)))
+                 (cond
+                   ((= i n) (list (substring str 0 n) ))
+                   ((char=? (string-ref str i) #\-)
+                      (cons (substring str 0 i)
+                            (split (substring str (+ i 1) n))))
+                   (else (f (+ i 1) n)))))
+         (define (lower-camel-case l)
+           (let loop
+             ((x l) (s "" ) (i 0) )
+              (if (null? x)
+                  s
+                  (begin
+                    (if (> i 0)
+                        (string-set!  (car x) 0 (char-upcase (string-ref (car x) 0))))
+                    (loop (cdr x) (string-append s (car x)) (+ i 1))))))
+
+         (define lib-name
+           (case (machine-type)
+             ((arm32le) "libimgui.so")
+             ((i3le ti3le) "libc.so.6")))
+         (define lib (load-lib "libimgui.so"))
+         ;(define lib (load-shared-object lib-name))
+         (define-syntax define-function
+           (syntax-rules ()
+             ((_ ret name args)
+              (define name
+                (foreign-procedure (string-replace! #\- #\_ (symbol->string 'name) ) args ret)))))
+
+         (define-syntax define-imgui
+                    (syntax-rules ()
+                      ((_ ret name args)
+                       (define name
+                         (foreign-procedure (lower-camel-case (split (symbol->string 'name) )) args ret)))))
+
+
+         (define-ftype imgui-vec2 (struct [x float] [y float]))
+
+         (define-function void imgui-init () )
+         (define-function void imgui-exit () )
+         (define-function void imgui-test () )
+         (define-function void imgui-test2 (string string int int void* void* void*  ) )
+
+         (define-function void imgui-touch-event (int int int) )
+         (define-function void imgui-key-event (int int int string) )
+
+         (define-function void imgui-resize (int int) )
+         (define-function void imgui-scale (float float) )
+         (define-function void imgui-render-start () )
+         (define-function void imgui-render-end () )
+         (define-function void imgui-disable-default-color () )
+         (define-function void* imgui-get-default-color () )
+         (define-function void* imgui-make-vec2 (float float))
+         (define-function void* imgui-make-vec4 (float float float float))
+         (define-function void* imgui-make-text-edit-callback (scheme-object))
+
+
+         (define-imgui void* imgui-get-io () )
+         (define-imgui void imgui-render () )
+         (define-imgui void imgui-text (string) )
+         (define-imgui void imgui-new-frame () )
+         (define-imgui void imgui-color-edit3 (string void*) )
+         (define-imgui void imgui-set-next-window-size (void* int) )
+         (define-imgui void imgui-set-next-window-pos (void* int) )
+
+         (define-imgui void imgui-begin (string int) )
+         (define-imgui void imgui-end () )
+         (define-imgui boolean imgui-button (string void*) )
+         (define-imgui boolean imgui-small-button (string void*) )
+         (define-imgui boolean imgui-checkbox (string u8*) )
+
+         (define-imgui boolean imgui-input-text (string string int int void* void*))
+         (define-imgui boolean imgui-input-text-multiline (string string int int void* void* void* ) )
+         (define-imgui float imgui-get-text-line-height () )
+         (define-imgui int imgui-get-mouse-cursor () )
+         (define-imgui boolean imgui-is-mouse-clicked (int boolean) )
+         (define-imgui boolean imgui-is-mouse-down (int) )
+
+
+
+        (define imgui-set-cond-always 0)
+        (define imgui-set-cond-once 2)
+        (define imgui-set-cond-first-use-ever 4)
+        (define imgui-set-cond-appearing 8)
+
+        (define << fxarithmetic-shift-left)
+        (define >> fxarithmetic-shift-right)
+
+
+
+          )

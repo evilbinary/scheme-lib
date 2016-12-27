@@ -48,6 +48,5 @@ ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATIO
 ```
   运行效果如下：
   
-  ![image](https://raw.githubusercontent.com/evilbinary/scheme-lib/master/android/screenshot/helloworld.png)    
-  
+  <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/android/screenshot/helloworld.png" width="350px" />
   [1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/android/apk/scheme-release-1.1.apk   "scheme apk"

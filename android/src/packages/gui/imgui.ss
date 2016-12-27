@@ -50,22 +50,7 @@
 
           )
 
-          (import  (scheme) (utils libutil) )
-
-         (define (string-replace! old new str)
-           (let loop
-             ((len (- (string-length str) 1))
-              (i 0))
-              ;(display (format "len=~a i=~a old=~a new=~a~%" len i old (string-ref str i)))
-             (cond
-               ((< i len )
-                 (begin
-                   (if (eq? (string-ref str i) old)
-                      (string-set! str i new)  str))
-                 (loop len (+ i 1)))
-
-               ((>= i len) str)
-               )))
+         (import  (scheme) (utils libutil) )
          (define (split str)
                (let f ((i 0) (n (string-length str)))
                  (cond
@@ -90,11 +75,6 @@
              ((i3le ti3le) "libc.so.6")))
          (define lib (load-lib "libimgui.so"))
          ;(define lib (load-shared-object lib-name))
-         (define-syntax define-function
-           (syntax-rules ()
-             ((_ ret name args)
-              (define name
-                (foreign-procedure (string-replace! #\- #\_ (symbol->string 'name) ) args ret)))))
 
          (define-syntax define-imgui
                     (syntax-rules ()
@@ -105,23 +85,23 @@
 
          (define-ftype imgui-vec2 (struct [x float] [y float]))
 
-         (define-function void imgui-init () )
-         (define-function void imgui-exit () )
-         (define-function void imgui-test () )
-         (define-function void imgui-test2 (string string int int void* void* void*  ) )
+         (define-c-function void imgui-init () )
+         (define-c-function void imgui-exit () )
+         (define-c-function void imgui-test () )
+         (define-c-function void imgui-test2 (string string int int void* void* void*  ) )
 
-         (define-function void imgui-touch-event (int int int) )
-         (define-function void imgui-key-event (int int int string) )
+         (define-c-function void imgui-touch-event (int int int) )
+         (define-c-function void imgui-key-event (int int int string) )
 
-         (define-function void imgui-resize (int int) )
-         (define-function void imgui-scale (float float) )
-         (define-function void imgui-render-start () )
-         (define-function void imgui-render-end () )
-         (define-function void imgui-disable-default-color () )
-         (define-function void* imgui-get-default-color () )
-         (define-function void* imgui-make-vec2 (float float))
-         (define-function void* imgui-make-vec4 (float float float float))
-         (define-function void* imgui-make-text-edit-callback (scheme-object))
+         (define-c-function void imgui-resize (int int) )
+         (define-c-function void imgui-scale (float float) )
+         (define-c-function void imgui-render-start () )
+         (define-c-function void imgui-render-end () )
+         (define-c-function void imgui-disable-default-color () )
+         (define-c-function void* imgui-get-default-color () )
+         (define-c-function void* imgui-make-vec2 (float float))
+         (define-c-function void* imgui-make-vec4 (float float float float))
+         (define-c-function void* imgui-make-text-edit-callback (scheme-object))
 
 
          (define-imgui void* imgui-get-io () )

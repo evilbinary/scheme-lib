@@ -12,7 +12,7 @@
           gl-test-demo3
           imgui-test-hello-world
           )
-         (import  (scheme) (gles1)  (glut) (imgui)  )
+         (import  (scheme) (gles1)  (glut) (imgui) (android)  )
          
          (define PI 3.1415)
          (define (glutPrespective fovy aspect zNear zFar)
@@ -30,9 +30,11 @@
          (define (imgui-test-hello-world)
                   (glut-init)
                   (imgui-init)
-                  (imgui-scale 2.5 2.5)
+
+                  (imgui-scale (* 1.5 (android-get-density)) (* 1.5 (android-get-density)))
                   (glut-touch-event (lambda (type x y)
                       (imgui-touch-event type x y)
+
                       ))
                   (glut-key-event (lambda (event)
                       (imgui-key-event
@@ -58,7 +60,8 @@
                                 (imgui-resize w h)
                                  ))
                   (glut-main-loop)
-                  (imgui-exit))
+                  (imgui-exit)
+                  (glut-exit))
          ;imgui例子
          (define (gl-test-demo3)
                  (glut-init)

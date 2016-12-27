@@ -7,6 +7,7 @@
 (library (utils libutil)
          (export
             load-lib
+            define-c-function
          )
          (import  (scheme))
           (define (string-split str separator)
@@ -24,4 +25,23 @@
                     (if (file-exists? (string-append (car libs) "/" name))
                         (load-shared-object (string-append (car libs) "/" name)) )
                   (loop (cdr libs))))) )
+         (define (string-replace! old new str)
+                    (let loop
+                      ((len (- (string-length str) 1))
+                       (i 0))
+                       ;(display (format "len=~a i=~a old=~a new=~a~%" len i old (string-ref str i)))
+                      (cond
+                        ((< i len )
+                          (begin
+                            (if (eq? (string-ref str i) old)
+                               (string-set! str i new)  str))
+                          (loop len (+ i 1)))
+
+                        ((>= i len) str)
+                        )))
+         (define-syntax define-c-function
+                    (syntax-rules ()
+                      ((_ ret name args)
+                       (define name
+                         (foreign-procedure (string-replace! #\- #\_ (symbol->string 'name) ) args ret)))))
          )

@@ -589,9 +589,9 @@
 
          (define lib-name
            (case (machine-type)
-             ((arm32le) "libGLESv2_CM.so")
-             ((i3le ti3le) "libc.so.6")
-             ((i3osx)  "OpenGLES1.framework/OpenGLES2")))
+             ((arm32le) "libglut.so")
+             ((i3le ti3le) "libglut.so.6")
+             ((i3osx)  "libglut.dylib")))
 
          (define lib (load-lib lib-name))
 

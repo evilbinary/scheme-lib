@@ -14,40 +14,39 @@ scheme-lib 是一个scheme使用的库。目前支持android，其它平台在�
 
 ###demo例子
 ```scheme
-	;imgui例子
-	;imgui hello,world
-     (define (imgui-test-hello-world)
-                  (glut-init)
-                  (imgui-init)
-                  (imgui-scale 2.5 2.5)
-                  (glut-touch-event (lambda (type x y)
-                      (imgui-touch-event type x y)
-                      ))
-                  (glut-key-event (lambda (event)
-                      (imgui-key-event
-                         (glut-event-get event 'type)
-                         (glut-event-get event 'keycode)
-                         (glut-event-get event 'char)
-                         (glut-event-get event 'chars))
-                       (if (= 4 (glut-event-get event 'keycode ))
-                         (begin (imgui-exit)
-                         (glut-exit)))
-                      ))
-
-                  (glut-display (lambda ()
-                          (imgui-render-start)
-                          ;(imgui-test)
-                          (imgui-set-next-window-size (imgui-make-vec2 200.0 140.0) 0)
-                          (imgui-begin "evilbinary" 0)
-                          (imgui-text "hello,world")
-                          (imgui-end)
-                          (imgui-render-end)
-                      ))
-                  (glut-reshape (lambda(w h)
-                                (imgui-resize w h)
-                                 ))
-                  (glut-main-loop)
-                  (imgui-exit))		
+;imgui例子
+;imgui hello,world
+(define (imgui-test-hello-world)
+       (glut-init)
+       (imgui-init)
+       (imgui-scale 2.5 2.5)
+       (glut-touch-event (lambda (type x y)
+            (imgui-touch-event type x y)
+                  ))
+            (glut-key-event (lambda (event)
+                  (imgui-key-event
+                     (glut-event-get event 'type)
+                     (glut-event-get event 'keycode)
+                     (glut-event-get event 'char)
+                     (glut-event-get event 'chars))
+                   (if (= 4 (glut-event-get event 'keycode ))
+                     (begin (imgui-exit)
+                     (glut-exit)))
+                  ))
+         (glut-display (lambda ()
+                   (imgui-render-start)
+                   ;(imgui-test)
+                   (imgui-set-next-window-size (imgui-make-vec2 200.0 140.0) 0)
+                   (imgui-begin "evilbinary" 0)
+                   (imgui-text "hello,world")
+                   (imgui-end)
+                   (imgui-render-end)
+                  ))
+         (glut-reshape (lambda(w h)
+                            (imgui-resize w h)
+                             ))
+         (glut-main-loop)
+         (imgui-exit))		
 ```
 
 运行效果如下：

@@ -8,8 +8,8 @@ scheme-lib 是一个scheme使用的库。目前支持android，其它平台在�
 3. 在run界面里面输入测试代码。比如:
  
 ```scheme
-	(import (test) (gles1) (glut) ) 
-	(load "/sdcard/org.evilbinary.chez/lib/apps/hello.ss")
+(import (test) (gles1) (glut) ) 
+(load "/sdcard/org.evilbinary.chez/lib/apps/hello.ss")
 ```
 
 ###demo例子

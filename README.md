@@ -56,7 +56,7 @@ scheme-lib 是一个scheme使用的库。目前支持android，其它平台在�
   
 ##高级篇
 ###使用外部库
-1. 手工添加Android.mk和源码文件到scheme-lib/android/src下命名为libhadd的文件夹。
+1. 手工添加Android.mk和源码文件到`scheme-lib/android/src`下命名为libhadd的文件夹。
 
 add.c 内容如下：
 ```c
@@ -82,7 +82,7 @@ LOCAL_LDLIBS += -ldl -llog -lz
 #include $(BUILD_SHARED_LIBRARY)
 ```
 
-2. 执行ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk。编译后生成的库在android/src/libs/下面。
+2. 执行`ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk`。编译后生成的库在`android/src/libs/`下面。
 3. 调用外libadd.so库和使用代码如下：
 
 ```scheme

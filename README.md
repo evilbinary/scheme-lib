@@ -72,14 +72,12 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/../Optimizations.mk
 LOCAL_MODULE    := add
- #LOCAL_PATH := $(LOCAL_PATH)
 LOCAL_SRC_FILES := add.c
 LOCAL_C_INCLUDES := 
 LOCAL_CFLAGS +=  -I. -I./c/
 LOCAL_CFLAGS += -g -Wall -DANDROID    -DINLINES -DGC_MACROS   -Wno-unused-parameter -pie -fPIE   -fPIC
 LOCAL_LDLIBS += -ldl -llog -lz
- #include $(BUILD_EXECUTABLE)
-#include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_SHARED_LIBRARY)
 ```
 
 2. 执行`ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk`。编译后生成的库在`android/src/libs/`下面。

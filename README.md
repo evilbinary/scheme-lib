@@ -49,9 +49,10 @@ scheme-lib 是一个scheme使用的库。目前支持android，其它平台在�
                   (glut-main-loop)
                   (imgui-exit))		
 ```
-  运行效果如下：
+
+运行效果如下：
   
-  ![image](https://raw.githubusercontent.com/evilbinary/scheme-lib/master/android/screenshot/helloworld.png)    
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/android/screenshot/helloworld.png" width="350px" />
   
 ##高级篇
 ###使用外部库
@@ -90,7 +91,5 @@ LOCAL_LDLIBS += -ldl -llog -lz
    (define-c-function int add (int int) )
    (display (add 100 1234))
 ```
-
-
 
   [1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/android/apk/scheme-release-1.1.apk   "scheme apk"

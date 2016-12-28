@@ -56,14 +56,14 @@ scheme-lib 是一个scheme使用的库。目前支持android，其它平台在�
   
 ##高级篇
 ###使用外部库
-1. 手工添加Android.mk和源码文件到`scheme-lib/android/src`下命名为libhadd的文件夹。
+0. 手工添加Android.mk和源码文件到`scheme-lib/android/src`下命名为libhadd的文件夹。
 add.c 内容如下：
 ```c
-	#include <stdio.h>
-	#include <stdarg.h>
-    int add(int a,int b){ 
-        return a+b;
-    }    
+#include <stdio.h>
+#include <stdarg.h>
+int add(int a,int b){ 
+    return a+b;
+}    
 ```
 Android.mk内容如下：
 ```makefile
@@ -78,11 +78,9 @@ LOCAL_CFLAGS += -g -Wall -DANDROID    -DINLINES -DGC_MACROS   -Wno-unused-parame
 LOCAL_LDLIBS += -ldl -llog -lz
 include $(BUILD_SHARED_LIBRARY)
 ```
-
-2. 执行`ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk`。
-3. 将编译后生成的库`android/src/libs/libadd.so` 同步到`/sdcard/org.evilbinary.chez/lib`目录下，这样能调用外部库了。
-4. 调用外`libadd.so`库和使用代码如下：
-
+1. 执行`ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk`。
+2. 将编译后生成的库`android/src/libs/libadd.so` 同步到`/sdcard/org.evilbinary.chez/lib`目录下，这样能调用外部库了。
+3. 调用外`libadd.so`库和使用代码如下：
 ```scheme
    (import  (scheme) (utils libutil) )
    (load-lib "libadd.so")
@@ -90,4 +88,4 @@ include $(BUILD_SHARED_LIBRARY)
    (display (add 100 1234))
 ```
 
-  [1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/android/apk/scheme-release-1.1.apk   "scheme apk"
+[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/android/apk/scheme-release-1.1.apk   "scheme apk"

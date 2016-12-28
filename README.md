@@ -11,7 +11,6 @@ scheme-lib 是一个scheme使用的库。目前支持android，其它平台在�
 (import (test) (gles1) (glut) ) 
 (load "/sdcard/org.evilbinary.chez/lib/apps/hello.ss")
 ```
-
 ###demo例子
 ```scheme
 ;imgui例子
@@ -52,7 +51,17 @@ scheme-lib 是一个scheme使用的库。目前支持android，其它平台在�
 运行效果如下：
   
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/android/screenshot/helloworld.png" width="350px" />
-  
+###测试配置
+1. 在手机上输入运行代码可能不方便，所以弄了个配置文件，把需要运行的代码放到配置中会自己加载代码运行。配置文件为`config.xml`内容如下:
+```xml
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <string name="debugCode">(import (test) (gles1) (glut) ) (load "/sdcard/org.evilbinary.chez/lib/apps/draw-point.ss") ;(imgui-test-hello-world) </string>
+</map>
+```
+2. `adb push config.xml /sdcard/org.evilbinary.chez/conf/config.xml`
+3. 打开scheme app就可以直接运行啦。
+
 ##高级篇
 ###使用外部库
 0. 手工添加Android.mk和源码文件到`scheme-lib/android/src`下命名为libhadd的文件夹。
@@ -77,9 +86,9 @@ LOCAL_CFLAGS += -g -Wall -DANDROID    -DINLINES -DGC_MACROS   -Wno-unused-parame
 LOCAL_LDLIBS += -ldl -llog -lz
 include $(BUILD_SHARED_LIBRARY)
 ```
-1. 执行`ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk`。
-2. 将编译后生成的库`android/src/libs/libadd.so` 同步到`/sdcard/org.evilbinary.chez/lib`目录下，这样能调用外部库了。
-3. 调用外`libadd.so`库和使用代码如下：
+1.执行`ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk`。
+2.将编译后生成的库`android/src/libs/libadd.so` 同步到`/sdcard/org.evilbinary.chez/lib`目录下，这样能调用外部库了。
+3.调用外`libadd.so`库和使用代码如下：
 ```scheme
    (import  (scheme) (utils libutil) )
    (load-lib "libadd.so")

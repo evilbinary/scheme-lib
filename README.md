@@ -90,10 +90,10 @@ include $(BUILD_SHARED_LIBRARY)
 2.将编译后生成的库`android/src/libs/libadd.so` 同步到`/sdcard/org.evilbinary.chez/lib`目录下，这样能调用外部库了。
 3.调用外`libadd.so`库和使用代码如下：
 ```scheme
-   (import  (scheme) (utils libutil) )
-   (load-lib "libadd.so")
-   (define-c-function int add (int int) )
-   (display (add 100 1234))
+(import  (scheme) (utils libutil) )
+(load-lib "libadd.so")
+(define-c-function int add (int int) )
+(display (add 100 1234))
 ```
 
 [1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/android/apk/scheme-release-1.1.apk   "scheme apk"

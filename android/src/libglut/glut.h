@@ -3,23 +3,10 @@
  * 邮箱:rootdebug@163.com 
  */
 
-#ifndef CHEZ_GLUT_H
-#define CHEZ_GLUT_H
+#ifndef GLUT_H
+#define GLUT_H
 
-
-#define ACTION_DOWN  0
-#define ACTION_UP   1
-#define  ACTION_MOVE 2
-
-#include "scheme.h"
-
-#define CALL0(who) Scall0(Stop_level_value(Sstring_to_symbol(who)))
-#define CALL1(who, arg) Scall1(Stop_level_value(Sstring_to_symbol(who)), arg)
-
-#define CALL2(who, arg0,arg1) Scall2(Stop_level_value(Sstring_to_symbol(who)), arg0,arg1)
-#define CALL3(who, arg0,arg1,arg2) Scall3(Stop_level_value(Sstring_to_symbol(who)), arg0,arg1,arg2)
-
-
+#include "scm.h"
 
 void glut_init();
 void glut_exit();
@@ -34,4 +21,4 @@ void glut_main_loop_run();
 
 
 
-#endif //CHEZ_GLUT_H
+#endif //GLUT_H

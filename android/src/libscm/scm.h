@@ -3,14 +3,14 @@
  * 邮箱:rootdebug@163.com 
  */
 
-#ifndef CHEZ_SCM_H_H
-#define CHEZ_SCM_H_H
+#ifndef SCM_H_H
+#define SCM_H_H
 
-#include <jni.h>
 
 typedef void *ptr;
 typedef int iptr;
 typedef unsigned int uptr;
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,11 +38,9 @@ extern "C" {
 
     iptr scm_fixnum_value(ptr p);
 
-    char *jstringTostring(JNIEnv *env, jstring jstr);
-
-    jstring strToJstring(JNIEnv *env, const char *pat);
+    iptr scm_fixnum(iptr p);
 
 #ifdef __cplusplus
 }
 #endif
-#endif //CHEZ_SCM_H_H
+#endif //SCM_H_H

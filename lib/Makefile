@@ -33,6 +33,7 @@ $(OS_NAME):
 	@echo link... $(OS_NAME)
 	@rm -rf libscm
 	@rm -rf libglut
+	@rm -rf boot
 	@ln -sf platform/$(OS_NAME)/libscm libscm
 	@ln -sf platform/$(OS_NAME)/libglut libglut
 	@ln -sf platform/$(OS_NAME)/boot/ boot
@@ -41,6 +42,7 @@ android:
 	@echo link... android
 	@rm -rf libscm
 	@rm -rf libglut
+	@rm -rf boot
 	@ln -sf platform/android/libscm libscm
 	@ln -sf platform/android/libglut libglut
 	@ln -sf platform/android/boot/ boot

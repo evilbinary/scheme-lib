@@ -24,6 +24,7 @@ $(TARGET):  $(SOFILES)
 $(SOFILES):
 	$(MAKE) -C lib
 clean:
-	$(MAKE) -C lib clean		
+	$(MAKE) -C lib clean
+	rm -rf bin/*.boot bin/scheme bin/*.so
 android:
 	$(MAKE) -C lib android	

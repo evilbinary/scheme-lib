@@ -1,5 +1,13 @@
 # scheme-lib
-scheme-lib 是一个scheme使用的库。目前支持android，其它平台在规划中。
+scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它平台在规划中。
+#linux、mac
+###安装编译
+1. 执行`make`命令就可以编译对应平台的文件在`bin`目录下。
+2. 进入`bin`目录，执行`source env.sh`，然后运行`scheme --script ../apps/hello.ss'就可以运行例子。
+###截图
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld2.png" width="350px" />
+
+
 #android平台
 ##新手入门
 ###环境安装
@@ -50,7 +58,7 @@ scheme-lib 是一个scheme使用的库。目前支持android，其它平台在�
 
 运行效果如下：
   
-<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/android/screenshot/helloworld.png" width="350px" />
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld.png" width="350px" />
 ###测试配置
 1. 在手机上输入运行代码可能不方便，所以弄了个配置文件，把需要运行的代码放到配置中会自己加载代码运行。配置文件为`config.xml`内容如下:
 
@@ -65,7 +73,7 @@ scheme-lib 是一个scheme使用的库。目前支持android，其它平台在�
 3. 打开scheme app就可以直接运行啦。
 
 ##高级篇
-###使用外部库
+###android使用外部库
 1. 手工添加Android.mk和源码文件到`scheme-lib/android/src`下命名为libhadd的文件夹。
    add.c 内容如下：
 	 ```c
@@ -89,7 +97,7 @@ scheme-lib 是一个scheme使用的库。目前支持android，其它平台在�
 	include $(BUILD_SHARED_LIBRARY)
 	```
 
-2. 执行`ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk`。
+2. 执行`make android`。
 3. 将编译后生成的库`android/src/libs/libadd.so` 同步到`/sdcard/org.evilbinary.chez/lib`目录下，这样能调用外部库了。
 4. 调用外`libadd.so`库和使用代码如下：
 	
@@ -100,4 +108,4 @@ scheme-lib 是一个scheme使用的库。目前支持android，其它平台在�
 	(display (add 100 1234))
 	```
 
-[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/android/apk/scheme-release-1.1.apk   "scheme apk"
+[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.1.apk   "scheme apk"

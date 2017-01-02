@@ -4,11 +4,13 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它�
 ###安装编译
 1. 执行`make`命令就可以编译对应平台的文件在`bin`目录下。
 2. 进入`bin`目录，执行`source env.sh`，然后运行`scheme --script ../apps/hello.ss'就可以运行例子。
+
 ###截图
+
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld2.png" width="350px" />
 
 
-#android平台
+#android
 ##新手入门
 ###环境安装
 1. 先安装[scheme-release-1.1.apk][1]

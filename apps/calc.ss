@@ -33,10 +33,30 @@
       (glut-display (lambda ()
               (imgui-render-start)
               ;(imgui-test)
-              (imgui-set-next-window-size (imgui-make-vec2 210.0 230.0) 1)
+              (imgui-set-next-window-size (imgui-make-vec2 210.0 280.0) 1)
               (imgui-begin "calculator" 0)
               (imgui-text "exp:")
               (imgui-separator)
+
+
+
+              (if (imgui-button "C" (imgui-make-vec2 40.0 40.0) )
+                1;
+              )
+              (imgui-same-line)
+              (if (imgui-button "+/-" (imgui-make-vec2 40.0 40.0) )
+                              1;
+               )
+               (imgui-same-line)
+               (if (imgui-button "%" (imgui-make-vec2 40.0 40.0) )
+                                             1;
+                              )
+               (imgui-same-line)
+               (if (imgui-button "÷" (imgui-make-vec2 40.0 40.0) )
+                                             1;
+                              )
+
+
               (if (imgui-button "7" (imgui-make-vec2 40.0 40.0) )
                 1;
               )
@@ -48,46 +68,56 @@
                (if (imgui-button "9" (imgui-make-vec2 40.0 40.0) )
                                              1;
                               )
-
-               (if (imgui-button "4" (imgui-make-vec2 40.0 40.0) )
-                                             1;
-                              )
                (imgui-same-line)
-               (if (imgui-button "5" (imgui-make-vec2 40.0 40.0) )
-                                             1;
-                              )
-               (imgui-same-line)
-               (if (imgui-button "6" (imgui-make-vec2 40.0 40.0) )
+               (if (imgui-button "x" (imgui-make-vec2 40.0 40.0) )
                                              1;
                               )
 
-               (if (imgui-button "1" (imgui-make-vec2 40.0 40.0) )
-                                             1;
-                              )
-               (imgui-same-line)
-               (if (imgui-button "2" (imgui-make-vec2 40.0 40.0) )
-                                             1;
-                              )
-               (imgui-same-line)
-               (if (imgui-button "3" (imgui-make-vec2 40.0 40.0) )
-                                             1;
-                              )
+                (if (imgui-button "4" (imgui-make-vec2 40.0 40.0) )
+                                              1;
+                               )
+                (imgui-same-line)
+                (if (imgui-button "5" (imgui-make-vec2 40.0 40.0) )
+                                              1;
+                               )
+                (imgui-same-line)
+                (if (imgui-button "6" (imgui-make-vec2 40.0 40.0) )
+                                              1;
+                               )
 
-               (if (imgui-button "0" (imgui-make-vec2 40.0 40.0) )
-                                                            1;
-                                             )
-               (imgui-same-line)
-               (if (imgui-button "." (imgui-make-vec2 40.0 40.0) )
-                                                            1;
-                                             )
-               (imgui-same-line)
-               (if (imgui-button "c" (imgui-make-vec2 40.0 40.0) )
-                                                            1;
-                                             )
-               (imgui-same-line)
-               (if (imgui-button "=" (imgui-make-vec2 40.0 40.0) )
-                                                            1;
-                                             )
+                 (imgui-same-line)
+                (if (imgui-button "-" (imgui-make-vec2 40.0 40.0) )
+                                              1;
+                               )
+
+                (if (imgui-button "1" (imgui-make-vec2 40.0 40.0) )
+                                              1;
+                               )
+                (imgui-same-line)
+                (if (imgui-button "2" (imgui-make-vec2 40.0 40.0) )
+                                              1;
+                               )
+                (imgui-same-line)
+                (if (imgui-button "3" (imgui-make-vec2 40.0 40.0) )
+                                              1;
+                               )
+                (imgui-same-line)
+                (if (imgui-button "+" (imgui-make-vec2 40.0 40.0) )
+                                              1;
+                               )
+
+                (if (imgui-button "0" (imgui-make-vec2 88.0 40.0) )
+                                                             1;
+                                              )
+                (imgui-same-line)
+                (if (imgui-button "." (imgui-make-vec2 40.0 40.0) )
+                                                             1;
+                                              )
+               
+                (imgui-same-line)
+                (if (imgui-button "=" (imgui-make-vec2 40.0 40.0) )
+                                                             1;
+                                              )
 
               (imgui-end)
               (imgui-render-end)

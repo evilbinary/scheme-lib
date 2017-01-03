@@ -143,7 +143,8 @@ CIMGUI_API void             imguiPopButtonRepeat();
 
 // Layout
 CIMGUI_API void             imguiSeparator();
-CIMGUI_API void             imguiSameLine(float pos_x, float spacing_w);
+CIMGUI_API void 			imguiSameLine2(float pos_x, float spacing_w);
+CIMGUI_API void             imguiSameLine();
 CIMGUI_API void             imguiNewLine();
 CIMGUI_API void             imguiSpacing();
 CIMGUI_API void             imguiDummy(CONST struct ImVec2* size);

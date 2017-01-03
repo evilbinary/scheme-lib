@@ -388,7 +388,10 @@ CIMGUI_API void imguiSeparator() {
     return ImGui::Separator();
 }
 
-CIMGUI_API void imguiSameLine(float pos_x, float spacing_w) {
+CIMGUI_API void imguiSameLine() {
+    return ImGui::SameLine();
+}
+CIMGUI_API void imguiSameLine2(float pos_x, float spacing_w) {
     return ImGui::SameLine(pos_x, spacing_w);
 }
 

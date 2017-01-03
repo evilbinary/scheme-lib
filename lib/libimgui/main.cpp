@@ -136,14 +136,85 @@ ImGuiTextEditCallback  imgui_make_text_edit_callback(ptr fobj){
     ImGuiTextEditCallback callback= a_lambda_func;
 
     return callback;
-//    return [](struct ImGuiTextEditCallbackData *data)->int {
-//        LOGI("dd========dd==============>");
-//        return -1;
-//    };
 }
-
 //scheme callback end
 
+//test begin
+
+#define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
+void imgui_test3(){
+    // if (ImGui::TreeNode("Basic Horizontal Layout"))
+    //     {
+            // ImGui::TextWrapped("(Use ImGui::SameLine() to keep adding items to the right of the preceding item)");
+
+            // // Text
+            // ImGui::Text("Two items: Hello"); ImGui::SameLine();
+            // ImGui::TextColored(ImVec4(1,1,0,1), "Sailor");
+
+            // // Adjust spacing
+            // ImGui::Text("More spacing: Hello"); ImGui::SameLine(0, 20);
+            // ImGui::TextColored(ImVec4(1,1,0,1), "Sailor");
+
+            // // Button
+            // //ImGui::AlignFirstTextHeightToWidgets();
+            // ImGui::Text("Normal buttons"); ImGui::SameLine();
+            ImGui::Button("1",ImVec2(30,30)); ImGui::SameLine();
+            ImGui::Button("2",ImVec2(30,30)); ImGui::SameLine();
+            ImGui::Button("3",ImVec2(30,30));
+
+            // Button
+            // ImGui::Text("Small buttons"); ImGui::SameLine();
+            // ImGui::SmallButton("Like this one"); ImGui::SameLine();
+            // ImGui::Text("can fit within a text block.");
+
+            // // Aligned to arbitrary position. Easy/cheap column.
+            // ImGui::Text("Aligned");
+            // ImGui::SameLine(150); ImGui::Text("x=150");
+            // ImGui::SameLine(300); ImGui::Text("x=300");
+            // ImGui::Text("Aligned");
+            // ImGui::SameLine(150); ImGui::SmallButton("x=150");
+            // ImGui::SameLine(300); ImGui::SmallButton("x=300");
+
+            // // Checkbox
+            // static bool c1=false,c2=false,c3=false,c4=false;
+            // ImGui::Checkbox("My", &c1); ImGui::SameLine();
+            // ImGui::Checkbox("Tailor", &c2); ImGui::SameLine();
+            // ImGui::Checkbox("Is", &c3); ImGui::SameLine();
+            // ImGui::Checkbox("Rich", &c4);
+
+            // // Various
+            // static float f0=1.0f, f1=2.0f, f2=3.0f;
+            // ImGui::PushItemWidth(80);
+            // const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD" };
+            // static int item = -1;
+            // ImGui::Combo("Combo", &item, items, IM_ARRAYSIZE(items)); ImGui::SameLine();
+            // ImGui::SliderFloat("X", &f0, 0.0f,5.0f); ImGui::SameLine();
+            // ImGui::SliderFloat("Y", &f1, 0.0f,5.0f); ImGui::SameLine();
+            // ImGui::SliderFloat("Z", &f2, 0.0f,5.0f);
+            // ImGui::PopItemWidth();
+
+            // ImGui::PushItemWidth(80);
+            // ImGui::Text("Lists:");
+            // static int selection[4] = { 0, 1, 2, 3 };
+            // for (int i = 0; i < 4; i++)
+            // {
+            //     if (i > 0) ImGui::SameLine();
+            //     ImGui::PushID(i);
+            //     ImGui::ListBox("", &selection[i], items, IM_ARRAYSIZE(items));
+            //     ImGui::PopID();
+            //     //if (ImGui::IsItemHovered()) ImGui::SetTooltip("ListBox %d hovered", i);
+            // }
+            // ImGui::PopItemWidth();
+
+            // // Dummy
+            // ImVec2 sz(30,30);
+            // ImGui::Button("A", sz); ImGui::SameLine();
+            // ImGui::Dummy(sz); ImGui::SameLine();
+            // ImGui::Button("B", sz);
+
+            //ImGui::TreePop();
+        // }
+}
 
 void imgui_test2( CONST char *label, char *buf, size_t buf_size,
                   ImGuiInputTextFlags f,
@@ -169,7 +240,6 @@ void imgui_test2( CONST char *label, char *buf, size_t buf_size,
     ImGui::Text("eeeee!");
 
 }
-
 
 void imgui_test() {
 
@@ -227,6 +297,8 @@ void imgui_test() {
         ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiSetCond_FirstUseEver);
         ImGui::ShowTestWindow(&show_test_window);
     }
+
+
 
     // Rendering
 //        int display_w, display_h;

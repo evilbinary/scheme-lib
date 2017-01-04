@@ -5,3 +5,8 @@
 *.scm~
 *.scm#*
 .#*.scm
+bin/*.so
+bin/scheme
+bin/*.boot
+lib/scheme/scheme
+

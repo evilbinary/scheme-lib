@@ -8,5 +8,9 @@
 bin/*.so
 bin/scheme
 bin/*.boot
+bin/imgui.ini
 lib/scheme/scheme
+
+ lib/libglut
+ lib/libscm
 

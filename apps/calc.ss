@@ -53,17 +53,16 @@
                     (imgui-text (format "exp: ~A" exp))
                     (imgui-separator)
 
-                    (if (imgui-button "C" (imgui-make-vec2 40.0 40.0) )
-                        ((set! exp "") (set! exp2 ""))
+                    (if (imgui-button "C" (imgui-make-vec2 88.0 40.0) )
+                        (set! exp "")
                         )
-                    (imgui-same-line)
-                    (if (imgui-button "+/-" (imgui-make-vec2 40.0 40.0) )
-                        (set! exp (string-append exp " + "))                        
-                        )
+                    ;;(imgui-same-line)
+                    ;;(if (imgui-button "+/-" (imgui-make-vec2 80.0 40.0) )
+                    ;;    (set! exp (string-append exp " + "))                        
+                    ;;    )
                     (imgui-same-line)
                     (if (imgui-button "%" (imgui-make-vec2 40.0 40.0) )
-                        ((set! exp (string-append exp " % ")) 
-                         (set! exp2 (string-append exp2 " remainder "))))
+                        (set! exp (string-append exp " % ")))
                     (imgui-same-line)
                     (if (imgui-button "÷" (imgui-make-vec2 40.0 40.0) )
                         (set! exp (string-append exp " / ")))
@@ -128,11 +127,10 @@
                     (imgui-same-line)
                     (if (imgui-button "=" (imgui-make-vec2 40.0 40.0) )
                         ;;(glut-log (infix-prefix (read (open-input-string exp))))
-                        (set! exp (string-append exp (format " = ~a"
-                                                             (eval
-                                                              (infix-prefix
-                                                               (read (open-input-string
-                                                                      (string-append (string-append "(" exp) ")"))))))))
+                        (set! exp (string-append exp (format " = ~a" (eval
+                                                                      (infix-prefix
+                                                                       (read (open-input-string
+                                                                              (string-append (string-append "(" exp) ")"))))))))
                         )
 
                     (imgui-end)

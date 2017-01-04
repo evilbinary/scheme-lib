@@ -18,7 +18,7 @@
 
 
 (define (app-calc)
-  (let ((exp "") (exp2 ""))
+  (let ((exp "") (clear #t))
     (glut-init)
     (imgui-init)
                                         ;(android)
@@ -55,6 +55,7 @@
 
                     (if (imgui-button "C" (imgui-make-vec2 88.0 40.0) )
                         (set! exp "")
+                        (set! clear #t) 
                         )
                     ;;(imgui-same-line)
                     ;;(if (imgui-button "+/-" (imgui-make-vec2 80.0 40.0) )
@@ -125,12 +126,15 @@
                         )
                     
                     (imgui-same-line)
-                    (if (imgui-button "=" (imgui-make-vec2 40.0 40.0) )
+                    (if (and  (imgui-button "=" (imgui-make-vec2 40.0 40.0) ) clear (> (string-length exp) 0) )
                         ;;(glut-log (infix-prefix (read (open-input-string exp))))
-                        (set! exp (string-append exp (format " = ~a" (eval
-                                                                      (infix-prefix
-                                                                       (read (open-input-string
-                                                                              (string-append (string-append "(" exp) ")"))))))))
+                        (begin 
+                            (set! exp (string-append exp (format " = ~a" (eval
+                                                                          (infix-prefix
+                                                                           (read (open-input-string
+                                                                                  (string-append (string-append "(" exp) ")")))))))) 
+                            (set! clear #f) )
+                        
                         )
 
                     (imgui-end)

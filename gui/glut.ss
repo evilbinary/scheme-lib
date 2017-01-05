@@ -27,6 +27,9 @@
             glut-hide-soft-input
             glut-event-get
 
+            glut-init-window-size
+            glut-init-window-position 
+
             glut-init-callback
             glut-on-key-event-callback
             glut-on-touch-event-callback
@@ -45,6 +48,13 @@
 
     (define lib (load-lib lib-name))
 
+  (define-syntax define-glut
+                    (syntax-rules ()
+                      ((_ ret name args)
+                       (define name
+                         (foreign-procedure (lower-camel-case (string-split (symbol->string 'name) #\- )) args ret)))))
+
+    (define glut-init-proc '())
 
     (define glut-display-proc '())
     (define glut-reshape-proc '())
@@ -53,9 +63,21 @@
     (define glut-motion-event-proc '())
     (define glut-mouse-event-proc '())
 
-    (define glut-init
+    (define glut-init-op  
       (foreign-procedure "glut_init" () void))
+
+    (define (glut-init . args)
+        (if (= 0 (length args) )
+          (glut-init-op)
+          (if (procedure? (car args))
+            (begin
+              (set! glut-init-proc (car args) )
+              (glut-init-op)
+              )
+            )))
     
+
+
     (define glut-main-loop
       (foreign-procedure "glut_main_loop" () void))
 
@@ -75,6 +97,11 @@
     (define glut-set-soft-input-mode
                       (foreign-procedure "glut_set_soft_input_mode" (int int) void))
 
+    ;;c function
+    (define-glut void glut-init-window-size (int int ) )
+    (define-glut void glut-init-window-position (int int ) )
+
+
     (define is-soft-input-show #f)
     (define glut-show-soft-input (lambda ()
         (if (not is-soft-input-show)
@@ -90,11 +117,13 @@
             ))
 
     (define (glut-init-callback)
-      1
+      (if (procedure? glut-init-proc)
+              (glut-init-proc)
+              )
     )
 
     (define (glut-on-key-event-callback . args)
-        ;(glut-log (format "on-key-event callback arg==~a ~a\n" (length args) (car args)   ) )
+        (glut-log (format "on-key-event callback arg==~a ~a\n" (length args) (car args)   ) )
           (if (procedure? glut-key-event-proc)
               (if (= 2 (length args) )
                 (glut-key-event-proc (car args) (cadr args))

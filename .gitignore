@@ -11,6 +11,6 @@ bin/*.boot
 bin/imgui.ini
 lib/scheme/scheme
 
- lib/libglut
- lib/libscm
+lib/libglut
+lib/libscm
 

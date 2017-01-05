@@ -8,6 +8,8 @@
          (export
             load-lib
             define-c-function
+            lower-camel-case
+            string-split
          )
          (import  (scheme))
           (define (string-split str separator)
@@ -44,4 +46,17 @@
                       ((_ ret name args)
                        (define name
                          (foreign-procedure (string-replace! #\- #\_ (symbol->string 'name) ) args ret)))))
+
+         (define (lower-camel-case l)
+           (let loop
+             ((x l) (s "" ) (i 0) )
+              (if (null? x)
+                  s
+                  (begin
+                    (if (> i 0)
+                        (string-set!  (car x) 0 (char-upcase (string-ref (car x) 0))))
+                    (loop (cdr x) (string-append s (car x)) (+ i 1))))))
+
+
          )
+    

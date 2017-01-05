@@ -26,6 +26,10 @@
             imgui-pvec2
             imgui-uvec2
 
+            imgui-load-style 
+            imgui-save-style 
+            imgui-reset-style
+
             imgui-get-io
             imgui-text
             imgui-new-frame
@@ -45,6 +49,8 @@
             imgui-is-mouse-clicked
             imgui-is-mouse-down
             imgui-image
+            imgui-tree-node
+            imgui-tree-pop
 
             ;consts
             imgui-set-cond-always
@@ -60,24 +66,7 @@
             imgui-separator
           )
 
-         (import  (scheme) (utils libutil) )
-         (define (split str)
-               (let f ((i 0) (n (string-length str)))
-                 (cond
-                   ((= i n) (list (substring str 0 n) ))
-                   ((char=? (string-ref str i) #\-)
-                      (cons (substring str 0 i)
-                            (split (substring str (+ i 1) n))))
-                   (else (f (+ i 1) n)))))
-         (define (lower-camel-case l)
-           (let loop
-             ((x l) (s "" ) (i 0) )
-              (if (null? x)
-                  s
-                  (begin
-                    (if (> i 0)
-                        (string-set!  (car x) 0 (char-upcase (string-ref (car x) 0))))
-                    (loop (cdr x) (string-append s (car x)) (+ i 1))))))
+        (import  (scheme) (utils libutil) )
 
         (define lib-name
            (case (machine-type)
@@ -92,7 +81,7 @@
                     (syntax-rules ()
                       ((_ ret name args)
                        (define name
-                         (foreign-procedure (lower-camel-case (split (symbol->string 'name) )) args ret)))))
+                         (foreign-procedure (lower-camel-case (string-split (symbol->string 'name) #\- )) args ret)))))
 
 
          (define-ftype imgui-vec2 (struct [x float] [y float]))
@@ -121,6 +110,10 @@
         (define-c-function void* imgui-pvec2 (float float) )
         (define-c-function void imgui-uvec2 (void*) )
 
+        ;;样式加载和修改
+        (define-c-function boolean imgui-load-style (string) )
+        (define-c-function boolean imgui-save-style (string) )
+        (define-c-function boolean imgui-reset-style (int) )
 
          (define-imgui void* imgui-get-io () )
          (define-imgui void imgui-render () )
@@ -135,6 +128,9 @@
          (define-imgui boolean imgui-button (string void*) )
          (define-imgui boolean imgui-small-button (string void*) )
          (define-imgui boolean imgui-checkbox (string u8*) )
+         (define-imgui boolean imgui-tree-node (string) )
+         (define-imgui void imgui-tree-pop () )
+
 
          (define-imgui boolean imgui-input-text (string string int int void* void*))
          (define-imgui boolean imgui-input-text-multiline (string string int int void* void* void* ) )

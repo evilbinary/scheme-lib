@@ -15,11 +15,15 @@ OBJS = main.o \
     cimgui/drawList.o \
     cimgui/fontAtlas.o \
     imgui_impl_glb.o \
+    addons/imguistyleserializer/imguistyleserializer.o \
+
     #test.o
 
 LIBS =-L../libscm -lscm 
 CFLAGS = -Wall -Wformat 
-CXXFLAGS= -Wall -Wformat -Iimgui -I../libscm -g -std=c++11 -DLOG
+CXXFLAGS= -Wall -Wformat -Iimgui -I../libscm -g -std=c++11 -DLOG \
+	-Iaddons/ \
+	-Iaddons/imguistyleserializer 
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Linux) #LINUX

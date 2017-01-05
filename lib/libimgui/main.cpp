@@ -5,6 +5,7 @@
 #include "cimgui/cimgui.h"
 #include "scm.h"
 #include <functional>
+#include "imgui_user.h"
 
 
 #ifdef __cplusplus
@@ -139,8 +140,21 @@ ImGuiTextEditCallback  imgui_make_text_edit_callback(ptr fobj){
 }
 //scheme callback end
 
-//test begin
 
+//addons interface
+bool imgui_load_style(const char* style){
+    return ImGui::LoadStyle(style,ImGui::GetStyle());
+}
+bool imgui_save_style(const char* style){
+    return ImGui::SaveStyle(style,ImGui::GetStyle());
+}
+bool imgui_reset_style(int stylenum){
+    return ImGui::ResetStyle(stylenum,ImGui::GetStyle());
+}
+
+
+
+//test begin
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 void imgui_test3(){
     // if (ImGui::TreeNode("Basic Horizontal Layout"))
@@ -300,15 +314,17 @@ void imgui_test() {
 
 
 
-    // Rendering
+// Rendering
 //        int display_w, display_h;
 //        glfwGetFramebufferSize(window, &display_w, &display_h);
 //        glViewport(0, 0, display_w, display_h);
-    //glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    //glClear(GL_COLOR_BUFFER_BIT);
-    //ImGui::Render();
+//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+//glClear(GL_COLOR_BUFFER_BIT);
+//ImGui::Render();
 
 }
+//test end
+
 
 
 #ifdef __cplusplus

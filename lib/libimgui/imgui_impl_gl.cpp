@@ -46,21 +46,24 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData *draw_data) {
     // We are using the OpenGL fixed pipeline to make the example code simpler to read!
     // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, vertex/texcoord/color pointers.
     // Backup GL state
-    GLint last_program; glGetIntegerv(GL_CURRENT_PROGRAM, &last_program);
+//    GLint last_program; glGetIntegerv(GL_CURRENT_PROGRAM, &last_program);
     GLint last_texture; glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-    GLint last_active_texture; glGetIntegerv(GL_ACTIVE_TEXTURE, &last_active_texture);
-    GLint last_array_buffer; glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &last_array_buffer);
-    GLint last_element_array_buffer; glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &last_element_array_buffer);
+    //GLint last_active_texture; glGetIntegerv(GL_ACTIVE_TEXTURE, &last_active_texture);
+
+//    GLint last_array_buffer; glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &last_array_buffer);
+//    GLint last_element_array_buffer; glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &last_element_array_buffer);
     //GLint last_vertex_array; glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &last_vertex_array);
-    GLint last_blend_src; glGetIntegerv(GL_BLEND_SRC_ALPHA, &last_blend_src);
-    GLint last_blend_dst; glGetIntegerv(GL_BLEND_DST_ALPHA, &last_blend_dst);
-    GLint last_blend_equation_rgb; glGetIntegerv(GL_BLEND_EQUATION_RGB, &last_blend_equation_rgb);
-    GLint last_blend_equation_alpha; glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &last_blend_equation_alpha);
+//    GLint last_blend_src; glGetIntegerv(GL_BLEND_SRC_ALPHA, &last_blend_src);
+//    GLint last_blend_dst; glGetIntegerv(GL_BLEND_DST_ALPHA, &last_blend_dst);
+//    GLint last_blend_equation_rgb; glGetIntegerv(GL_BLEND_EQUATION_RGB, &last_blend_equation_rgb);
+//    GLint last_blend_equation_alpha; glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &last_blend_equation_alpha);
     GLint last_viewport[4]; glGetIntegerv(GL_VIEWPORT, last_viewport);
-    GLboolean last_enable_blend = glIsEnabled(GL_BLEND);
-    GLboolean last_enable_cull_face = glIsEnabled(GL_CULL_FACE);
-    GLboolean last_enable_depth_test = glIsEnabled(GL_DEPTH_TEST);
-    GLboolean last_enable_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
+//    GLboolean last_enable_blend = glIsEnabled(GL_BLEND);
+//    GLboolean last_enable_cull_face = glIsEnabled(GL_CULL_FACE);
+//    GLboolean last_enable_depth_test = glIsEnabled(GL_DEPTH_TEST);
+//    GLboolean last_enable_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
+    GLint last_scissor_box[4];
+    glGetIntegerv(GL_SCISSOR_BOX, last_scissor_box);
 
     // glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
     glEnable(GL_BLEND);
@@ -77,19 +80,19 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData *draw_data) {
     //glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
 
     // Setup viewport, orthographic projection matrix
-    glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
+    glViewport(0, 0, (GLsizei) fb_width, (GLsizei) fb_height);
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
+
     glOrthof(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
 
     // Render command lists
-    #define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
-    for (int n = 0; n < draw_data->CmdListsCount; n++)
-    {
+#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
+    for (int n = 0; n < draw_data->CmdListsCount; n++){
         const ImDrawList* cmd_list = draw_data->CmdLists[n];
         const unsigned char* vtx_buffer = (const unsigned char*)&cmd_list->VtxBuffer.front();
         const ImDrawIdx* idx_buffer = &cmd_list->IdxBuffer.front();
@@ -97,15 +100,12 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData *draw_data) {
         glTexCoordPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)(vtx_buffer + OFFSETOF(ImDrawVert, uv)));
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(ImDrawVert), (void*)(vtx_buffer + OFFSETOF(ImDrawVert, col)));
 
-        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.size(); cmd_i++)
-        {
+        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.size(); cmd_i++){
             const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
-            if (pcmd->UserCallback)
-            {
+            if (pcmd->UserCallback){
                 pcmd->UserCallback(cmd_list, pcmd);
             }
-            else
-            {
+            else{
                 glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
                 glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
                 glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer);
@@ -127,21 +127,25 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData *draw_data) {
     //glPopAttrib();
 
     // Restore modified GL state
-    glUseProgram(last_program);
-    glActiveTexture(last_active_texture);
-    glBindTexture(GL_TEXTURE_2D, last_texture);
+//    glUseProgram(last_program);
+    //glActiveTexture(last_active_texture);
+    //glBindTexture(GL_TEXTURE_2D, last_texture);
     // glBindVertexArray(last_vertex_array);
-    glBindBuffer(GL_ARRAY_BUFFER, last_array_buffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, last_element_array_buffer);
-    glBlendEquationSeparate(last_blend_equation_rgb, last_blend_equation_alpha);
-    glBlendFunc(last_blend_src, last_blend_dst);
-    if (last_enable_blend) glEnable(GL_BLEND); else glDisable(GL_BLEND);
-    if (last_enable_cull_face) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
-    if (last_enable_depth_test) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
-    if (last_enable_scissor_test) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
+
+
+//    glBindBuffer(GL_ARRAY_BUFFER, last_array_buffer);
+//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, last_element_array_buffer);
+
+//    glBlendEquationSeparate(last_blend_equation_rgb, last_blend_equation_alpha);
+//    glBlendFunc(last_blend_src, last_blend_dst);
+//    if (last_enable_blend) glEnable(GL_BLEND); else glDisable(GL_BLEND);
+//    if (last_enable_cull_face) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
+//    if (last_enable_depth_test) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
+//    if (last_enable_scissor_test) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
 
     glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
-
+ glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei) last_scissor_box[2],
+              (GLsizei) last_scissor_box[3]);
 }
 #endif
 

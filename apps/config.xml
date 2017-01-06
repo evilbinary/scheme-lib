@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <string name="debugCode">(import (scheme)(glut)(gles1) (imgui)) (load "/sdcard/org.evilbinary.chez/lib/apps/glut-demo.ss") </string>
+</map>

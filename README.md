@@ -15,7 +15,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它�
 #android
 ##新手入门
 ###环境安装
-1. 先安装[scheme-release-1.1.apk][1]
+1. 先安装[scheme-release-1.2.apk][1]
 2. 将手机连接电脑，开启adb调试模式（需要安装adb命令,不会用goolge）。进入`cd scheme-lib/android/src/packages`，在shell下执行`python sync.py`命令,这样每次修改后，会自动同步packages下的代码到手机`/sdcard/org.evilbinary.chez/lib`目录下面，这样方便运行了。
 3. 在run界面里面输入测试代码。比如:
  
@@ -112,4 +112,4 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它�
 	(display (add 100 1234))
 	```
 
-[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.1.apk   "scheme apk"
+[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.2.apk   "scheme apk"

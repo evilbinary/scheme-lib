@@ -21,7 +21,7 @@
   (let ((exp "") (clear #t))
     (glut-init)
     (imgui-init)
-    (imgui-reset-style 7)
+    (imgui-reset-style 11)
                                     ;(android)
                                         ;(imgui-scale (* 1.5 (android-get-density)) (* 1.5 (android-get-density)))
     (glut-touch-event (lambda (type x y)

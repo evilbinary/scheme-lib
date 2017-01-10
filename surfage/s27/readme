@@ -1,0 +1,67 @@
+REFERENCE IMPLEMENTATIONS FOR SRFI-27 "Sources of Random Bits"
+==============================================================
+
+Sebastian.Egner@philips.com, 10-Apr-2002.
+
+Files
+-----
+
+  readme         - this file
+  mrg32k3a.scm   - generic parts of P. L' Ecuyer's MRG32k3a PRGN
+  mrg32k3a-a.scm - core generator in Scheme integers
+  mrg32k3a-b.c   - core generator in C doubles for Scheme 48
+  mrg32k3a-c.scm - core generator in Gambit [Scheme] flonums
+  srfi-27-a.scm  - Scheme 48 package definition for Scheme-only impl.
+  srfi-27-b.scm  - Scheme 48 package definition for C/Scheme impl.
+  srfi-27-c.scm  - Gambit definition for Scheme-only impl.
+  conftest.scm   - confidence tests for the implementation
+
+Implementations
+---------------
+
+The implementation has been factored into three parts.
+One part implements the core generator, one part provides
+the more generic functionality as specified in the SRFI,
+and one part combines the parts and provides the interface
+as specified in the SRFI.
+
+a) A Scheme-only implementation for Scheme 48 0.57:
+     srfi-27-a.scm
+     mrg32k3a-a.scm
+     mrg32k3a.scm
+
+   This implementation uses 54-bit Scheme integers for all
+   arithmetics of the generator. The result are Scheme integers
+   and inexact Scheme numbers when floating point values are
+   requested. 
+
+   The implementation is slow but tries to stay away from
+   unportable features as much as possible.
+
+b) An implementation in Scheme 48 0.57 and ANSI-C:
+     srfi-27-b.scm
+     mrg32k3a-b.scm
+     mrg32k3a.scm
+
+   This is a more realistic implementation using C's (double)
+   datatype for the core generator and 54-bit Scheme integers
+   for the more infrequent operations on the state like the
+   random-source-pseudo-randomize! operation.
+
+   This implementation is meant as an example for a realistic
+   native code implementation of the SRFI. Performance is good.
+
+c) A Scheme-only implementation for Gambit 3.0:
+     srfi-27-c.scm
+     mrg32k3a-c.scm
+     mrg32k3a.scm
+
+   This implementation uses Gambit's 64-bit flonums. It is
+   entirely written in Scheme but uses a few special features
+   of the Gambit system to tell the compiler.
+
+   This implementation is meant as an example for a realistic
+   Scheme implementation using flonums in Scheme and no C-code.
+   Performance is good when the code is used in compiled form;
+   the implementation has been optimized by Brad Lucier. This
+   has resulted in a subtantial performance gain.

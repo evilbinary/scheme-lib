@@ -14,6 +14,7 @@
             glut-mouse-event
             glut-key-event
             glut-reshape
+            glut-idle
 
             glut-vector
             glut-unvector
@@ -28,7 +29,9 @@
             glut-event-get
 
             glut-init-window-size
-            glut-init-window-position 
+            glut-init-window-position
+            glut-set-window-title 
+
 
             glut-init-callback
             glut-on-key-event-callback
@@ -37,8 +40,13 @@
             glut-on-reshape-callback
             glut-on-mouse-event-callback
             glut-on-motion-event-callback
+            glut-on-idle-callback
+
             )
     (import (scheme) (utils libutil) )
+    ;;simulator glut c function
+    
+    ;;begin glut function
     (define lib-name
      (case (machine-type)
        ((arm32le) "libglut.so")
@@ -55,13 +63,14 @@
                          (foreign-procedure (lower-camel-case (string-split (symbol->string 'name) #\- )) args ret)))))
 
     (define glut-init-proc '())
-
+    (define glut-idle-proc '())
     (define glut-display-proc '())
     (define glut-reshape-proc '())
     (define glut-touch-event-proc '())
     (define glut-key-event-proc '())
     (define glut-motion-event-proc '())
     (define glut-mouse-event-proc '())
+
 
     (define glut-init-op  
       (foreign-procedure "glut_init" () void))
@@ -100,6 +109,8 @@
     ;;c function
     (define-glut void glut-init-window-size (int int ) )
     (define-glut void glut-init-window-position (int int ) )
+    (define-glut void glut-set-window-title (string) )
+
 
 
     (define is-soft-input-show #f)
@@ -167,6 +178,11 @@
       (if (procedure? glut-reshape-proc)
           (glut-reshape-proc w h))
       )
+     (define (glut-on-idle-callback)
+      ;(display "glut-on-idle-callback")
+      (if (procedure? glut-idle-proc)
+          (glut-idle-proc))
+      )
     
     (define (glut-event proc)
       ;(display "glut-event")
@@ -194,6 +210,9 @@
 
     (define (glut-reshape proc)
       (set! glut-reshape-proc proc))
+
+    (define (glut-idle proc)
+      (set! glut-idle-proc proc))
 
     (define (glut-event-get event name)
         (cond

@@ -1,0 +1,74 @@
+
+* define-record-type++
+
+[[file:define-record-type.sls][(dharmalab records define-record-type)]]
+  
+Let's define a simple point type:
+
+: (define-record-type++ point
+:   (fields x y))
+
+Define an instance:
+
+: (define p0 (make-point 10 20))
+
+Declare that 'p0' is a point:
+
+: (is-point p0)
+
+Access the fields:
+
+: > p0.x
+: 10
+
+: > p0.y
+: 20
+
+Let's define a procedure 'point-add' which utilizes 'is-point':
+
+#+BEGIN_SRC scheme
+(define (point-add a b)
+  (is-point a)
+  (is-point b)
+  (make-point (+ a.x b.x)
+              (+ a.y b.y)))
+#+END_SRC
+
+** mutable fields
+
+What if you want mutable fields?
+
+: (define-record-type++ point
+:   (fields (mutable x)
+:           (mutable y)))
+
+Setting a field:
+
+: (p0.x! 100)
+
+** methods
+
+There's also a way to declare 'methods' on a record type. Suppose we
+want to have a method 'neg' which negates a point. Define the record
+type:
+
+#+BEGIN_SRC scheme
+(define-record-type++ point
+  (fields x y)
+  (methods (neg point::neg)))
+#+END_SRC
+
+Then define the procedure which implements the method:
+
+#+BEGIN_SRC scheme
+(define (point::neg p)
+  (is-point p)
+  (make-point (- p0.x)
+              (- p0.y)))
+#+END_SRC
+
+Using the method:
+
+: > (p0.neg)
+: #[point -10 -20]
+

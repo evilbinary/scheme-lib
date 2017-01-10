@@ -8,9 +8,9 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它�
 
 ###截图
 
-<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld2.png" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/showimage.png" width="400px" />
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld2.png" width="400px" /> <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/showimage.png" width="400px" />
 
-<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/draw-imge.png" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/box2d-demo.png" width="400px" />
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/draw-image.png" width="400px" /> <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/box2d-demo.png" width="400px" />
 
 #android
 ##新手入门

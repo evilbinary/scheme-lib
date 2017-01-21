@@ -10,8 +10,11 @@
             define-c-function
             lower-camel-case
             string-split
+            string-replace!
          )
          (import  (scheme))
+         (define loaded-libs (make-hashtable equal-hash equal?))
+
           (define (string-split str separator)
                 (let f ((i 0) (n (string-length str)))
                   (cond
@@ -24,8 +27,12 @@
             (let  loop ((libs (map car (library-directories)) ))
               (if (pair? libs)
                   (begin
-                    (if (file-exists? (string-append (car libs) "/" name))
-                        (load-shared-object (string-append (car libs) "/" name)) )
+                    (if (and (file-exists? (string-append (car libs) "/" name)) 
+                              (eq? "" (hashtable-ref loaded-libs (string-append (car libs) "/" name) "") ) )
+                      (begin 
+                        ;(display (format "load-lib ~a\n" (string-append (car libs) "/" name)) )
+                        (load-shared-object (string-append (car libs) "/" name)) 
+                        (hashtable-set! loaded-libs (string-append (car libs) "/" name) name )))
                   (loop (cdr libs))))) )
          (define (string-replace! old new str)
                     (let loop

@@ -2,7 +2,7 @@
 ;作者:evilbinary on 11/19/16.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(library (android)
+(library (gui android)
     (export
         android-get-width
         android-get-height

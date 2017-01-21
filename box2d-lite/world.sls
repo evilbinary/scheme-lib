@@ -17,6 +17,7 @@
   (export make-world is-world import-world
 	  world-bodies
 	  world-joints
+	  world-arbiters
 	  world::step)
 
   (import (except (rnrs) remove)
@@ -44,6 +45,7 @@
     
     (methods (add-body  world::add-body)
 	     (add-joint world::add-joint)
+	     (remove-body world::remove-body)
 	     (clear     world::clear)
 	     (step      world::step)))
 
@@ -68,6 +70,24 @@
     (w.arbiters! '()))
 
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ (define (world::remove-body w body)
+ 	(is-world w)
+ 	(w.arbiters!
+	  (remove
+	   (lambda (arbiter)
+	     (is-arbiter arbiter)
+	      (or (eq? body arbiter.body-1)
+	 	      (eq? body arbiter.body-2))
+	     )
+	   w.arbiters))
+	(w.bodies!
+	  (remove
+	   (lambda (b)
+	     (is-body b)
+	      (eq? body b))
+	   w.bodies))
+ )
 
   (define (world::broad-phase w)
     (import-world w)

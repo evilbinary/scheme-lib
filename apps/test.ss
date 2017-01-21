@@ -12,7 +12,7 @@
           gl-test-demo3
           imgui-test-hello-world
           )
-         (import  (scheme) (gles1)  (glut) (imgui) (android)  )
+         (import  (scheme) (gui gles1)  (gui glut) (gui imgui) (gui android)  )
          
          (define PI 3.1415)
          (define (glutPrespective fovy aspect zNear zFar)

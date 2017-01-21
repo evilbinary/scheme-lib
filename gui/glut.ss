@@ -3,7 +3,7 @@
 ;作者:evilbinary on 11/19/16.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(library (glut)
+(library (gui glut)
     (export glut-init
             glut-main-loop
             glut-exit
@@ -134,7 +134,7 @@
     )
 
     (define (glut-on-key-event-callback . args)
-        (glut-log (format "on-key-event callback arg==~a ~a\n" (length args) (car args)   ) )
+        ;(glut-log (format "on-key-event callback arg==~a ~a\n" (length args) (car args)   ) )
           (if (procedure? glut-key-event-proc)
               (if (= 2 (length args) )
                 (glut-key-event-proc (car args) (cadr args))

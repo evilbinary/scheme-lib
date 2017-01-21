@@ -3,7 +3,7 @@
 ;作者:evilbinary on 12/24/16.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(import  (scheme) (glut) (gles1))
+(import  (scheme) (gui glut) (gui gles1))
 ;opengles1.x 例子
 (define (gl-demo)
            (define  rotation 0.0)

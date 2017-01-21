@@ -2,7 +2,7 @@
 ;作者:evilbinary on 11/19/16.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(import  (scheme) (gles1) (glut) (imgui)  )
+(import  (scheme) (gui gles1) (gui glut) (gui imgui)  )
 (define (imgui-test-hello-world)
       (glut-init)
       (imgui-init)
@@ -32,7 +32,7 @@
 
       (glut-display (lambda ()
               (imgui-render-start)
-              ;(imgui-test)
+              (imgui-test)
               (imgui-set-next-window-size (imgui-make-vec2 200.0 140.0) 0)
               (imgui-begin "evilbinary" 0)
               (imgui-text "hello,world!")

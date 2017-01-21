@@ -25,7 +25,7 @@
          gl-clear-color-rgba
          )
 
- (import (rnrs) (gles1) (glut) (agave color rgba))
+ (import (rnrs) (gui gles1) (gui glut) (agave color rgba))
 
  (define (initialize-glut)
    ;(glut-init)

@@ -15,8 +15,8 @@
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (import (rnrs)
-	(gles1)
-	(glut)
+	(gui gles1)
+	(gui glut)
         (dharmalab misc limit-call-rate)
 	(agave glamour misc)
 	(agave glamour window)

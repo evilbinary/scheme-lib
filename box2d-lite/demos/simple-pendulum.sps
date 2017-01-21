@@ -15,8 +15,8 @@
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (import (rnrs)
-	(gl)
-	(glut)
+	(gui gles1)
+	(gui glut)
         (dharmalab misc limit-call-rate)
 	(agave glamour misc)
 	(agave glamour window)
@@ -36,9 +36,14 @@
 	(title "Box2d Lite - Simple Pendulum")
 	(reshape (width height)
 		 (lambda (w h)
+
+
 		   (glMatrixMode GL_PROJECTION)
 		   (glLoadIdentity)
-		   (glOrtho -20.0 20.0 -20.0 20.0 -1000.0 1000.0))))
+		    (glScalef 0.1 0.1 1.0)
+		           (glTranslatef 0.0 -6.0 0.0)
+
+		   (glOrthof -20.0 20.0 -20.0 20.0 -1000.0 1000.0))))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -114,14 +119,19 @@
       (is-vec v4)
 
       (if (eq? body bomb)
-	  (glColor3f 0.4 0.9 0.4)
-	  (glColor3f 0.8 0.8 0.9))
+	  (glColor4f 0.4 0.9 0.4 1.0)
+	  (glColor4f 0.8 0.8 0.9 1.0))
 
-      (gl-begin GL_LINE_LOOP
-	(glVertex2d v1.x v1.y)
-	(glVertex2d v2.x v2.y)
-	(glVertex2d v3.x v3.y)
-	(glVertex2d v4.x v4.y)))))
+      (let ((p (glut-vector 'float (vector v1.x v1.y
+                         v2.x v2.y
+                         v3.x v3.y
+                         v4.x v4.y)) ))
+       (glVertexPointer 2  GL_FLOAT  0  p);
+       (glEnableClientState GL_VERTEX_ARRAY);
+       (glDrawArrays GL_LINE_LOOP  0 4);
+       (glDisableClientState GL_VERTEX_ARRAY)
+       (glut-unvector p) )
+      )))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -147,14 +157,19 @@
 	(is-vec p1)
 	(is-vec p2)
 
-	(glColor3f 0.5 0.5 0.8)
+	(glColor4f 0.5 0.5 0.8 1.0)
 
-	(gl-begin GL_LINES
-
-	  (glVertex2d x1.x x1.y)
-	  (glVertex2d p1.x p1.y)
-	  (glVertex2d x2.x x2.y)
-	  (glVertex2d p2.x p2.y))))))
+	(let ((p (glut-vector 'float (vector 
+                          x1.x x1.y
+                          p1.x p1.y
+                          x2.x x2.y
+                          p2.x p2.y)) ))
+        (glVertexPointer 2  GL_FLOAT  0  p);
+        (glEnableClientState GL_VERTEX_ARRAY);
+        (glDrawArrays GL_LINES  0 4);
+        (glDisableClientState GL_VERTEX_ARRAY)
+        (glut-unvector p) )
+	))))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -219,14 +234,14 @@
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(glutIdleFunc (limit-call-rate 60 (glutPostRedisplay)))
+;(glutIdleFunc (limit-call-rate 60 (glutPostRedisplay)))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(glutKeyboardFunc
- (lambda (key x y)
-   (case (integer->char key)
-     ((#\space) (launch-bomb)))))
+; (glutKeyboardFunc
+ ; (lambda (key x y)
+   ; (case (integer->char key)
+     ; ((#\space) (launch-bomb)))))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -234,4 +249,4 @@
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(glutMainLoop)
+(glut-main-loop)

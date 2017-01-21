@@ -16,7 +16,7 @@
   (agave glamour window)
   (export window invert-y)
 
-  (import (rnrs) (gles1) (glut))
+  (import (rnrs) (gui gles1) (gui glut))
 
 
  (define-syntax window

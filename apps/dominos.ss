@@ -15,8 +15,8 @@
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (import (rnrs)
-	(gles1)
-	(glut)
+	(gui gles1)
+	(gui glut)
   (dharmalab misc limit-call-rate)
 	(agave glamour misc)
 	(agave glamour window)
@@ -33,7 +33,7 @@
 (initialize-glut)
 
 (window
-  (size 600 600)
+  (size 800 600)
 	(title "Box2d Lite - Dominos")
 	(reshape (width height)
 		 (lambda (w h)

@@ -39,7 +39,9 @@
 
   (import (rnrs)
 	  (surfage s27 random-bits)
-	  (gles1)
+	  (gui gles1)
+	  (gui glut)
+
 	  (agave glamour misc)
 	  (dharmalab misc is-vector)
 	  (box2d-lite util define-record-type)
@@ -68,7 +70,7 @@
 
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  (define (create-arbiter b1 b2)
+(define (create-arbiter b1 b2)
 
     (let ((arb (make-arbiter (vector (create-contact)
 				     (create-contact))
@@ -86,28 +88,49 @@
 
       (friction! (sqrt (* body-1.friction body-2.friction)))
 
-      (glPointSize 4.0)
+  ;     (glPointSize 4.0)
 
-      (glColor4f 1.0 0.0 0.0 0.0)
+  ;     (glColor4f 1.0 0.0 0.0 1.0)
 
-      (gl-begin GL_POINTS
+  ;     (let* ((v (list ))
+  ;     		 (t '())
+  ;     		 (number num-contacts)
+  ;     		)
 
-	(do ((i 0 (+ i 1)))
-	    ((>= i num-contacts))
+		; (do ((i 0 (+ i 1)))
+		;     ((>= i num-contacts))
 
-	  (let ()
+		;   (let ()
 
-	    (is-vector  contacts i)
-	    (is-contact contacts.i)
-	    (is-vec     contacts.i.position)
-	    ;;todo
-	    1
-	    ;(glVertex2f contacts.i.position.x contacts.i.position.y)
-	    )))
+		;     (is-vector  contacts i)
+		;     (is-contact contacts.i)
+		;     (is-vec     contacts.i.position)
+		;     (set! v (append v (list contacts.i.position.x contacts.i.position.y ) ) )
+		;     ;(glVertex2f contacts.i.position.x contacts.i.position.y)
+		;     )
+		;   )
+		; ;(display v ) (newline)
+		; ;(display (> (length v ) 0 ))(newline )
+		; ;(display num-contacts) (newline)
+		;  (if (= number 1)
+		;  	(set! number (+ 1 number))
+		;  	(set! v (append v v))
+		;  	)
+		;   (if (> number 0)
+	 ;    	(begin
+		; 		(glPointSize 5.0)
+		; 		(set! t (glut-vector 'float v ))
+		; 	    (glVertexPointer number GL_FLOAT  0 t  );
+		; 	   	(glEnableClientState GL_VERTEX_ARRAY);
+		; 	   	(glDrawArrays GL_POINTS  0  number )
+		; 	    (glDisableClientState GL_VERTEX_ARRAY)
+		; 	    (glut-unvector t) ))
+		;  )
 
-      (glPointSize 1.0)
+  ;     (glPointSize 1.0)
 
       arb))
+
 
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

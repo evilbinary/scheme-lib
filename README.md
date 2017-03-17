@@ -1,20 +1,20 @@
 # scheme-lib
 scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它平台在规划中。
 #linux、mac
-###安装编译
+### 安装编译
 1. linux下安装`apt-get install freeglut3-dev  libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev`依赖库。
 2. 执行`make`命令就可以编译对应平台的文件在`bin`目录下。
 3. 进入`bin`目录，执行`source env.sh`，然后运行`scheme --script ../apps/hello.ss`就可以运行例子。
 
-###截图
+### 截图
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld2.png" width="400px" /> <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/showimage.png" width="400px" />
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/draw-image.png" width="400px" /> <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/box2d-demo.png" width="400px" />
 
-#android
-##新手入门
-###环境安装
+# android
+## 新手入门
+### 环境安装
 1. 先安装[scheme-release-1.2.apk][1]
 2. 将手机连接电脑，开启adb调试模式（需要安装adb命令,不会用goolge）。进入`cd scheme-lib/android/src/packages`，在shell下执行`python sync.py`命令,这样每次修改后，会自动同步packages下的代码到手机`/sdcard/org.evilbinary.chez/lib`目录下面，这样方便运行了。
 3. 在run界面里面输入测试代码。比如:
@@ -23,7 +23,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它�
 (import (test) (gles1) (glut) ) 
 (load "/sdcard/org.evilbinary.chez/lib/apps/hello.ss")
 ```
-###demo例子
+### demo例子
 ```scheme
 ;imgui例子
 ;imgui hello,world
@@ -63,7 +63,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它�
 运行效果如下：
   
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld.png" width="350px" />
-###测试配置
+### 测试配置
 1. 在手机上输入运行代码可能不方便，所以弄了个配置文件，把需要运行的代码放到配置中会自己加载代码运行。配置文件为`config.xml`内容如下:
 
 	```xml
@@ -76,8 +76,8 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它�
 2. `adb push config.xml /sdcard/org.evilbinary.chez/conf/config.xml`
 3. 打开scheme app就可以直接运行啦。
 
-##高级篇
-###android使用外部库
+## 高级篇
+### android使用外部库
 1. 手工添加Android.mk和源码文件到`scheme-lib/android/src`下命名为libhadd的文件夹。
    add.c 内容如下：
 	 ```c

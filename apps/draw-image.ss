@@ -15,7 +15,7 @@
       (glut-init (lambda ()
           (let ( 
             ; (texture-id  0)
-          (texture-id (imgui-load-texture  (string-append res-dir "/test2.jpg")))
+          (texture-id (imgui-load-texture  (string-append res-dir "duck.png")))
           (rotation 2.0)
           (square-vertices (glut-vector 'float 
             (vector 

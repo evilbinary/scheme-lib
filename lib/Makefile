@@ -47,6 +47,8 @@ libffi.so: ./libffi/libffi.so
 libgles.so: ./libgl/libgles.so
 	$(MAKE) -C libgl
 
+libalut.so: libalut.so
+	$(MAKE) -C libalut
 
 $(OS_NAME):
 	@echo link... $(OS_NAME) $(LN_SRC)

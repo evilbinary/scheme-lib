@@ -13,9 +13,9 @@ SOFILES= lib/libscm/libscm.so \
 		 lib/libffi/libffi.so  \
 		 lib/libglfw/libglfw.so  \
 		 lib/libgl/libgles.so  \
-		 lib/libffi/libffi.so  \
 		 lib/libnanovg/libnanovg.so  \
 		 lib/libgui/libgui.so  \
+		 lib/libalut/libalut.so  \
 		 lib/scheme/scheme	\
 		 lib/boot/scheme.boot	\
 		 lib/boot/petite.boot	\

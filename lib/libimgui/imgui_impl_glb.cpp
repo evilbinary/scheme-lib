@@ -3,9 +3,19 @@
 *作者:evilbinary on 12/24/16.
 *邮箱:rootdebug@163.com
 ********************************************************/
+#ifdef GLAD
+
+#include "glut.h"
+#include "glad/glad.h"
+#include "glfw.h"
+
+#else
 #include <GL/glut.h>
+#endif
+
 #include <imgui.h>
 #include "imgui_impl_gl.h"
+#include <stdio.h>
 
 extern double g_Time ;
 extern bool g_MousePressed[3] = {false, false, false};
@@ -33,6 +43,7 @@ void Imgui_ImplGLUT_KeyMap(ImGuiIO& io){
 }
 
 void ImGui_ImplGlut_SpecialCallback(int key){
+  printf("ImGui_ImplGlut_SpecialCallback\n");
    ImGuiIO& io = ImGui::GetIO();
    io.KeysDown[key] = true;
 
@@ -45,6 +56,7 @@ void ImGui_ImplGlut_SpecialCallback(int key){
 void ImGui_ImplGlut_SpecialUpCallback(int key){
    ImGuiIO& io = ImGui::GetIO();
    io.KeysDown[key] = false;
+  printf("ImGui_ImplGlut_SpecialUpCallback\n");
 
    int mods = glutGetModifiers();
    io.KeyCtrl = (mods & GLUT_ACTIVE_CTRL) != 0;
@@ -77,8 +89,6 @@ void ImGui_ImplGLUT_MouseButtonCallback(int button, int state){
    }
 }
 
-
-
 void ImGui_ImplGLUT_RenderDrawLists(ImDrawData* draw_data)
 {
     // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
@@ -89,29 +99,49 @@ void ImGui_ImplGLUT_RenderDrawLists(ImDrawData* draw_data)
         return;
     draw_data->ScaleClipRects(io.DisplayFramebufferScale);
 
+
     // We are using the OpenGL fixed pipeline to make the example code simpler to read!
     // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, vertex/texcoord/color pointers.
     GLint last_texture; glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
     GLint last_viewport[4]; glGetIntegerv(GL_VIEWPORT, last_viewport);
+
+
+    //glEnable(GL_MULTISAMPLE);
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glEnable(GL_TEXTURE_2D);
     //glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
 
+
+    //printf("ImGui_ImplGLUT_RenderDrawLists6 %d %d\n",fb_width,fb_height);
+
     // Setup viewport, orthographic projection matrix
     glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
     glMatrixMode(GL_PROJECTION);
+
+
     glPushMatrix();
+    
+    //printf("ImGui_ImplGLUT_RenderDrawLists8 %f %f\n",io.DisplaySize.x,io.DisplaySize.y);
+
     glLoadIdentity();
-    glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
+
+    glOrtho( 0.0 , io.DisplaySize.x,io.DisplaySize.y,0.0f, - 1.0 , 1.0 );
+    // glOrthof(0.0f, io.DisplaySize.x,io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
+
     glMatrixMode(GL_MODELVIEW);
+
     glPushMatrix();
     glLoadIdentity();
 

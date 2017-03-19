@@ -165,9 +165,15 @@ void ImGui_ImplGL_ScrollCallback(double xoffset, double yoffset) {
 
 void ImGui_ImplGL_KeyCallback(int type, int keycode, int ch, char *chars) {
     ImGuiIO &io = ImGui::GetIO();
-
     //LOGI("ImGui_ImplGL_KeyCallback=type=%d keycode=%d ch=%c chars=%s", type,keycode,ch,chars);
+#ifdef ANDROID
+#else    
+    //   int mods = glutGetModifiers();
+    // io.KeyCtrl = (mods&GLUT_ACTIVE_CTRL) != 0;
+    // io.KeyShift = (mods&GLUT_ACTIVE_SHIFT) != 0;
+    // io.KeyAlt = (mods&GLUT_ACTIVE_ALT) != 0;
 
+#endif
     if (type == 0) {//key down
         io.KeysDown[keycode] = true;
     } else if (type == 1) {//key up
@@ -303,16 +309,27 @@ void ImGui_ImplGL_SetScale(float x, float y) {
 void ImGui_ImplGL_ResizeCallback(int w, int h) {
     ImGuiIO &io = ImGui::GetIO();
     // Setup display size (every frame to accommodate for window resizing)
+    printf("ImGui_ImplGL_ResizeCallback %d,%d\n",w,h);
 
     int display_w, display_h;
+    #ifdef GLAD
+        display_w = glutGet(GLUT_WINDOW_FRAMBUFFER_WIDTH);
+        display_h = glutGet(GLUT_WINDOW_FRAMBUFFER_HEIGHT);
+        printf("ImGui_ImplGL_ResizeCallback display_w=%d,%d\n",display_w,display_h);
 
-    display_w = w;
-    display_h = h;
-    w = w / g_Scale.x;
-    h = h / g_Scale.y;
+    #else
+        display_w = w;
+        display_h = h;
+    #endif
+
+    w = w / (g_Scale.x);
+    h = h / (g_Scale.y);
     io.DisplaySize = ImVec2((float) w, (float) h);
-    io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float) display_w / w) : 0,
-                                        h > 0 ? ((float) display_h / h) : 0);
+    io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)  display_w/w) : 0,
+                                        h > 0 ? ((float)  display_h/h ) : 0);
+
+    // printf("ImGui_ImplGL_ResizeCallback %d,%d\n",w,h);
+
 
 }
 
@@ -377,6 +394,7 @@ void ImGui_ImplGL_NewFrame() {
 }
 
 
+ #include "glad/glad.h"
 
 void ImImpl_FreeTexture(ImTextureID& imtexid) {
     GLuint& texid = reinterpret_cast<GLuint&>(imtexid);
@@ -387,7 +405,6 @@ void ImImpl_GenerateOrUpdateTexture(ImTextureID& imtexid,int width,int height,in
     IM_ASSERT(channels>0 && channels<=4);
     GLuint& texid = reinterpret_cast<GLuint&>(imtexid);
     if (texid==0) glGenTextures(1, &texid);
-
     glBindTexture(GL_TEXTURE_2D, texid);
     GLenum clampEnum = 0x2900;    // 0x2900 -> GL_CLAMP; 0x812F -> GL_CLAMP_TO_EDGE
 #   ifndef GL_CLAMP

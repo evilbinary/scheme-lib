@@ -7,6 +7,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它�
 3. 进入`bin`目录，执行`source env.sh`，然后运行`scheme --script ../apps/hello.ss`就可以运行例子。
 
 ### 截图
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/game-demo.png" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/gui-demo.png" width="400px" />
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld2.png" width="400px" /> <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/showimage.png" width="400px" />
 

@@ -3,13 +3,21 @@
 *作者:evilbinary on 12/24/16.
 *邮箱:rootdebug@163.com
 ********************************************************/
+#ifdef GLAD
+  #include "glad/glad.h"
+  #include "glfw.h"
+  #include "glut.h"
+#else
 
 #include <GLES/gl.h>
 #include <GLES2/gl2.h>
 
 #include <GLES/glext.h>
 #include <GLES2/gl2ext.h>
+
+#endif
 #include <imgui.h>
+
 
 #if ANDROID
 

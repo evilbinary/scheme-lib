@@ -32,7 +32,7 @@
 
       (glut-display (lambda ()
               (imgui-render-start)
-              (imgui-test)
+              ;;(imgui-test)
               (imgui-set-next-window-size (imgui-make-vec2 200.0 140.0) 0)
               (imgui-begin "evilbinary" 0)
               (imgui-text "hello,world!")

@@ -54,12 +54,12 @@
  
   (imgui-init)
   (imgui-reset-style 7)
-  (let ((texture-id (imgui-load-texture "./number.png")))
+  (let ((texture-id (imgui-load-texture "./duck.png")))
 
       (glut-display (lambda ()
               (imgui-render-start)
               
-              (imgui-test)
+              ;;(imgui-test)
               ; ;(imgui-test3 )
 
 

@@ -27,7 +27,7 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 	LIBS += 
 	CXXFLAGS += 
 	CXXFLAGS += 
-	CFLAGS +=    -L/opt/local/lib -lopenal  -L/opt/local/lib  -lalut 
+	CFLAGS += -D__APPLE__   -L../3rdparty/lib -lalut -I../3rdparty/include -framework OpenAL
 #	CXXFLAGS += -D__APPLE__
 endif
 

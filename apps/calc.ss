@@ -2,7 +2,7 @@
 ;作者:evilbinary on 11/19/16.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(import  (scheme) (gui gles1)  (gui glut) (gui imgui)  )
+(import  (scheme) (gles gles1)  (glut glut) (gui imgui)  )
 
 
 

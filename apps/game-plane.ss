@@ -3,8 +3,8 @@
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (import  (scheme) 
-  (gui gles1)
-  (gui glut)
+  (gles gles1)
+  (glut glut)
   (gui imgui)
   (utils libutil) 
   (box2d-lite util math)
@@ -16,6 +16,8 @@
   (box2d-lite arbiter)
   (dharmalab misc is-vector)
   (box2d-lite contact)
+  (sound alut)
+  (sound al)
 
 
 )
@@ -48,6 +50,8 @@
            (else "./")
             ))
 
+(define bgmusic (string-append res-dir "game_bg.wav"))
+(define shot-snd  (string-append res-dir "bullet.wav" ))
 (define (draw-img texture-id vec)
   (let ((texture-array (glut-vector 'float 
           (vector 
@@ -358,6 +362,14 @@
          ; (list p3 (create-plane 0.0 0.0 0.0 0.9) )
          ; (list p2 (create-plane 0.0 0.0 0.0 0.9) )
          ))
+  (alut-init )
+  ;bg music
+  (let ((buffer (alut-create-buffer-from-file bgmusic))
+        (source (al-gen-source 1 ) ))
+    (al-source-i source AL-BUFFER buffer)
+    (al-source-i source AL-LOOPING AL-TRUE)
+    (al-source-play source)
+  )
 
 )
 
@@ -404,6 +416,7 @@
               (115 (set! deltay -0.01))
               (32  (let ((l (create-bullet x (+ y 0.12) 2.0 0.0003 shot 1)))
                       (append! objects (list l) )
+                      (alut-play-file  shot-snd)
                   ))
               )
             (begin 
@@ -484,18 +497,19 @@
 
       (glut-reshape (lambda(w h)
                     (imgui-resize w h)
-                    (glut-log (format "reshape"))
+                    (glut-log (format "reshape ~a ~a" w h))
                     (glClearDepthf 1.0)
                     (glClearColor 0.0 0.0 0.0 0.0 )
                     (glFrontFace GL_CCW);
                     (glEnable GL_BLEND);
                     (glBlendFunc GL_SRC_ALPHA  GL_ONE_MINUS_SRC_ALPHA);
-                    (glViewport 0 0 w h)
+                    ;(glViewport 0 0 w h)
                     (glMatrixMode GL_PROJECTION)
                     (glLoadIdentity)
                      ))
       (glut-main-loop)
       (imgui-exit)
+      (alut-exit)
       (glut-exit)
       )
 

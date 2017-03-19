@@ -1,0 +1,13 @@
+prefix=/Users/evil/dev/workspace2/chez/app/src/main/jni/thirdpart
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
+
+Name: GLFW
+Description: A multi-platform library for OpenGL, window and input
+Version: 3.2.1
+URL: http://www.glfw.org/
+Requires.private: 
+Libs: -L${libdir} -lglfw3
+Libs.private:  -framework Cocoa -framework IOKit -framework CoreFoundation -framework CoreVideo
+Cflags: -I${includedir}

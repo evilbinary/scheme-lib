@@ -3,7 +3,7 @@
 ;作者:evilbinary on 12/24/16.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(import  (scheme)  (gui glut) (utils libutil) )
+(import  (scheme)  (glut glut) (utils libutil) )
 (import (gui imgui))
 ; (load-lib "libimgui.so")
 ; ;;(define-c-function int test-main (int string) )
@@ -57,14 +57,13 @@
   (let ((texture-id (imgui-load-texture "./number.png")))
 
       (glut-display (lambda ()
-              ;(imgui-test3)
               (imgui-render-start)
-              ;(imgui-test)
-              ;(imgui-test3 )
+              
+              (imgui-test)
+              ; ;(imgui-test3 )
 
 
               (imgui-set-next-window-size (imgui-make-vec2 200.0 240.0) 0)
-
               (imgui-begin "evilbinary" 0)
               (imgui-text "hello,world!")
               (if (imgui-tree-node "node")
@@ -77,7 +76,6 @@
                     (imgui-reset-style 7)
                     )
                   (imgui-tree-pop) ))
-
               (imgui-end)
 
 

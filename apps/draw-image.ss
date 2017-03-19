@@ -3,10 +3,19 @@
 ;作者:evilbinary on 01/08/17.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(import  (scheme) (gui glut) (gui gles1) (gui imgui) )
+(import  (scheme) (glut glut) (gles gles1) (gui imgui) )
+;;资源文件目录设置
+(define res-dir 
+         (case (machine-type)
+           ((arm32le) "/data/data/org.evilbinary.chez/files/")
+           (else "./")
+            ))
+            
 (define (draw-image)
       (glut-init (lambda ()
-          (let ((texture-id (imgui-load-texture "/sdcard/org.evilbinary.chez/number.png"))
+          (let ( 
+            ; (texture-id  0)
+          (texture-id (imgui-load-texture  (string-append res-dir "/test2.jpg")))
           (rotation 2.0)
           (square-vertices (glut-vector 'float 
             (vector 
@@ -57,11 +66,11 @@
           ))
       (glut-reshape (lambda(w h)
 	                   (glut-log (format "reshape"))
-	                   (glClearDepthf 1.0)
-		               (glClearColor 0.0 0.0 0.0 0.0 )
-		               (glViewport 0 0 w h)
-		               (glMatrixMode GL_PROJECTION)
-		               (glLoadIdentity)
+	                ;    (glClearDepthf 1.0)
+		               ; (glClearColor 0.0 0.0 0.0 0.0 )
+		               ; (glViewport 0 0 w h)
+		               ; (glMatrixMode GL_PROJECTION)
+		               ; (glLoadIdentity)
 
                    ))
       (glut-main-loop)

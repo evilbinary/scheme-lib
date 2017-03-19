@@ -39,8 +39,8 @@
 
   (import (rnrs)
 	  (surfage s27 random-bits)
-	  (gui gles1)
-	  (gui glut)
+	  (gles gles1)
+	  (glut glut)
 
 	  (agave glamour misc)
 	  (dharmalab misc is-vector)

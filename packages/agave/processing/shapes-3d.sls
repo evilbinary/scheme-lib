@@ -25,7 +25,7 @@
  (import (rnrs)
          (agave geometry pt-3d)
          (agave color rgba)
-         (gui gles1)
+         (gles gles1)
          (agave glamour misc)
          )
 

@@ -13,7 +13,8 @@ SUB_DIR :=  libscm \
 	libglut libimgui \
 	scheme	libgl \
 	libffi libglfw \
-	libnanovg
+	libnanovg libgui \
+	libalut
 
 LIBSCM =./libscm/libscm.so
 LIBGLUT =./libglut/libglut.so
@@ -21,10 +22,12 @@ LIBGLUT =./libglut/libglut.so
 UNAME_S := $(shell uname -s)
 OS_NAME :=$(shell echo $(UNAME_S) | tr '[A-Z]' '[a-z]')
 
+LIBS_ALL= libscm.so libimgui.so libglfw.so libffi.so libgles.so libnanovg.so \
+	libalut.so libgui.so
 
 all: $(TARGET)	
 	@echo Build complete for $(TARGET)
-$(TARGET): $(OS_NAME) libscm.so libimgui.so libglfw.so libffi.so libgles.so libnanovg.so
+$(TARGET): $(OS_NAME) $(LIBS_ALL)
 	$(MAKE) -C scheme
 libscm.so: $(LIBSCM) 
 	$(MAKE) -C libscm
@@ -49,6 +52,9 @@ libgles.so: ./libgl/libgles.so
 
 libalut.so: libalut.so
 	$(MAKE) -C libalut
+
+libgui.so: libgui.so libnanovg.so
+	$(MAKE) -C libgui
 
 $(OS_NAME):
 	@echo link... $(OS_NAME) $(LN_SRC)

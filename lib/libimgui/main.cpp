@@ -5,6 +5,7 @@
 #include "cimgui/cimgui.h"
 #include "scm.h"
 #include <functional>
+#include "imgui_user.h"
 
 
 #ifdef __cplusplus
@@ -16,10 +17,10 @@ static void error_callback(int error, const char *description) {
     fprintf(stderr, "Error %d: %s\n", error, description);
 }
 
-void imgui_exit() {
+SCM_API void imgui_exit() {
     ImGui_ImplGL_Shutdown();
 }
-void imgui_init() {
+SCM_API void imgui_init() {
     // Setup ImGui binding
     ImGui_ImplGL_Init();
 
@@ -27,7 +28,7 @@ void imgui_init() {
     // (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
     ImGuiIO& io = ImGui::GetIO();
     //io.Fonts->AddFontDefault();
-//    io.Fonts->AddFontFromFileTTF("../../extra_fonts/Cousine-Regular.ttf", 15.0f);
+    io.Fonts->AddFontFromFileTTF("Roboto-Regular.ttf", 18.0f);
 //    io.Fonts->AddFontFromFileTTF("/system/fonts/DroidSans.ttf", 16.0f);
 #ifdef ANDROID
     io.Fonts->AddFontFromFileTTF("/system/fonts/DroidSansFallback.ttf", 18.0f,NULL,io.Fonts->GetGlyphRangesChinese() );
@@ -40,87 +41,87 @@ void imgui_init() {
 //    io.Fonts->AddFontFromFileTTF("/system/fonts/DroidSans.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
 
 }
-void imgui_mouse_event(int button, int state) {
+SCM_API void imgui_mouse_event(int button, int state) {
 
     ImGui_ImplGL_MouseButtonCallback(button,state);
 }
-void imgui_motion_event(int x, int y) {
+SCM_API void imgui_motion_event(int x, int y) {
 
     ImGui_ImplGL_MouseMotionCallback(x, y);
 }
-void imgui_touch_event(int type, int x, int y) {
+SCM_API void imgui_touch_event(int type, int x, int y) {
 
     ImGui_ImplGL_TouchCallback(type, x, y);
 }
-void imgui_key_event(int type, int key,int ch,char* chars) {
+SCM_API void imgui_key_event(int type, int key,int ch,char* chars) {
     //LOGI("imgui_key_event type=%d key=%d",type,key);
 
     ImGui_ImplGL_KeyCallback(type,key,ch,chars);
 }
-void imgui_resize(int w, int h) {
+SCM_API void imgui_resize(int w, int h) {
     ImGui_ImplGL_ResizeCallback(w, h);
 }
-void imgui_render_start() {
+SCM_API void imgui_render_start() {
     ImGui_ImplGL_NewFrame();
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 }
-void imgui_scale(float x, float y) {
+SCM_API void imgui_scale(float x, float y) {
     ImGui_ImplGL_SetScale(x, y);
 }
-int is_enable_default_color=1;
+SCM_API int is_enable_default_color=1;
 ImVec4 default_clear_color=ImColor(114, 144, 154);
 
-void imgui_disable_default_color(){
+SCM_API void imgui_disable_default_color(){
     is_enable_default_color=0;
 }
-void imgui_enable_default_color(){
+SCM_API void imgui_enable_default_color(){
     is_enable_default_color=1;
 }
-void imgui_set_default_color(int r,int g,int b){
+SCM_API void imgui_set_default_color(int r,int g,int b){
     default_clear_color=ImColor(r, g, b);
 }
-ImVec4* imgui_get_default_color(){
+SCM_API ImVec4* imgui_get_default_color(){
     return &default_clear_color;
 }
 
-void imgui_render_end(){
+SCM_API void imgui_render_end(){
     if(is_enable_default_color==1) {
         glClearColor(default_clear_color.x, default_clear_color.y, default_clear_color.z, default_clear_color.w);
     }
     ImGui::Render();
 }
-ImVec2 imgui_make_vec2(float x,float y){
+SCM_API ImVec2 imgui_make_vec2(float x,float y){
     return  ImVec2(x,y);
 }
-ImVec2* imgui_pvec2(float x,float y){
+SCM_API ImVec2* imgui_pvec2(float x,float y){
    return  new ImVec2(x,y);
 }
-void imgui_uvec2(ImVec2* v){
+SCM_API void imgui_uvec2(ImVec2* v){
     if(v!=NULL)
      delete v;
 }
-ImVec4 imgui_make_vec4(float x,float y,float z,float w){
+SCM_API ImVec4 imgui_make_vec4(float x,float y,float z,float w){
     return  ImVec4(x,y,z,w);
 }
 
-ImTextureID imgui_load_texture(char* filename){
-    ImTextureID imageTextureId = ImImpl_LoadTexture(filename);
-    LOGI("imgui_load_texture imageTextureId=%d",imageTextureId);
+SCM_API ImTextureID imgui_load_texture(char* filename){
 
+    ImTextureID imageTextureId = ImImpl_LoadTexture(filename);
+    //LOGI("imgui_load_texture %s imageTextureId=%d",filename,imageTextureId);
     return imageTextureId;
 }
 
 //scheme callback
 
-void test_texture(char* filename,  ImVec2& size,  ImVec2& uv0 ,  ImVec2& uv1){
+SCM_API void test_texture(char* filename,  ImVec2& size,  ImVec2& uv0 ,  ImVec2& uv1){
     LOGI("test_texture");
     ImTextureID imageTextureId = ImImpl_LoadTexture(filename);
     ImGui::Image(imageTextureId, size, uv0, uv1);
 
 }
 
-ImGuiTextEditCallback  imgui_make_text_edit_callback(ptr fobj){
+SCM_API ImGuiTextEditCallback  imgui_make_text_edit_callback(ptr fobj){
     static std::function<int (struct ImGuiTextEditCallbackData *)> tt;
     auto a_lambda_func = [](struct ImGuiTextEditCallbackData *data)->int {
         return tt(data);
@@ -128,7 +129,7 @@ ImGuiTextEditCallback  imgui_make_text_edit_callback(ptr fobj){
     tt=[&](struct ImGuiTextEditCallbackData * data)->int{
         //LOGI("dd======================>");
         if (scm_procedurep(fobj)) {
-            ptr ret = scm_call1(fobj, data);
+            ptr ret = scm_call1_proc(fobj, data);
             //LOGI("call=%d", scm_fixnum_value(ret));
             return scm_fixnum_value(ret);
         }
@@ -139,8 +140,21 @@ ImGuiTextEditCallback  imgui_make_text_edit_callback(ptr fobj){
 }
 //scheme callback end
 
-//test begin
 
+//addons interface
+SCM_API bool imgui_load_style(const char* style){
+    return ImGui::LoadStyle(style,ImGui::GetStyle());
+}
+SCM_API bool imgui_save_style(const char* style){
+    return ImGui::SaveStyle(style,ImGui::GetStyle());
+}
+SCM_API bool imgui_reset_style(int stylenum){
+    return ImGui::ResetStyle(stylenum,ImGui::GetStyle());
+}
+
+
+
+//test begin
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 void imgui_test3(){
     // if (ImGui::TreeNode("Basic Horizontal Layout"))
@@ -241,7 +255,7 @@ void imgui_test2( CONST char *label, char *buf, size_t buf_size,
 
 }
 
-void imgui_test() {
+SCM_API void imgui_test() {
 
     bool show_test_window = true;
     bool show_another_window = false;
@@ -274,9 +288,9 @@ void imgui_test() {
                         "label:\n"
                         "\tlock cmpxchg8b eax\n";
 
-//        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
-//        ImGui::Checkbox("Read-only", &read_only);
-//        ImGui::PopStyleVar();
+       ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
+       ImGui::Checkbox("Read-only", &read_only);
+       ImGui::PopStyleVar();
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
         ImGui::InputTextMultiline("##source", text, IM_ARRAYSIZE(text), ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_AllowTabInput | (read_only ? ImGuiInputTextFlags_ReadOnly : 0));
@@ -292,7 +306,7 @@ void imgui_test() {
         ImGui::End();
     }
 
-    // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
+    //3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
     if (show_test_window) {
         ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiSetCond_FirstUseEver);
         ImGui::ShowTestWindow(&show_test_window);
@@ -300,15 +314,17 @@ void imgui_test() {
 
 
 
-    // Rendering
+// Rendering
 //        int display_w, display_h;
 //        glfwGetFramebufferSize(window, &display_w, &display_h);
 //        glViewport(0, 0, display_w, display_h);
-    //glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    //glClear(GL_COLOR_BUFFER_BIT);
-    //ImGui::Render();
+//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+//glClear(GL_COLOR_BUFFER_BIT);
+//ImGui::Render();
 
 }
+//test end
+
 
 
 #ifdef __cplusplus

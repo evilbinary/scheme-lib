@@ -3,7 +3,7 @@
 ;作者:evilbinary on 12/24/16.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(import  (scheme) (glut) (gles1))
+(import  (scheme) (glut glut) (gles gles1))
 ;opengles1.x 例子
 (define (gl-demo)
            (define  rotation 0.0)
@@ -112,12 +112,12 @@
                ;(gl-disable GL-DEPTH-TEST)
                (glClearDepthf 1.0)
                (glClearColor 0.0 0.0 0.0 0.0 )
-               (glViewport 0 0 w h)
+               ;(glViewport 0 0 w h)
                (glMatrixMode GL_PROJECTION)
                (glLoadIdentity)
                ;(glutPrespective 45.0 (* 1.0 (/ w h)) 0.1 100.0)
                ;(gl-color-texture-reset)
-               ;(glOrthof   0.0 0.0 480.0  480.0  -1.0 1.0)
+               ;(glOrthof   0.0 0.0 w  h -1.0 1.0)
                ;(glMatrixMode GL_MODELVIEW)
                ;(glLoadIdentity)
                ;(glEnable GL_LINE_SMOOTH)

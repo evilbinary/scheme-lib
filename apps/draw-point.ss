@@ -2,7 +2,7 @@
 ;作者:evilbinary on 11/19/16.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(import  (scheme) (gles1)  (glut) (imgui) (android)  )
+(import  (scheme) (gles gles1)  (glut glut) (gui imgui)    )
 (define (gl-draw-point)
         (define gx 0)
         (define gy 0)
@@ -41,7 +41,7 @@
                     ;(glRotatef rotation 0.0 1.0 0.0 )
                     (glPointSize 20.0)
                     (glEnableClientState GL_VERTEX_ARRAY);
-                    (glDrawArrays GL_POINTS  0  1);
+                    (glDrawArrays GL_POINTS  0  3);
                     (glDisableClientState GL_VERTEX_ARRAY)
 
                 )))

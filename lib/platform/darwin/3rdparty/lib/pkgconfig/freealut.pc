@@ -1,0 +1,11 @@
+prefix=/Users/evil/dev/workspace2/chez/app/src/main/jni/3rdparty
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: freealut
+Description: freealut is a free implementation of the OpenAL utility toolkit.
+Requires: openal
+Version: 1.1.0
+Libs: -L${libdir} -lalut
+Cflags: -I${includedir}

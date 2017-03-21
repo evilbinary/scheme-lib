@@ -2,7 +2,7 @@
 ;作者:evilbinary on 11/19/16.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(import  (scheme) (gles1)  (glut) (imgui)  )
+(import  (scheme) (gles gles1)  (glut glut) (gui imgui)  )
 
 
 
@@ -21,7 +21,8 @@
   (let ((exp "") (clear #t))
     (glut-init)
     (imgui-init)
-                                        ;(android)
+    (imgui-reset-style 7)
+                                    ;(android)
                                         ;(imgui-scale (* 1.5 (android-get-density)) (* 1.5 (android-get-density)))
     (glut-touch-event (lambda (type x y)
                         (imgui-touch-event type x y)

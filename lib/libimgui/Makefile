@@ -15,11 +15,16 @@ OBJS = main.o \
     cimgui/drawList.o \
     cimgui/fontAtlas.o \
     imgui_impl_glb.o \
-    #test.o
+    addons/imguistyleserializer/imguistyleserializer.o \
+   
 
-LIBS =-L../libscm -lscm 
+LIBS =-L../libscm -lscm  -L../libgl  -lgles
 CFLAGS = -Wall -Wformat 
-CXXFLAGS= -Wall -Wformat -Iimgui -I../libscm -g -std=c++11 -DLOG
+CXXFLAGS=  -g -std=c++11 	\
+	-Wall -Wformat -Iimgui -I../libscm -I../libgl \
+	-Iaddons/ \
+	-Iaddons/imguistyleserializer  \
+
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Linux) #LINUX
@@ -33,17 +38,18 @@ endif
 ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"
 	LIBS += 
-	CXXFLAGS += -DMESA_EGL_NO_X11_HEADERS   -DMESA_EGL_NO_X11_HEADERS  -L/opt/local/lib -lGL -lglut 
-	CFLAGS +=  
+	CXXFLAGS+= -DGLAD -I../3rdparty/include -I../libglfw  -I../libglut  -L../libglfw/  -L../libglut/ -lglut -lglfw
+	#CXXFLAGS += -DMESA_EGL_NO_X11_HEADERS   -DMESA_EGL_NO_X11_HEADERS  -L/opt/local/lib -lGL -lglut 
+	CFLAGS += 
 #	CXXFLAGS += -D__APPLE__
 endif
 
-ifeq ($(UNAME_S), MINGW64_NT-6.3)
+ifeq ($(UNAME_S), MINGW32_NT-6.1)
    ECHO_MESSAGE = "Windows"
-	LIBS += 
-	CXXFLAGS += 
-	CXXFLAGS += 
-	CFLAGS +=
+	LIBS += -lglut32 -lopengl32
+	CXXFLAGS += -DNO_IMGUI_OPENGL_GLGENERATEMIPMAP
+	CFLAGS += -DNO_IMGUI_OPENGL_GLGENERATEMIPMAP
+	TARGET = libimgui.dll
 endif
 
 .cpp.o:
@@ -57,7 +63,7 @@ $(TARGET): $(OBJS)
 	$(CXX)  $(CXXFLAGS) $(OBJS) -shared -o $(TARGET)   $(LIBS)
 
 clean:
-	rm -rf $(TARGET) $(OBJS)
+	rm -rf $(TARGET) $(OBJS) *.o *.so *.dll
 
 
 

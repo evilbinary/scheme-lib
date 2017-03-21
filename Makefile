@@ -10,6 +10,12 @@ TARGET =bin/scheme
 SOFILES= lib/libscm/libscm.so \
 		 lib/libglut/libglut.so  \
 		 lib/libimgui/libimgui.so \
+		 lib/libffi/libffi.so  \
+		 lib/libglfw/libglfw.so  \
+		 lib/libgl/libgles.so  \
+		 lib/libnanovg/libnanovg.so  \
+		 lib/libgui/libgui.so  \
+		 lib/libalut/libalut.so  \
 		 lib/scheme/scheme	\
 		 lib/boot/scheme.boot	\
 		 lib/boot/petite.boot	\

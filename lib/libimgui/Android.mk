@@ -24,24 +24,27 @@ SCM=$(LOCAL_PATH)/../libscm
 
 LOCAL_MODULE    := imgui
 LOCAL_SRC_FILES := imgui_impl_gl.cpp \
-    imgui/imgui.cpp \
-    imgui/imgui_draw.cpp \
-    imgui/imgui_demo.cpp \
-    cimgui/cimgui.cpp \
-    cimgui/drawList.cpp \
-    cimgui/fontAtlas.cpp \
+    $(IMGUI)/imgui.cpp \
+    $(IMGUI)/imgui_draw.cpp \
+    $(IMGUI)/imgui_demo.cpp \
+    $(CIMGUI)/cimgui.cpp \
+    $(CIMGUI)/drawList.cpp \
+    $(CIMGUI)/fontAtlas.cpp \
     main.cpp    \
-    keyboard.cpp
+    keyboard.cpp \
+    addons/imguistyleserializer/imguistyleserializer.cpp \
+
 
 
 
 LOCAL_ARM_MODE := arm
 
-LOCAL_C_INCLUDES := imgui -I$(SCM)
+LOCAL_C_INCLUDES := imgui -I$(SCM) addons
 
 
-LOCAL_CFLAGS +=  -I. -I./c/ -I$(IMGUI)  -I$(SCM)
-LOCAL_CXXFLAGS+= -I. -I./c/ -I$(IMGUI) -I$(SCM)  -std=c++11
+LOCAL_CFLAGS +=  -I. -I./c/ -I$(IMGUI)  -I$(SCM) -Iaddons -I$(LOCAL_PATH)/addons/imguistyleserializer 
+LOCAL_CXXFLAGS+= -I. -I./c/ -I$(IMGUI) -I$(SCM) -DANDROID -std=c++11 \
+    -I$(LOCAL_PATH)/addons/ -I$(LOCAL_PATH)/addons/imguistyleserializer
 
 LOCAL_CFLAGS += -g -Wall -DANDROID   -DINLINES -DGC_MACROS -fPIC -Wno-unused-parameter -pie -fPIE  -fpermissive -std=c++11
 

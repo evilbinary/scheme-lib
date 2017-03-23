@@ -30,8 +30,8 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
 	LIBS += 
-	CXXFLAGS += 
-	CXXFLAGS += -fPIC -lGL -lglut
+	CXXFLAGS += -DGLAD -I../3rdparty/include -I../libglfw  -I../libglut  -L../libglfw/  -L../libglut/ -lglut -lglfw
+	CXXFLAGS += -fPIC 
 	CFLAGS +=
 endif
 

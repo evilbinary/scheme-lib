@@ -326,7 +326,6 @@ NVGcontext* nvgCreateInternal(NVGparams* params)
 	ctx->fontImages[0] = ctx->params.renderCreateTexture(ctx->params.userPtr, NVG_TEXTURE_ALPHA, fontParams.width, fontParams.height, 0, NULL);
 	if (ctx->fontImages[0] == 0) goto error;
 	ctx->fontImageIdx = 0;
-
 	return ctx;
 
 error:
@@ -368,13 +367,14 @@ void nvgBeginFrame(NVGcontext* ctx, int windowWidth, int windowHeight, float dev
 		ctx->drawCallCount, ctx->fillTriCount, ctx->strokeTriCount, ctx->textTriCount,
 		ctx->fillTriCount+ctx->strokeTriCount+ctx->textTriCount);*/
 
+
 	ctx->nstates = 0;
 	nvgSave(ctx);
 	nvgReset(ctx);
 
 	nvg__setDevicePixelRatio(ctx, devicePixelRatio);
-
 	ctx->params.renderViewport(ctx->params.userPtr, windowWidth, windowHeight, devicePixelRatio);
+
 
 	ctx->drawCallCount = 0;
 	ctx->fillTriCount = 0;
@@ -774,13 +774,14 @@ void printNVGcolor(NVGcolor color){
 void printNVGpaint(NVGpaint paint){
 	printf("\n");
 	printf("xform=");
-	for(int i=0;i<6;i++){
+	int i;
+	for(i=0;i<6;i++){
 		printf("%f ",paint.xform[i]);
 	}
 	printf("\n");
 
 	printf("extent=");
-	for(int i=0;i<2;i++){
+	for(i=0;i<2;i++){
 		printf("%f ",paint.extent[i]);
 	}
 	printf("\n");

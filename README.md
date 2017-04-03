@@ -65,6 +65,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它�
 运行效果如下：
   
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld.png" width="350px" />
+
 ### 测试配置
 1. 在手机上输入运行代码可能不方便，所以弄了个配置文件，把需要运行的代码放到配置中会自己加载代码运行。配置文件为`config.xml`内容如下:
 

@@ -16,6 +16,7 @@ SOFILES= lib/libscm/libscm.so \
 		 lib/libnanovg/libnanovg.so  \
 		 lib/libgui/libgui.so  \
 		 lib/libalut/libalut.so  \
+		 lib/libsqlite/libsqlite.so  \
 		 lib/scheme/scheme	\
 		 lib/boot/scheme.boot	\
 		 lib/boot/petite.boot	\
@@ -33,4 +34,4 @@ clean:
 	$(MAKE) -C lib clean
 	rm -rf bin/*.boot bin/scheme bin/*.so
 android:
-	$(MAKE) -C lib android	
+	$(MAKE) -C lib android

@@ -14,7 +14,7 @@ SUB_DIR :=  libscm \
 	scheme	libgl \
 	libffi libglfw \
 	libnanovg libgui \
-	libalut
+	libalut libsqlite
 
 LIBSCM =./libscm/libscm.so
 LIBGLUT =./libglut/libglut.so
@@ -25,11 +25,11 @@ OS_NAME :=$(shell echo $(UNAME_S) | tr '[A-Z]' '[a-z]')
 LIBS_ALL= libscm.so libimgui.so libglfw.so libffi.so libgles.so libnanovg.so \
 	libalut.so libgui.so
 
-all: $(TARGET)	
+all: $(TARGET)
 	@echo Build complete for $(TARGET)
 $(TARGET): $(OS_NAME) $(LIBS_ALL)
 	$(MAKE) -C scheme
-libscm.so: $(LIBSCM) 
+libscm.so: $(LIBSCM)
 	$(MAKE) -C libscm
 
 libglut.so: $(LIBGLUT)
@@ -56,6 +56,9 @@ libalut.so: libalut.so
 libgui.so: libgui.so libnanovg.so
 	$(MAKE) -C libgui
 
+libsqlite.so: libsqlite.so
+		$(MAKE) -C libsqlite
+
 $(OS_NAME):
 	@echo link... $(OS_NAME) $(LN_SRC)
 	@ln -sf platform/$(OS_NAME)/boot/ boot
@@ -65,14 +68,14 @@ $(OS_NAME):
 	@ln -sf platform/$(OS_NAME)/libgl/ libgl
 	@ln -sf platform/$(OS_NAME)/libglfw/ libglfw
 	@ln -sf platform/$(OS_NAME)/3rdparty/ 3rdparty
+	@ln -sf platform/$(OS_NAME)/libsqlite/ libsqlite
 
 android:
 	@echo link... android
 	@ln -sf platform/android/libscm libscm
 	@ln -sf platform/android/libglut libglut
 	@ln -sf platform/android/boot/ boot
-	@ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk	
+	@ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk
 clean:
 	@for n in $(SUB_DIR); do $(MAKE) -C $$n clean; done
-	rm -rf libscm libglut boot libffi libgl libglfw 3rdparty 
-
+	rm -rf libscm libglut boot libffi libgl libglfw 3rdparty

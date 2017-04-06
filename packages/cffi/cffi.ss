@@ -9,14 +9,22 @@
    ffi-prep-cif
    ffi-prep-cif-var
    ffi-call
-   ffi-get-struct-offsets
+
    cffi-get-int
    cffi-get-float
    cffi-get-long
    cffi-get-double
    cffi-get-pointer
+   cffi-get-string
+   cffi-get-string-offset
+   cffi-set-pointer
+   cffi-set-string
+   cffi-get-pointer-offset
    cffi-get-string-pointer
-   
+   cffi-string-pointer
+   cffi-string
+   print-ptr
+   print-string
    ;; cffi-load-lib
    ;; cffi-open-lib
    ;; cffi-call
@@ -55,7 +63,9 @@
 
 
   (define RTLD_LAZY 1)
-  (define RTLD_NOW 0)
+  (define RTLD_NOW 2)
+  (define RTLD_GLOBAL #x00100)
+  
 
 
   (define cffi-enable-log #f)
@@ -72,11 +82,11 @@
       ((a6osx i3osx)  "libffi.so")
       ((a6le i3le) "libffi.so")))
   (define lib (load-lib lib-name))
-
+  
   (define ffi-prep-cif (foreign-procedure "ffi_prep_cif" (void* int int void* void*) int))
   (define ffi-prep-cif-var (foreign-procedure "ffi_prep_cif_var" (void* int int int void* void*) int))
   (define ffi-call (foreign-procedure "ffi_call" (void* void* void* void*) void))
-  (define ffi-get-struct-offsets (foreign-procedure "ffi_get_struct_offsets" (int void* void* ) int))
+  ;;(define ffi-get-struct-offsets (foreign-procedure "ffi_get_struct_offsets" (int void* void* ) int))
 
   (define $ffi-cif-alloc (foreign-procedure "ffi_cif_alloc" () void*))
   (define $ffi-cif-free (foreign-procedure "ffi_cif_free" (void*) void))
@@ -89,7 +99,8 @@
 
   (define $ffi-alloc (foreign-procedure "ffi_alloc" (int ) void*))
   (define $ffi-free (foreign-procedure "ffi_free" (void*) void))
-
+  ;;(define $ffi-free (lambda (addr)
+  ;;(display (format "addr=~x\n" addr))))
 
   
   (define (ffi-cif-alloc)
@@ -118,12 +129,12 @@
     )
 
   (define (ffi-free-all)
-					;(display (format "ffi-free-all=~a\n" (length $ffi-alloc-list)))
+    ;;(display (format "ffi-free-all=~a\n" (length $ffi-alloc-list)))
     (let loop ((l $ffi-alloc-list))
       (if (pair? l)
-	  (begin 
+	  (begin
+	    ;;(display (format "addr=~x\n" (car l)))
 	    ($ffi-free (car l) )
-					;(display (format "addr=~x " (car l)))
 	    (loop (cdr l))
 	    )
 	  )
@@ -151,9 +162,6 @@
   (define ffi-type-double (ffi-type-double-ptr))
   (define ffi-type-longdouble (ffi-type-longdouble-ptr))
 
-  (define add-ptr (foreign-procedure "add_ptr" () void*))
-  (define print-ptr (foreign-procedure "print_ptr" (void*) int))
-  (define print-array (foreign-procedure "printf_array" (void*) int))
 
 
 
@@ -161,12 +169,11 @@
 
 
   (define ffi-set-char (foreign-procedure "ffi_set_char" (void* int) void))
-
   (define ffi-set-int (foreign-procedure "ffi_set_int" (void* int) void))
   (define ffi-set-float (foreign-procedure "ffi_set_float" (void* float) void))
   (define ffi-set-double (foreign-procedure "ffi_set_double" (void* double) void))
   (define ffi-set-longdouble (foreign-procedure "ffi_set_longdouble" (void* double ) void))
-  (define ffi-set-pointer (foreign-procedure "ffi_set_pointer" (void* void*) void))
+  (define ffi-set-pointer (foreign-procedure "ffi_set_pointer" (void* integer-64) void))
   (define ffi-set-string (foreign-procedure "ffi_set_string" (void* string) void))
   
   (define ffi-init-struct (foreign-procedure "ffi_init_struct" (void* int int int void*) void))
@@ -181,8 +188,24 @@
   (define ffi-get-double (foreign-procedure "ffi_get_double" (void* ) double))
   (define ffi-get-string (foreign-procedure "ffi_get_string" (void* ) string ))
   (define ffi-get-pointer (foreign-procedure "ffi_get_pointer" (void* ) void* ))
-  (define ffi-get-string-pointer (foreign-procedure "ffi_get_string_pointer" (string ) void* ))
+  (define ffi-get-string-pointer
+    (foreign-procedure "ffi_get_string_pointer" (string ) void* ))
+  
+  (define ffi-get-string-offset
+    (foreign-procedure "ffi_get_string_offset" (string int) string))
 
+  (define ffi-get-pointer-offset
+    (foreign-procedure "ffi_get_pointer_offset" (void* int) void*))
+
+
+  (define ffi-string-pointer
+      (foreign-procedure "ffi_string_pointer" (string) void*))
+
+  (define ffi-string
+    (foreign-procedure "ffi_string" (void*) string))
+
+
+  
   (define ffi-dlsym (foreign-procedure "ffi_dlsym" (void*  string) void*))
   (define ffi-dlopen (foreign-procedure "ffi_dlopen" (string int ) void*))
   (define ffi-dlerror (foreign-procedure "ffi_dlerror" ( ) string ))
@@ -190,6 +213,11 @@
   
   (define ffi-dl-test (foreign-procedure "ffi_dl_test" ( ) void))
 
+
+  (define print-string (foreign-procedure "print_string" (string) int ))
+  (define print-ptr (foreign-procedure "print_ptr" (void*) int))
+  (define print-array (foreign-procedure "printf_array" (void*) int))
+  
   ;;cffi define here
   (define cffi-alloc $ffi-alloc)
   (define cffi-free $ffi-free)
@@ -198,34 +226,53 @@
   (define cffi-get-float ffi-get-float)
   (define cffi-get-double ffi-get-double)
   (define cffi-get-pointer ffi-get-pointer)
+  (define cffi-get-string ffi-get-string)
   (define cffi-get-string-pointer ffi-get-string-pointer)
+
+  (define cffi-get-string-offset
+    (case-lambda
+     [(addr) (ffi-get-string-offset addr 0)]
+     [(addr offset) (ffi-get-string-offset addr offset)]))
+
+  (define cffi-get-pointer-offset
+    (case-lambda
+     [(addr) (ffi-get-pointer-offset addr 0)]
+     [(addr offset) (ffi-get-pointer-offset addr offset)]))
+  
+  (define cffi-set-pointer  ffi-set-pointer)
+  (define cffi-set-string  ffi-set-string)
+  (define cffi-string-pointer  ffi-string-pointer)
+  (define cffi-string  ffi-string)
   
   (define handler '() )
   (define precedures '() )
 
   (define loaded-libs (make-hashtable equal-hash equal?))
+  
   (define (cffi-load-lib-op name)
-            (let  loop ((libs (map car (library-directories)) ))
-              (if (pair? libs)
-                  (begin
-                    (if (and (file-exists? (string-append (car libs) "/" name)) 
-                              (eq? "" (hashtable-ref loaded-libs (string-append (car libs) "/" name) "") ) )
-                      (begin 
-                        ;(display (format "cffi-load-lib ~a\n" (string-append (car libs) "/" name)) )
-                        (cffi-open-lib (string-append (car libs) "/" name)) 
-                        (hashtable-set! loaded-libs (string-append (car libs) "/" name) name )))
-                  (loop (cdr libs))))) )
+    (let  loop ((libs (map car (library-directories)) ) )
+      (if (pair? libs )
+	  (begin
+	    ;;(display (format "   lib##>>>~a ~a\n" (car libs)  (length (cdr libs))))
+	    (if (and (file-exists? (string-append (car libs) "/" name)) 
+		     (eq? "" (hashtable-ref loaded-libs (string-append (car libs) "/" name) "") ) )
+		(begin
+		  (if  cffi-enable-log
+		       (display (format "cffi-load-lib ~a\n" (string-append (car libs) "/" name)) ))
+		  (cffi-open-lib (string-append (car libs) "/" name)) 
+		  (hashtable-set! loaded-libs (string-append (car libs) "/" name) name )))
+	    (loop (cdr libs)) ))) )
 
 
   (define (load-librarys . args)
     (let loop ((arg args))
-          (if (pair? arg)
-            (begin
-              (cffi-load-lib-op (car arg))
-                (loop (cdr args))
-              ))
+      (if (pair? arg)
+	  (begin
+	    (cffi-load-lib-op (car arg))
+	    (loop (cdr arg))
+	    ))
       )
-   )
+    )
   
   ;;(name1 name2 name3)
   ;;(type1 type2 type3)
@@ -336,7 +383,7 @@
 
   ;;cffi functions begin
   (define (cffi-open-lib path)
-    (set! handler (ffi-dlopen path RTLD_LAZY) )
+    (set! handler (ffi-dlopen path  RTLD_LAZY) )
     handler
     )
 
@@ -349,10 +396,11 @@
       (if (pair? l)
         (apply + l)
         (case l
-          [(int  ) 32]
+          [(int long ) 32]
           [(float ) 32]
-          [(double long void* string ) 64]
-          [(void float* ) 32]
+          [(double  void* string ) 64]
+          [(float* ) 32]
+	  [(void ) 0]
           )
       )
     )
@@ -427,38 +475,38 @@
           [(void* float* ) ffi-type-pointer]
           [(void)  ffi-type-void ]
           [else
-            ;(display (format "  $$$else type=~a\n" ret-type) )
+            ;;(display (format "  $$$else type=~a\n" ret-type) )
             (process-struct ret-type )
             ]
         ))
     )
 
   (define (create-cret ret-type)
-     ;;(display (format "ret-type-size=~a\n" (cffi-size ret-type) ))
-     (let ( (ret-fun (lambda (x) x)  )
-            (ret-type-s ret-type )
-            (ret-struct-val '() )
-          )
-       (set! ret-fun (case ret-type
-            [(int ) ffi-get-int]
-            [(float ) ffi-get-float]
-            [(double ) ffi-get-double]
-            [(string ) ffi-get-string]
-            [(void* float* ) ffi-get-long]
-            [(void)  '() ]
-            [else
-              ;;(display (format "  ###else type=~a\n" ret-type) )
-                (set! ret-struct-val ((top-level-value 
-                                                (string->symbol (format "make-~a" ret-type ) )) ))
-                (set! ret-type-s (struct-ref ret-struct-val 1) )
-                (lambda (addr)
-                      (struct2lisp addr ret-struct-val )
-                    )
-              ]
-          ) )
+    ;;(display (format "ret-type-size=~a\n" (cffi-size ret-type) ))
+    (let ( (ret-fun (lambda (x) x)  )
+	   (ret-type-s ret-type )
+	   (ret-struct-val '() )
+	   )
+      (set! ret-fun (case ret-type
+		      [(int ) ffi-get-int]
+		      [(float ) ffi-get-float]
+		      [(double ) ffi-get-double]
+		      [(string ) ffi-get-string]
+		      [(void* float* ) ffi-get-pointer]
+		      [(void)  '() ]
+		      [else
+		       ;;(display (format "  ###else type=~a\n" ret-type) )
+		       (set! ret-struct-val ((top-level-value 
+					      (string->symbol (format "make-~a" ret-type ) )) ))
+		       (set! ret-type-s (struct-ref ret-struct-val 1) )
+		       (lambda (addr)
+			 (struct2lisp addr ret-struct-val )
+			 )
+		       ]
+		      ) )
       (list (ffi-alloc (cffi-size ret-type-s) ) ret-fun )
 
-     )
+      )
     )
 
   (define (create-cargs arg-type args carg-type)
@@ -497,9 +545,11 @@
                     )
                     (ffi-values-set cargs i alloc) ]
                   [(void* )
-                    (set! alloc (ffi-alloc 64) ) 
-                    (ffi-set-pointer alloc  (car arg))
-                    (ffi-values-set cargs i alloc) ]
+		   (set! alloc (ffi-alloc 64) )
+		   ;;(display (format "===>~x\n" (car arg)))
+			    
+		   (ffi-set-pointer alloc  (car arg))
+		   (ffi-values-set cargs i alloc) ]
                   [else
                       ;(display (format "  %%%else type=~a size=~a \n" (car type) (cffi-size (struct-ref (car arg) 1) ) ) )
                       (set! alloc (ffi-alloc (cffi-size (struct-ref (car arg) 1) ))  )
@@ -522,8 +572,8 @@
   ;;ffi call
   (define (cffi-call sym arg-type ret-type args )
     (if cffi-enable-log
-      (begin (display "\n")(display (format "cffi-call ~a arg-type=~a ret-type=~a args=~a \n"  sym  arg-type ret-type args) )
-      ) )
+	(begin
+	  (display "\n")(display (format "cffi-call ~a arg-type=~a ret-type=~a args=~a \n"  sym  arg-type ret-type args) )  ) )
     (let* (
           (carg-type (create-carg-type arg-type) )
           (cret-type (create-cret-type ret-type) )
@@ -540,27 +590,28 @@
           (set! call-ret (cadr cret-info))
           (set! cret (car cret-info))
 
-          ;(display (format "ffi-prep-cif len=~a  cret-type=~a carg-type=~a\n" (length arg-type) cret-type carg-type) )
-          ;(display (test-float cif FFI_DEFAULT_ABI  cret-type carg-type cargs) )
-          ;init cif
+          ;;(display (format "ffi-prep-cif len=~a  cret-type=~a carg-type=~a\n" (length arg-type) cret-type carg-type) )
+          ;;(display (test-float cif FFI_DEFAULT_ABI  cret-type carg-type cargs) )
+          ;;init cif
           (if (= FFI_OK (ffi-prep-cif cif FFI_DEFAULT_ABI (length arg-type) cret-type carg-type ) )
               (begin
-                ;(display "ffi-ok\n")
+                ;;(display "ffi-ok\n")
                 (if (> fptr 0)
                   (begin 
-                    ;(display (format "ffi-call cret=~a cargs=~a\n" cret cargs ))
-
+                    ;;(display (format "ffi-call cret=~x cargs=~x\n" cret cargs ))
                     (ffi-call cif fptr cret cargs)  
-
                     )
                   (display (format "cannot find symbol ~a\n" sym ))
                 ))
               (error 'cffi (format "ffi-prep-cif return error\n"))
-            )
+	      )
+	  ;;(display (format "cret=~x\n" cret))
           (if (procedure? call-ret)
             (set! ret-val (call-ret cret))
             )
           (ffi-free-all)
+	   (if cffi-enable-log
+	       (display (format "ffi-call ret=~x\n" ret-val)))
           ret-val
         )
 
@@ -679,7 +730,7 @@
             (loop (+ i 1) (cdr e) offset (cdr s) )
           ))
       )
-  )
+    )
 
 
 )

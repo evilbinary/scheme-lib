@@ -19,15 +19,14 @@ ifeq ($(UNAME_S), Linux) #LINUX
 	LIBS += 
 	CXXFLAGS += 
 	CXXFLAGS += 
-	CFLAGS += -lGL -I/usr/include/GL -fPIC  -lglut -lGLESv1_CM -lGLESv2
+	CFLAGS +=  -fPIC -lalut -lopenal
 endif
-
 ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"
 	LIBS += 
 	CXXFLAGS += 
 	CXXFLAGS += 
-	CFLAGS += -D__APPLE__   -L../3rdparty/lib -lalut -I../3rdparty/include -framework OpenAL
+	CFLAGS += -D__APPLE__   -L../3rdparty/lib  -Wl,-all_load ../3rdparty/lib/libalut.a -Wl,-noall_load -I../3rdparty/include -framework OpenAL
 #	CXXFLAGS += -D__APPLE__
 endif
 
@@ -52,7 +51,7 @@ $(TARGET): $(OBJS)
 	$(CC)  $(CFLAGS) $(OTHERS) $(OBJS) -shared -o $(TARGET)   $(LIBS)
 
 clean:
-	rm -rf $(TARGET) $(OBJS) *.a
+	rm -rf $(TARGET) $(OBJS) *.a 
 
 
 

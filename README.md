@@ -2,9 +2,10 @@
 scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它平台在规划中。
 # linux、mac
 ### 安装编译
-1. linux下安装`apt-get install freeglut3-dev  libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev`依赖库。
-2. 执行`make`命令就可以编译对应平台的文件在`bin`目录下。
-3. 进入`bin`目录，执行`source env.sh`，然后运行`scheme --script ../apps/hello.ss`就可以运行例子。
+1. linux下安装`apt-get install freeglut3-dev  libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev  libalut-dev libopenal-dev libffi-dev`依赖库。
+2. mac安装xcode command line tool。
+2. 执行`make`命令就可以编译，对应平台的文件在`bin`目录下。
+3. 进入`bin`目录，执行`source env.sh`，然后运行`./scheme --script ../apps/hello.ss`就可以运行例子。
 
 ### 截图
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/game-demo.png" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/gui-demo.png" width="400px" />
@@ -64,6 +65,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它�
 运行效果如下：
   
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld.png" width="350px" />
+
 ### 测试配置
 1. 在手机上输入运行代码可能不方便，所以弄了个配置文件，把需要运行的代码放到配置中会自己加载代码运行。配置文件为`config.xml`内容如下:
 

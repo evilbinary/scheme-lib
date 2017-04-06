@@ -10,8 +10,8 @@ OBJS = main.o
 PLATFORM=
 BITS =$(shell getconf LONG_BIT)
 
-LIBS =-L../libscm -lscm 
-CFLAGS = -Wall -Wformat -I../libscm -g
+LIBS =-L../libscm -lscm -lm
+CFLAGS = -Wall -Wformat -I../libscm -g 
 CXXFLAGS= -Wall -Wformat
 
 UNAME_S := $(shell uname -s)

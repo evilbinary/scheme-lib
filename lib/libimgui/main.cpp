@@ -28,7 +28,7 @@ SCM_API void imgui_init() {
     // (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
     ImGuiIO& io = ImGui::GetIO();
     //io.Fonts->AddFontDefault();
-    io.Fonts->AddFontFromFileTTF("Roboto-Regular.ttf", 18.0f);
+//    io.Fonts->AddFontFromFileTTF("../../extra_fonts/Cousine-Regular.ttf", 15.0f);
 //    io.Fonts->AddFontFromFileTTF("/system/fonts/DroidSans.ttf", 16.0f);
 #ifdef ANDROID
     io.Fonts->AddFontFromFileTTF("/system/fonts/DroidSansFallback.ttf", 18.0f,NULL,io.Fonts->GetGlyphRangesChinese() );

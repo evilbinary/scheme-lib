@@ -2,7 +2,7 @@
 ;作者:evilbinary on 11/19/16.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(import  (scheme) (gui gui) )
+(import  (scheme) (gui gui) (utils macro) )
 
 (define (test1)
   (window "test gui" 800 800 
@@ -139,9 +139,102 @@
 		    (loop (+ i 1)))))
 	  )))			     
 
+
+
+(define (test-edit)
+  (window "test-edit" 800 800
+	  (let* ( (win (window '() "evilbinary test editor" 300 300 :center))
+		)
+	    (edit win "One may fall in love with many people during the lifetime.When you finally get your own happiness, you will understand the previous sadness is kind of treasure, which makes you better to hold and cherishthe people you love." 290 240 :center  )
+		 
+	    ;;(button win3 "win3-4" 80 40 :left (color-rgba  0 255 0 255) )
+	    ;;(edit '() "testafasfa" 80 40 :top-right)
+
+	    ) ))
+
+(define (test-tab)
+  (window "test-tab" 800 800
+	  (let*  ((win (window '() "evilbinary" 500 500 :right))
+		  (tt '() )
+		  (tt1 '() )
+		  (tt2 '() )
+		  (l '() )
+		  (l2 '() )
+		  (ss '() ))
+	    
+	    (set! tt (tab win 440 400 :center))
+	    (tab-titles tt (list "code" "label" "value" "image" "gaga" ))
+	    (edit tt "One may fall in love with many people during the lifetime.When you finally get your own happiness, you will understand the previous sadness is kind of treasure, which makes you better to hold and cherishthe people you love." 420 320 :center  )
+	    (label tt "first" 100 100 :center)
+	    (label tt "second" 100 100 :center)
+	    ;;(label tt "third" 100 100 :center)
+	    (image tt "./test2.jpg" 180 180 :center )
+	    (set! l2 (label tt "gaga" 100 100 :center))
+	    ;;(view-visible-set! win #f)
+
+	  )))
+
+
+(define (test-stack)
+  (window "test-stack" 800 800
+	  (let*  ((win (window '() "evilbinary" 500 500 :right))
+		  (tt '() )
+		  (tt1 '() )
+		  (tt2 '() )
+		  (l '() )
+		  (l2 '() )
+		  (ss '() ))
+	    
+	    (set! tt (tab win 440 400 :center))
+	    (tab-titles tt (list "code" "label" "value" "image" "gaga" ))
+	    (edit tt "One may fall in love with many people during the lifetime.When you finally get your own happiness, you will understand the previous sadness is kind of treasure, which makes you better to hold and cherishthe people you love." 420 320 :center  )
+	    (label tt "first" 100 100 :center)
+	    (label tt "second" 100 100 :center)
+	    ;;(label tt "third" 100 100 :center)
+	    (image tt "./duck.png" 180 180 :center )
+	    (set! l2 (label tt "gaga" 100 100 :center))
+	    (view-visible-set! win #f)
+	    
+	    ;;stack view
+	    (set! ss (stack '() 200 600 :center))
+	    (stack-titles ss (list "code" "label" "value" "image" "gaga" "tab" ))
+	    ;; (label ss "first" 100 100 :center)
+	    ;; (label ss "second" 100 100 :center)
+	    ;; (label ss "third" 100 100 :center)
+
+	    (set! l (label ss "first" 200 100 :center  (color-rgba 255 255 255 255 )  (color-rgba 23 134 201 255 ) ) )
+	    (label l "buttom" 80 40 :bottom)
+	    (label l "left" 80 40 :left )
+	    ;; (set! tt2 (tab l 200 80 :top))
+	    ;; (tab-titles tt2 (list "aa" "bb" "cc"))
+	    ;; (label tt2 "first" 100 100 :center)
+	    ;; (label tt2 "second" 100 100 :center)
+	    ;;(label tt2 "third" 100 100 :center)
+	    
+	    (label ss "second" 200 100 :center  (color-rgba 255 255 255 255 )  (color-rgba 223 160 59 255 ) )
+	    ;;(label ss "third" 200 100 :center (color-rgba 255 255 255 255 )  (color-rgba 113 158 36 255 ) )
+	    ;;(label ss "4" 200 120 :center (color-rgba 255 255 255 255 )  (color-rgba 61 82 113 255 ) ) 
+	    (edit ss "One may fall in love with many people during the lifetime.When you finally get your own happiness, you will understand the previous sadness is kind of treasure, which makes you better to hold and cherishthe people you love." 200 200 :center  )
+	    
+	    (set! tt1 (tab ss 200 200 :center))
+	    (tab-titles tt1 (list "image" "label" "value" "image" "gaga" "tab" ))
+	    
+	    (image tt1 "./duck.png" 140 140 :center )
+
+	    (label tt1 "first" 100 100 :center) 
+	    (label tt1 "second" 100 100 :center)
+	    ;;(label tt "third" 100 100 :center)
+	    (label tt1 "gaga" 100 100 :center)
+	    )
+
+	  ))
+
 ;;(test-win-order)
 ;;(test-corner-view)
 ;;(test-edge-view)
 ;;(test-label)
- (test-win-label)
+;;(test-win-label)
 ;;(test-image)
+;;(test-edit)
+;;(test-tab)
+(test-stack)

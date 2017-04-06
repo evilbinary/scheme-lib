@@ -9,6 +9,11 @@
    label
    image
    edit
+   tab
+   tab-titles
+   stack
+   stack-titles
+   
    make-view
    window-root-view
    view-onclick-set!
@@ -22,6 +27,8 @@
    view-attrib-set!
    view-attrib-ref
    view-add
+   view-visible-set!
+   view-visible
    
    :fill 		
    :center 	
@@ -209,7 +216,7 @@
 	  (w  (view-width view))
 	  (h  (view-height view))
 	  (py (view-y  view )))
-      (if (and (>= x px) (<= x (+ px w)) (>= y py) (<= y (+ py h)))
+      (if (and (view-visible view) (>= x px) (<= x (+ px w)) (>= y py) (<= y (+ py h)))
 	  #t #f)))
 
   (define (find-view view x y)
@@ -242,12 +249,15 @@
     nil)
 
   (define (window-mouse-event button action mods )
-   ;; (display (format "window-mouse-event ~a ~a\n" button action ))
+   ;;(display (format "window-mouse-event ~a ~a\n" button action ))
     (if (and (= 0 button ) (= 1 action))
 	(begin
 	  (set! $active-view (find-view $root-view $cursor-x $cursor-y))
 	  (set! $last-focus $active-view)
-	  ((view-mouse-event $active-view) $active-view button action mods)
+	  ;;(display  (format "window-mouse-event ~a\n" (view-y $active-view) ))
+	  ;;(draw-button $active-view)
+	  (if (not (null? $active-view))
+	      ((view-mouse-event $active-view) $active-view button action mods))
 	  )
 	(let ((view (find-view $root-view $cursor-x $cursor-y)))
 	  (if (not (null? view))
@@ -295,8 +305,8 @@
      (mutable key-event)
      (mutable focus-event)
      (mutable drag-event)
-     
      (mutable focus)
+     (mutable visible)
      (mutable margin-left)
      (mutable margin-right)
      (mutable margin-top)
@@ -318,7 +328,7 @@
 			0
 			view-calc-layout :view-group
 			default-mouse-event default-motion-event default-key-event default-focus-event default-drag-event
-			#f
+			#f #t
 			0.0 0.0 0.0 0.0) )
 	   (if  (null? p)
 		nil
@@ -338,7 +348,7 @@
 			layout-attrib
 			view-calc-layout :view-group
 			default-mouse-event default-motion-event default-key-event default-focus-event default-drag-event
-			#f
+			#f #t
 			0.0 0.0 0.0 0.0 ) )
 	   (if  (null? p)
 		nil
@@ -348,12 +358,14 @@
 
 
   (define (layout-views view)
-    ((view-layout view ) view)
-    (let loop ((childs (view-childs view)))
-      (if (pair? childs)
-	  (begin
-	    (layout-views (car childs))
-	    (loop (cdr childs))))))
+    (begin
+      (if (procedure? (view-layout view))
+	  ((view-layout view ) view))
+      (let loop ((childs (view-childs view)))
+	(if (pair? childs)
+	    (begin
+	      (layout-views (car childs))
+	      (loop (cdr childs)))))) )
 
   (define (view-calc-layout view)
     (let* ((p (view-parent view))
@@ -372,9 +384,9 @@
 	   (mb (view-margin-bottom view)))
       (cond  
        [(= layout 0 )
-	(display "---->default\n")
-	(view-x-set! view (+ p-x x) )
-	(view-x-set! view (+ p-y y) )]
+	(display (format "---->default ~a ~a ~a ~a\n" p-x p-y x y))
+	(view-x-set! view (+ p-x x ) )
+	(view-y-set! view (+ p-y y) )]
        [(= :fill (logand layout :fill ) )
 	(display "---->fill\n")
 	(view-x-set! view (+ p-x x ) )
@@ -448,9 +460,11 @@
 	(view-x-set! view (+ p-x x (/ p-w 2) (/ w -2 ) )  )
 	(view-y-set! view (+ p-y y p-h (- h) ) )]
        [else
-	(display "---->else")])
-      ;; (view-x-set! view (+ ml (view-x view) ))
-      ;; (view-x-set! view (+ ml (view-x view) ))
+	(display "---->else")
+	;; (view-x-set! view (+ ml (view-x view) ))
+	;; (view-x-set! view (+ ml (view-x view) ))
+	])
+   
       ))
   
   
@@ -621,6 +635,18 @@
 	(view-drag-event-set! view window-box-drag-process)
 	(view-attrib-set! view 'title text)
 	view)]))
+
+ (define (view-child-move view dx dy)
+    (view-x-set! view (+ (view-x view) dx))
+    (view-y-set! view (+ (view-y view) dy))
+    (let loop ((childs (view-childs view)))
+      (if (pair? childs)
+	  (begin
+	    (view-child-move (car childs) dx dy)
+	    (loop (cdr childs)))
+	  ))
+    )
+  
   
   ;;label
   (define label
@@ -691,46 +717,158 @@
 	(view-mouse-event-set! view edit-mouse-event)
 	(view-key-event-set! view edit-key-event)
 	view)]))
+  ;;tab
+  (define tab
+    (case-lambda
+     [(parent  width height)
+      (let ((view (make-view parent  width height ) ))
+	(view-draw-set! view draw-tab )
+	(view-attrib-set! view 'bar-height 20.0)
+	;;(view-attrib-set! view 'cursor 0)
+	(view-mouse-event-set! view tab-mouse-event)
+	;;(view-key-event-set! view edit-key-event)
+	view) ]
+     [(parent  width height layout)
+      (let ((view (make-view parent  width height layout) ))
+	(view-draw-set! view draw-tab )
+	(view-attrib-set! view 'bar-height 20.0)
+	;;(view-attrib-set! view 'cursor 0)
+	(view-mouse-event-set! view tab-mouse-event)
+	;;(view-key-event-set! view edit-key-event)
+	view)]
+     [(parent  width height layout color bgcolor)
+      (let ((view (make-view parent  width height layout) ))
+	(view-draw-set! view draw-tab )
+	(view-attrib-set! view 'bar-height 20.0)
+	(view-attrib-set! view 'background-color bgcolor)
+	(view-attrib-set! view 'color color)
+	;;(view-attrib-set! view 'cursor 0)
+	(view-mouse-event-set! view tab-mouse-event)
+	;;(view-key-event-set! view edit-key-event)
+	view)]))
+  ;;tab-titles
+  (define tab-titles
+    (case-lambda
+     [(parent l)
+      (view-attrib-set! parent 'titles l)]))
 
+
+  ;;stack
+  (define stack
+    (case-lambda
+     [(parent  width height)
+      (let ((view (make-view parent  width height ) ))
+	(view-draw-set! view draw-stack )
+	(view-attrib-set! view 'bar-height 20.0)
+	(view-layout-set! view stack-layout)
+	;;(view-attrib-set! view 'cursor 0)
+	(view-mouse-event-set! view stack-mouse-event)
+	;;(view-key-event-set! view edit-key-event)
+	view) ]
+     [(parent  width height layout)
+      (let ((view (make-view parent  width height layout) ))
+	(view-draw-set! view draw-stack )
+	(view-attrib-set! view 'bar-height 20.0)
+	(view-layout-set! view stack-layout)
+	;;(view-attrib-set! view 'cursor 0)
+	(view-mouse-event-set! view stack-mouse-event)
+	;;(view-key-event-set! view edit-key-event)
+	view)]
+     [(parent  width height layout color bgcolor)
+      (let ((view (make-view parent  width height layout) ))
+	(view-draw-set! view draw-stack )
+	(view-attrib-set! view 'bar-height 20.0)
+	(view-layout-set! view stack-layout)
+	(view-attrib-set! view 'background-color bgcolor)
+	(view-attrib-set! view 'color color)
+	;;(view-attrib-set! view 'cursor 0)
+	(view-mouse-event-set! view stack-mouse-event)
+	;;(view-key-event-set! view edit-key-event)
+	view)]))
   
+  ;;stack-titles
+  (define stack-titles
+    (case-lambda
+     [(parent l)
+      (view-attrib-set! parent 'titles l)]))
+  
+  (define (stack-layout view)
+    (let* ((p (view-parent view))
+	   (x (view-x view))
+	   (y (view-y view))
+	   (p-x (view-x p))
+	   (p-y (view-y p))
+	   (layout (view-layout-attrib view))
+	   (childs (view-childs view))
+	   (w (view-width view))
+	   (h (view-height view))
+	   (p-w (view-width p) )
+	   (p-h (view-height p))
+	   (bar-height (view-attrib-ref view 'bar-height))
+	   (ml (view-margin-left view))
+	   (mr (view-margin-right view))
+	   (mt (view-margin-top view))
+	   (mb (view-margin-bottom view)))
+      (view-calc-layout view)
+      
+      (let loop ((child childs)
+		 (i 0)
+		 (offset 0.0))
+	(if (pair? child)
+	    (begin
+	      ;;(cffi-log #t)
+	     
+	      (view-layout-set! (car child) nil)
+	      (view-y-set! (car child) (+ bar-height  (view-y view ) offset) )
+	      (view-x-set! (car child) (+ (view-x view ) ) )
+	      ;;(layout-views (car child))
+	     
+	      (loop (cdr child ) (+ i 1)
+		    (+ offset  bar-height  (if (view-visible (car child ) ) (view-height (car child))  0.0 ) ))
+	      )))
+      
+      ))
+  
+  ;;edit-key-event
   (define (edit-key-event view keycode scancode action modifier )
     (display (format "   keycode=~a action=~a\n" keycode action))
     (let ((row (view-attrib-ref view 'cursor-row nil))
 	  (col (view-attrib-ref view 'cursor-col nil))
 	   (x (view-x view))
 	   (y (view-y view))
-	  (cursor-cols (view-attrib-ref view 'cursor-cols nil))
+	  (cursor-pos (view-attrib-ref view 'cursor-pos nil))
 	  (cx (view-attrib-ref view 'cursor-x nil))
 	  (cy (view-attrib-ref view 'cursor-y nil))
 	  (text (view-attrib-ref view 'text "")))
-      (display (format "cols=~a\n" cursor-cols ))
+      ;;(display (format "cols=~a\n" cursor-pos ))
       (cond 
-	[(= keycode GLFW_KEY_RIGHT)  (view-calc-cursor-pos view (+ x cx 10.0) (+ y cy)) ]
-	[(= keycode GLFW_KEY_LEFT)   (view-calc-cursor-pos view (+ x cx -10.0) (+ y cy)) ]
-	[(= keycode GLFW_KEY_DOWN)  (display "abc\n") (view-calc-cursor-pos view (+ x cx ) (+ y cy 25.0)) ]
-	[(= keycode GLFW_KEY_UP)   (view-calc-cursor-pos view (+ x cx ) (+ y cy -10.0)) ]
-	
-	[(= keycode GLFW_KEY_BACKSPACE)
-	 (set! text (string-delete text (+ cursor-cols -1 )  ))
-	 (view-attrib-set! view 'text text)
-	 (view-calc-cursor-pos view (+ x cx ) (+ y cy 0.0)) ]
-	
-	[(= keycode GLFW_KEY_SPACE)
-	 (set! text (string-insert text (+ cursor-cols ) " " ))
-	 (view-attrib-set! view 'text text)
-	 (view-calc-cursor-pos view (+ x cx) (+ y cy)) ]
-	
-	[(= keycode GLFW_KEY_ENTER)
-	 (set! text (string-insert text (+ cursor-cols ) "\n" ))
-	 (view-attrib-set! view 'text text)
-	 (view-calc-cursor-pos view (+ x cx) (+ y cy)) ]
-	[else
-	 (if (number? cursor-cols)
-	     (begin
-	       (set! text (string-insert text (+ cursor-cols ) (format "~a" (integer->char keycode ))  ))
-	       (view-attrib-set! view 'text text)
-	       (view-calc-cursor-pos view (+ x cx 10.0) (+ y cy))
-	       )
+       [(= keycode GLFW_KEY_RIGHT)  (cursor->position view (+ (view-attrib-ref view 'cursor-pos ) 1 )) ]
+       [(= keycode GLFW_KEY_LEFT)   (cursor->position view (+ (view-attrib-ref view 'cursor-pos ) -1 )) ]
+       [(= keycode GLFW_KEY_DOWN)  (cursor->down view) ]
+       [(= keycode GLFW_KEY_UP)    (cursor->up view) ]
+       
+       [(= keycode GLFW_KEY_BACKSPACE)
+	(set! text (string-delete text (+ cursor-pos -1 )  ))
+	(view-attrib-set! view 'text text)
+	]
+       
+       [(= keycode GLFW_KEY_SPACE)
+	(set! text (string-insert text (+ cursor-pos ) " " ))
+	(view-attrib-set! view 'text text)
+	]
+       
+       [(= keycode GLFW_KEY_ENTER)
+	(set! text (string-insert text (+ cursor-pos ) "\n" ))
+	(view-attrib-set! view 'text text)
+	]
+       [else
+	(if (number? cursor-pos)
+	    (begin
+	      (set! text (string-insert text (+ cursor-pos ) (format "~a" (integer->char keycode ))  ))
+	      (view-attrib-set! view 'text text)
+	      (cursor->position view (+ cursor-pos ))
+
+	      )
 	     )]))
     nil)
   
@@ -748,7 +886,9 @@
 				    (nvg-rgba 0 0 0  32))))
 
       (if (= action 1)
-	  (view-calc-cursor-pos view $cursor-x $cursor-y)
+	  (begin
+	    (position->cursor view $cursor-x $cursor-y)
+	    )
 	  )
      
       ;;(nvg-fill-paint vg bg)
@@ -756,78 +896,491 @@
       (if (procedure? click)
 	  (click view action))))
 
-  (define (view-calc-cursor-pos view mx my)
-    (let ( (x (view-x view))
+
+  (define (tab-mouse-event view button action mods)
+    (let* ((click (view-attrib-ref view 'onclick nil))
+	   (bg-color (view-attrib-ref view 'background-color nil ))
+	   (x (view-x view))
 	   (y (view-y view))
-	   (text (view-attrib-ref view 'text ""))
 	   (w (view-width view))
 	   (h (view-height view))
-	   (cy (cffi-alloc 64))
-	   (cx (cffi-alloc 64))
-	   (crow (cffi-alloc 64))
-	   (ccol (cffi-alloc 64))
-	   (rows (cffi-alloc 64))
-	   (ccols (cffi-alloc 64)))
-      ;;(cffi-log #t)
-      (calc-cursor-pos vg x y w h mx my text cx cy crow ccol rows ccols)
-      ;;(display (format "cursor-cols=~a\n" (cffi-get-int ccols)))
-      (cffi-log #f)
-      (view-attrib-set! view 'cursor-x  (-  (cffi-get-float cx) x) )
-      (view-attrib-set! view 'cursor-y  (-  (cffi-get-float cy) y)  )
-      (view-attrib-set! view 'cursor-row (cffi-get-int crow) )
-      (view-attrib-set! view 'cursor-col (cffi-get-int ccol) )
-      (view-attrib-set! view 'rows (cffi-get-int rows) )
-      (view-attrib-set! view 'cursor-cols (cffi-get-int ccols) )
-      (cffi-free cx)
-      (cffi-free cy)
-      (cffi-free crow)
-      (cffi-free ccol)
-      (cffi-free rows)
-      (cffi-free ccols)
-    ))
-  
-  ;;position-cussor-index todo
-  (define (position-cussor-index pos-x pos-y string)
-    (let* ((len (string-length string))
-	   (glyphs (cffi-alloc (* len (* 64 4 ))))
-	   (caretx 0.0)
-	   (cur-id 0)
-	   (nglyphs (nvg-text-glyph-positions vg pos-x pos-y string NULL glyphs len )))
+	   (text (view-attrib-ref view 'text ""))
+	   (bar-height (view-attrib-ref view 'bar-height))
+	   (active-index (view-attrib-ref view 'active-index 0 ))
+	   (child-count (view-childs-count view) )
+	   (bg (nvg-linear-gradient vg 
+				    x y x (+ y h)
+				    (nvg-rgba 255 255 255 32) 
+				    (nvg-rgba 0 0 0  32))))
+
+      (if (= action 1)
+	  (begin
+	    (for i (0 to child-count)
+		 (if (and (>= $cursor-x (+ x (* (/ w child-count) (+ i 0))))
+			  (<= $cursor-x (+ x (* (/ w child-count) (+ i 1)) ))
+			  (>= $cursor-y y)
+			  (<= $cursor-y (+ y bar-height)))
+		     (begin
+		       (view-attrib-set! view 'active-index i )
+		       ;;(display (format "active=~a\n" i))
+		       )
+		     ))
+	    ;;(display "tab-mouse-event\n")
+	    )
+	  )
+     
+      ;;(nvg-fill-paint vg bg)
+      ;;(nvg-fill vg)
+      (if (procedure? click)
+	  (click view action))))
+
+
+    (define (stack-mouse-event view button action mods)
+    (let* ((click (view-attrib-ref view 'onclick nil))
+	   (bg-color (view-attrib-ref view 'background-color nil ))
+	   (x (view-x view))
+	   (y (view-y view))
+	   (w (view-width view))
+	   (h (view-height view))
+	   (childs (view-childs view))
+	   (text (view-attrib-ref view 'text ""))
+	   (bar-height (view-attrib-ref view 'bar-height))
+	   (active-index (view-attrib-ref view 'active-index 0 ))
+	   (child-count (view-childs-count view) )
+	   (bg (nvg-linear-gradient vg 
+				    x y x (+ y h)
+				    (nvg-rgba 255 255 255 32) 
+				    (nvg-rgba 0 0 0  32))))
+      ;;(display (format "stack-mouse-even\n"))
+			
+      (if (= action 1)
+	  (let loop ((child childs)
+		     (i 0)
+		     (offset 0.0))
+	    (if (pair? child)
+		(begin
+		  ;; (display (format "~a ~a ~a==~a ~a\n" x (+ y offset)
+		  ;; 		   (+ y offset bar-height)
+		  ;; 		   $cursor-x $cursor-y))
+
+		  (if (and (>= $cursor-x (+ x ))
+			   (<= $cursor-x (+ x w ))
+			   (>= $cursor-y (+ y offset) )
+			   (<= $cursor-y (+ y offset bar-height)))
+		      (begin
+			(if (view-visible (car child))
+			    (begin
+			      (view-visible-set! (car child) #f)
+			      )
+			    (begin
+			      (view-visible-set! (car child) #t)
+			      ))
+			
+			;;(display (format "stack index=~a\n" i))
+			)
+		      )
+		  ;;moving child here
+		  (view-child-move (car child) 0 (-  (+ bar-height  (view-y view ) offset)  (view-y (car child))  ) )
+
+		  (view-y-set! (car child) (+ bar-height  (view-y view ) offset) )
+		  (view-x-set! (car child) (+ (view-x view ) ) )
+		  ;;(view-layout-set! (car child) nil)
+		  
+		  
+		  (loop (cdr child ) (+ i 1)
+			(+ offset  bar-height  (if (view-visible (car child ) ) (view-height (car child))  0.0 ) )))
+		  )))
+     
+      ;;(nvg-fill-paint vg bg)
+      ;;(nvg-fill vg)
+      (if (procedure? click)
+	  (click view action))))
+
+  (define (position->cursor view mx my)
+     (let ((rows (cffi-alloc (* 40  3 )))
+	  (glyphs (cffi-alloc (* 20 100)))
+	  (text (view-attrib-ref view 'text ))
+	  (x (view-x view))
+	  (y (view-y view))
+	  (view-y (view-y view))
+	  (width (view-width view))
+	  (height (view-height view))
+	  (start 0)
+	  (end 0)
+	  (nrows 0)
+	  (i 0)
+	  (j 0)
+	  (nglyphs 0)
+	  (lnum 0)
+	  (lineh (cffi-alloc 8))
+	  (caretx 0)
+	  (px 0.0)
+	  (bounds (cffi-alloc (* 64 4)))
+	  (cx 0.0)
+	  (cy 0.0)
+	  (ccol -1)
+	  (crow 0)
+	  (crows 0)
+	  (ccols 0)
+	  (cpos 0)
+	  (is-end #f)
+	  (font-size (view-attrib-ref view 'font-size 20.0))
+	  (font-face (view-attrib-ref view 'font-face "sans"))
+	  (a 0.0))
+     
+      ;;(nvg-save vg)
+      (nvg-font-size vg font-size)
+      (nvg-font-face vg font-face)
+      (nvg-text-align vg  (+ NVG_ALIGN_LEFT NVG_ALIGN_TOP))
+      (nvg-text-metrics vg NULL NULL lineh)
       
-      (set! caretx (cffi-get-float (+ glyphs (* 0 64 ) 64 )))
-      (let loop ((i 1))
-	(if (<  i nglyphs)
-	    (begin
-	      (display (format " caretx=~a glyphs[~a].x=~a\n" caretx  i (cffi-get-float (+ glyphs (* i 64) )) ))
+      ;;(cffi-log #t)
+      (set! start (cffi-string-pointer text))
+      (set! end (+ start (string-length text ) ))
+     
+      (set! nrows (nvg-text-break-lines vg start NULL  width rows 3))
+      (while (> nrows 0)
+	     (for i (0 to nrows)
+		  ;;(display (format "i=~a\n" i))
+		
+		  (set! nglyphs
+			(nvg-text-glyph-positions
+		  		 vg x y
+		  		 (nvg-text-row-start rows i)
+		  		 (nvg-text-row-end rows i)
+		  		 glyphs 100)
+			)
 
-	      (if (> (abs (- caretx pos-x )) (abs (- (cffi-get-float (+ glyphs (* i 64 ) 64 )) pos-x )) )
-		  (begin
-		    (set! cur-id i)
-		    (set! caretx (cffi-get-float (+ glyphs (* cur-id 64 ) 64 )))
-		    ))
-	      (display (format " caretx=~a ~a\n" caretx cur-id ))
-	      
-	      (loop (+ i 1) )
-	      )))
+		  (if (and (> mx x )
+		  	      (< mx (+ x width))
+		  	      (>= my y)
+		  	      (< my (+ y (cffi-get-float lineh))))
+		      (begin
+			(set! caretx (if (< $cursor-x
+					    (+ x (/ (nvg-text-row-width rows i) 2)))
+					 x (+ x (nvg-text-row-width rows i))))
+			(set! px x)
+			
+			;; (display (format "\nhit nglyphs=~a cursor-x=~a row-width=~a row/2=~a caretx=~a x=~a\n"
+			;; 		 nglyphs
+			;; 		 $cursor-x
+			;; 		 (nvg-text-row-width rows i)
+			;; 		 (+ x (/ (nvg-text-row-width rows i) 2))
+			;; 		 caretx
+			;; 		 x))
 
+			(for j (0 to nglyphs)
+			     
+			     (let* ((x0 (nvg-glyph-positions-x glyphs j))
+				    (x1 (if (< (+ j 1) nglyphs)
+					    (nvg-glyph-positions-x glyphs (+ j 1) )
+					    (+ x (nvg-text-row-width rows i ))))
+				    (gx (+ (* x0 0.3) (* x1 0.7))))
+			       ;;(display (format "j=~a mx=~a x0=~a x1=~a gx=~a px=~a\n" j $cursor-x x0 x1 gx px))
+			       (if (and (>= mx px) (< mx gx))
+				   (begin
+				     (set! caretx x0)
+				     ;;(display (format "caretx=~a col=~a\n" x0 j))
+				     (set! ccol j)
+				     (set! ccols nglyphs)
+				     ))
+			       (set! px gx)
+			       )
+			     )
+			(set! cx caretx)
+			(set! cy y)
+			;;(display (format " yy=~a\n" y))
+			(set! crow lnum)
+			(if (and (> crow 0) (< ccol 0 ))
+			     (set! ccol nglyphs ))
+			(set! is-end #t)
+			)
+		      )
+		  
+		  (if (not is-end) (set! cpos (+ cpos nglyphs 1) ) )		  
+		  ;;(display (format "y=~a\n" y))
+		  (set! lnum (+ lnum 1))
+      	     	  (set! y (+ y (cffi-get-float lineh))) )
+	     
+	     (set! start  (nvg-text-row-next rows  (- nrows 1) ))
+	     (set! nrows (nvg-text-break-lines vg start NULL width rows 3)) )
+      (set! crows lnum)
+      (cffi-free rows)
       (cffi-free glyphs)
-      nglyphs
+      (cffi-free lineh)
+      (cffi-free bounds)
+      ;;(nvg-restore vg)
+
+      (display (format "#cpos=~a crow=~a ccol=~a  ccols=~a crows=~a\n" cpos crow ccol ccols crows  ))
+
+      (set! cpos (+ cpos ccol))
+      (view-attrib-set! view 'cursor-x (- cx x))
+      (view-attrib-set! view 'cursor-y (- cy view-y))
+      (view-attrib-set! view 'cursor-row crow)
+      (view-attrib-set! view 'cursor-col ccol)
+      (view-attrib-set! view 'cursor-rows crows)
+      (view-attrib-set! view 'cursor-cols ccols)	    
+      (view-attrib-set! view 'cursor-pos cpos)
+      
       ))
-  
-  ;;grapic op
-  (def-function draw-paragraph "drawParagraph"
-    (void* float float float float float float string)
-    void)
-  (def-function calc-cursor-pos "calcCursorPos"
-    (void* float float float float float float string void* void* void* void*  void* void*)
-    void
+
+  ;;cursor->position
+  (define (cursor->position view cursor-pos)
+    (if (>= cursor-pos 0)
+    (let ((rows (cffi-alloc (* 40  3 )))
+	  (glyphs (cffi-alloc (* 20 100)))
+	  (text (view-attrib-ref view 'text ))
+	  (x (view-x view))
+	  (y (view-y view))
+	  (view-y (view-y view))
+	  (width (view-width view))
+	  (height (view-height view))
+	  (start 0)
+	  (end 0)
+	  (nrows 0)
+	  (i 0)
+	  (j 0)
+	  (nglyphs 0)
+	  (lnum 0)
+	  (lineh (cffi-alloc 8))
+	  (caretx 0)
+	  (px 0.0)
+	  (cx 0.0)
+	  (cy 0.0)
+	  (ccol -1)
+	  (crow 0)
+	  (crows 0)
+	  (ccols 0)
+	  (cpos 0)
+	  (font-size (view-attrib-ref view 'font-size 20.0))
+	  (font-face (view-attrib-ref view 'font-face "sans"))
+	  (is-end #f) )
+
+      
+      (nvg-save vg)
+      (nvg-font-size vg font-size)
+      (nvg-font-face vg font-face)
+      (nvg-text-align vg  (+ NVG_ALIGN_LEFT NVG_ALIGN_TOP))
+      (nvg-text-metrics vg NULL NULL lineh)
+      
+      (set! start (cffi-string-pointer text))
+      (set! end (+ start (string-length text ) ))
+      
+      (display (format "cursor->position cpos=~a cursor-pos=~a\n" (view-attrib-ref view 'cursor-pos) cursor-pos))
+
+      (set! nrows (nvg-text-break-lines vg start NULL  width rows 3))
+      (while (> nrows 0)
+	     (for i (0 to nrows)
+		  (set! nglyphs
+			(nvg-text-glyph-positions
+			 vg x y
+			 (nvg-text-row-start rows i)
+			 (nvg-text-row-end rows i)
+			 glyphs 100))
+		  (if (and (>= cursor-pos cpos) (<= cursor-pos (+ cpos nglyphs)))
+		      (begin
+			(set! caretx (if (< $cursor-x
+					    (+ x (/ (nvg-text-row-width rows i) 2)))
+					 x (+ x (nvg-text-row-width rows i))))
+			(set! px x)
+			(for j (0 to nglyphs)
+			     (let* ((x0 (nvg-glyph-positions-x glyphs j))
+				    (x1 (if (< (+ j 1) nglyphs)
+					    (nvg-glyph-positions-x glyphs (+ j 1) )
+					    (+ x (nvg-text-row-width rows i ))))
+				    (gx (+ (* x0 0.3) (* x1 0.7))))
+			       
+			       (if (= (+ cpos j) cursor-pos )
+				   (begin
+				     (set! caretx x0)
+				     (set! ccol j)
+				     ;;(display (format "cpos=~a cursor-pos=~a\n" (+ cpos j) cursor-pos))
+				     (if (not is-end)
+					 (begin
+					   (set! cx caretx)
+					   (set! cy y)
+					   (set! crow lnum)
+					   (set! ccols nglyphs)
+					   ;;(display (format " crow=~a\n" crow))
+					   ))
+				     (set! is-end #t)
+				     ))
+			       (set! px gx)
+			       )
+			     )
+			
+			
+			(if (and (> crow 0) (< ccol 0 ))
+			    (set! ccol nglyphs ))
+			
+			)
+		      )
+		  
+		  (if (not is-end) (set! cpos (+ cpos nglyphs 1) ) )		  
+		  (set! lnum (+ lnum 1))
+		  (set! y (+ y (cffi-get-float lineh))) )
+	     
+	     (set! start  (nvg-text-row-next rows  (- nrows 1) ))
+	     (set! nrows (nvg-text-break-lines vg start NULL width rows 3)) )
+      (set! crows lnum)
+
+      (cffi-free rows)
+      (cffi-free glyphs)
+      (cffi-free lineh)
+      (nvg-restore vg)
+
+      (display (format "cpos=~a crow=~a ccol=~a  ccols=~a crows=~a\n" cpos crow ccol ccols crows  ))
+      (set! cpos (+ cpos ccol))
+      (view-attrib-set! view 'cursor-x (- cx x))
+      (view-attrib-set! view 'cursor-y (- cy view-y))
+      (view-attrib-set! view 'cursor-row crow)
+      (view-attrib-set! view 'cursor-cols ccols)
+      (view-attrib-set! view 'cursor-rows crows)
+      (view-attrib-set! view 'cursor-col ccol)
+      (view-attrib-set! view 'cursor-pos cursor-pos))))
+
+  (define (cursor->down view)
+    (let ((font-size (view-attrib-ref view 'font-size 20.0))
+	  (font-face (view-attrib-ref view 'font-face "sans"))
+	  (lineh (cffi-alloc 8))
+	  (cursor-x (view-attrib-ref view 'cursor-x))
+	  (cursor-y (view-attrib-ref view 'cursor-y))
+	  (x (view-x view))
+	  (y (view-y view))
+	  (rows (view-attrib-ref view 'cursor-rows ) )
+	  (row (view-attrib-ref view 'cursor-row))
+
+	  )
+      (nvg-font-size vg font-size)
+      (nvg-font-face vg font-face)
+      (nvg-text-align vg  (+ NVG_ALIGN_LEFT NVG_ALIGN_TOP))
+      (nvg-text-metrics vg NULL NULL lineh)
+      ;;(display (format "row=~a rows=~a\n" row rows))
+      
+      (if (< row (- rows 1))
+	  (position->cursor view (+ x cursor-x) (+ y cursor-y (cffi-get-float lineh) )))
+      
+      (cffi-free lineh)
+      )
     )
+
+   (define (cursor->up view)
+    (let ((font-size (view-attrib-ref view 'font-size 20.0))
+	  (font-face (view-attrib-ref view 'font-face "sans"))
+	  (lineh (cffi-alloc 8))
+	  (cursor-x (view-attrib-ref view 'cursor-x))
+	  (cursor-y (view-attrib-ref view 'cursor-y))
+	  (x (view-x view))
+	  (y (view-y view))
+	  )
+      (nvg-font-size vg font-size)
+      (nvg-font-face vg font-face)
+      (nvg-text-align vg  (+ NVG_ALIGN_LEFT NVG_ALIGN_TOP))
+      (nvg-text-metrics vg NULL NULL lineh)
+      (if (>= cursor-y (cffi-get-float lineh))
+	  (position->cursor view (+ x cursor-x) (+ y cursor-y (- (cffi-get-float lineh) ) )) )
+      
+      (cffi-free lineh)
+      )
+    )
+  
+  (define (draw-paragraph view)
+    (let ((rows (cffi-alloc (* 40  3 )))
+	  (glyphs (cffi-alloc (* 1 100)))
+	  (text (view-attrib-ref view 'text ))
+	  (x (view-x view))
+	  (y (view-y view))
+	  (width (view-width view))
+	  (height (view-height view))
+	  (start 0)
+	  (end 0)
+	  (nrows 0)
+	  (i 0)
+	  (j 0)
+	  (nglyphs 0)
+	  (text-padding-left (view-attrib-ref view 'text-padding-left 5.0))
+	  (text-padding-right (view-attrib-ref view 'text-padding-right 5.0))
+
+	  (lnum 0)
+	  (lineh (cffi-alloc 8))
+	  (caretx 0)
+	  (px 0)
+	  (bounds (cffi-alloc (* 64 4)))
+	  (font-size (view-attrib-ref view 'font-size 20.0))
+	  (font-face (view-attrib-ref view 'font-face "sans"))
+	  (a 0.0))
+      
+      (nvg-save vg)
+      (nvg-font-size vg font-size)
+      (nvg-font-face vg font-face)
+      (nvg-text-align vg  (+ NVG_ALIGN_LEFT NVG_ALIGN_TOP))
+      (nvg-text-metrics vg NULL NULL lineh)
+      
+      (set! start (cffi-string-pointer text))
+      (set! end (+ start (string-length text ) ))
+      ;;(set! end (end-ptr text))
+
+      (nvg-begin-path vg)
+      
+      (set! nrows (nvg-text-break-lines vg start NULL  (- width text-padding-left text-padding-right ) rows 3))
+      (while (> nrows 0)
+	     ;;(display (format "\n\nnrows=~a\n" nrows))
+	     (for i (0 to nrows)
+      	     	  (nvg-begin-path vg)
+      	     	  (nvg-fill-color vg (nvg-rgba 255 255 255 255))
+		  ;;(cffi-log #t)
+		  (nvg-text vg (+ x text-padding-left ) y  (nvg-text-row-start rows i)
+      	     		    (nvg-text-row-end rows i)  )
+		  ;;(cffi-log #f)
+		  
+      	     	  ;;(display (format "start[~a]=~a end=~a\n" i (nvg-text-row-start rows i)
+		  ;;(nvg-text-row-end rows i)))
+		  
+      	     	  (set! y (+ y (cffi-get-float lineh)))
+      	     	  ;;(print-row (+ rows (* 40 i) ))
+		  
+      	     	  )
+	     
+	     (set! start  (nvg-text-row-next rows  (- nrows 1) ))
+      	     ;;(print-row rows)
+	     (set! nrows (nvg-text-break-lines vg start NULL width rows 3))
+	     
+      	     )
+      
+      (cffi-free rows)
+      (cffi-free glyphs)
+      (cffi-free lineh)
+      (cffi-free bounds)
+      
+      (nvg-restore vg)
+      
+      ;;(display (format "pos-x=~a\n" (nvg-glyph-positions-x (get-glyph-position) 3)))
+      
+      ))
+
+  ;;64bit define here
+  (define (nvg-text-row-next rows i)
+   (cffi-get-pointer (+ rows (* 40  i) (* 8 2 ))))
+
+  (define (nvg-text-row-start rows i)
+   (cffi-get-pointer (+ rows (* 40  i) (* 8 0))))
+
+  (define (nvg-text-row-end rows i)
+    (cffi-get-pointer (+ rows (* 40  i) (* 8 1))))
+
+  (define (nvg-text-row-width rows i)
+     (cffi-get-float (+ rows (* 40  i) (* 8 3))))
+
+  (define (nvg-glyph-positions-x glyphs i)
+    (cffi-get-float (+ glyphs (* 24 i) (* 8 1) )))  
+  
   (define (draw-views view)
     ((view-draw view ) view)
     (let loop ((childs (view-childs view)))
       (if (pair? childs)
-	  (begin 
-	    (draw-views (car childs))
+	  (begin
+	    (if (view-visible (car childs))
+		(draw-views (car childs)))
 	    (loop (cdr childs)))
 	  )))
 
@@ -920,7 +1473,7 @@
 	   (h (view-height view)))
 
       ;;(cffi-log #t)
-      (if (number? cursor-x)
+      (if (and (number? cursor-x) (>= cursor-x  0))
 	  (begin 
 	    (nvg-begin-path vg)
 	    (nvg-move-to vg (+ x cursor-x) (+ y cursor-y) )
@@ -937,8 +1490,9 @@
 	    (nvg-rounded-rect vg x y  w h 2.0)
 	    (nvg-fill vg )))
       (draw-edit-box-base vg x y w h)
-   
-      (draw-paragraph vg x y w h   $cursor-x $cursor-y text)
+
+      (draw-paragraph view)
+      ;;(draw-paragraph vg x y w h   $cursor-x $cursor-y text)
       ;; (nvg-font-size vg font-size)
       ;; (nvg-font-face vg "sans")
       ;; (nvg-fill-color vg (nvg-rgba 255 255 255 64));
@@ -984,16 +1538,235 @@
 	 (set! tw (nvg-text-bounds vg 0.0 0.0 text NULL NULL ))
 	 (nvg-text vg (+ x (* w 0.5) (- (* tw 0.5)) (* iw 0.25)) (+ y (* h 0.5)) text NULL  )])
       ))
+  (define (view-childs-count view)
+    (length (view-childs view)))
 
+  ;;draw-stack
+  (define (draw-stack view)
+    (let (  (vg (view-context view) )
+	    (preicon 0)
+	    (text (view-attrib-ref view 'text ""))
+	    (tw 0.0)
+	    (iw 0.0)
+	    (x (view-x view))
+	    (y (view-y view))
+	    (w (view-width view))
+	    (h (view-height view))
+	    (titles (view-attrib-ref view 'titles nil))
+	    (childs (view-childs view))
+	    (bar-height (view-attrib-ref view 'bar-height))
+	    (bar-text-padding-left (view-attrib-ref view 'bar-text-padding-left 5.0))
+	    (active-index (view-attrib-ref view 'active-index 0))
+	    (child-count (view-childs-count view) )
+	    (text-align (view-attrib-ref view 'text-align 'center))
+	    (bar-text-align  (view-attrib-ref view 'bar-text-align 'left ))
+	    (radius (view-attrib-ref view 'corner-radius 4.0))
+	    (font-size (view-attrib-ref view 'font-size 18.0))
+	    (font-face (view-attrib-ref view 'font-face "sans"))
+	    (font-icon (view-attrib-ref view 'font-icon "icons"))
+	    (color (view-attrib-ref view 'color (nvg-rgba 255 255 255 160) ))
+	    (bg-color (view-attrib-ref view 'background-color nil )) )
+      
+      (nvg-intersect-scissor vg x y w h)
+      (nvg-font-size vg font-size)
+      (nvg-font-face vg font-face)
+      (let loop ((child childs)
+		 (i 0)
+		 (offset 0.0))
+	(if (pair? child)
+	    (begin
+	      
+	      (nvg-begin-path vg)
+	      (nvg-stroke-width vg 1.0)
+	      (nvg-rounded-rect vg (+ x 0.5 ) (+ y  offset 1.5 )
+				(+  w -2)  (+ bar-height 1.0)  radius)
+	      (nvg-fill-color vg  (nvg-rgba  29 29 29 160 ) )
+	      (nvg-fill vg)
+	      (nvg-stroke-color vg (nvg-rgba 92 92 92 160))
+	      (nvg-stroke vg)
+
+	      (if (< i (length titles))
+		  (begin
+		    (nvg-font-face vg font-face)
+		    (nvg-font-size vg font-size)
+		    
+		    (nvg-fill-color vg color)
+		    (nvg-text-align vg (+ NVG_ALIGN_LEFT  NVG_ALIGN_MIDDLE))
+		    (case bar-text-align
+		      [(left) 
+		       (nvg-text vg
+				 (+ x 16.0 bar-text-padding-left)
+				 (+ y  offset (/ bar-height 2) )
+				 (list-ref titles i)  NULL)]
+		      [(right)
+		       (set! tw (nvg-text-bounds vg 0.0 0.0 text NULL NULL ))
+		       (nvg-text vg  (+ x w (- tw )) (+ y )  (list-ref titles i)  NULL)]
+		      [(center)
+		       (set! tw (nvg-text-bounds vg 0.0 0.0  (list-ref titles i) NULL NULL ))
+		       (nvg-text vg
+				 (+ x (+ (* tw 1)) (* iw 0.25))
+				 (+ y offset (/ bar-height 2) )
+				 (list-ref titles i) NULL )])
+		    
+		    (nvg-font-face vg font-icon)
+		    (nvg-font-size vg 38.0)
+		    (nvg-fill-color vg color)
+		    (nvg-text-align vg (+ NVG_ALIGN_LEFT  NVG_ALIGN_MIDDLE))
+		    (if (view-visible (car child))
+			 (nvg-text vg  (+ x bar-text-padding-left (+ (* tw 1)) (* iw 0.25))
+			      (+ y offset (/ bar-height 2) )  "▾" NULL)
+			 (nvg-text vg  (+ x bar-text-padding-left (+ (* tw 1)) (* iw 0.25))
+				   (+ y offset (/ bar-height 2) )  "▸" NULL))
+		    
+		    
+		    ))
+	      
+
+	      
+	      (loop (cdr child ) (+ i 1)
+		    (+ offset  bar-height (if (view-visible (car child ) )  (view-height (car child))  0.0 ) ))
+	      )))
+
+      (nvg-begin-path vg)
+      (nvg-rounded-rect vg (+ x 0.5) (+ y 0.5) (- w 1.0) (- h 1.0) radius  )
+      (nvg-stroke-color vg (nvg-rgba  29 29 29 255 ))
+      (nvg-stroke vg)
+    
+      ))
+  
+  ;;draw-tab
+  (define (draw-tab view)
+    (let (  (vg (view-context view) )
+	    (preicon 0)
+	    (text (view-attrib-ref view 'text ""))
+	    (tw 0.0)
+	    (iw 0.0)
+	    (x (view-x view))
+	    (y (view-y view))
+	    (w (view-width view))
+	    (h (view-height view))
+	    (titles (view-attrib-ref view 'titles nil))
+	    (childs (view-childs view))
+	    (bar-height (view-attrib-ref view 'bar-height))
+	    (bar-text-padding-left (view-attrib-ref view 'bar-text-padding-left 5.0))
+	    (active-index (view-attrib-ref view 'active-index 0))
+	    (child-count (view-childs-count view) )
+	    (text-align (view-attrib-ref view 'text-align 'center))
+	    (bar-text-align  (view-attrib-ref view 'bar-text-align 'left ))
+	    (radius (view-attrib-ref view 'corner-radius 4.0))
+	    (font-size (view-attrib-ref view 'font-size 18.0))
+	    (font-face (view-attrib-ref view 'font-face "sans"))
+	    (color (view-attrib-ref view 'color (nvg-rgba 255 255 255 160) ))
+	    (bg-color (view-attrib-ref view 'background-color nil )) )
+      (nvg-font-size vg font-size)
+      (nvg-font-face vg font-face)
+      
+      (if (not (null?  bg-color))
+	  (begin
+	    (nvg-begin-path vg)
+	    (nvg-rounded-rect vg x y w h radius)
+	    (nvg-fill-color vg bg-color)
+	    (nvg-fill vg)))
+
+      ;;(display (format "active-index=~a childs-count=~a\n" active-index (view-childs-count view) ))
+      (let loop ((child childs)
+		 (i 0))
+	(if (pair? child)
+	    (begin
+	      ;;(display (format "child=~a\n" (car child) ))
+
+	      (view-visible-set! (car child) #f)
+	      (if (< i (length titles))
+		  (begin
+		    (nvg-fill-color vg color)
+		    (nvg-text-align vg (+ NVG_ALIGN_LEFT  NVG_ALIGN_MIDDLE))
+		    (case bar-text-align
+		      [(left) 
+		       (nvg-text vg
+				 (+ x  (* (/ w child-count) i ) bar-text-padding-left)
+				 (+ y (/ bar-height 2) )
+				 (list-ref titles i)  NULL)]
+		      [(right)
+		       (set! tw (nvg-text-bounds vg 0.0 0.0 text NULL NULL ))
+		       (nvg-text vg  (+ x w (- tw )) (+ y )  (list-ref titles i)  NULL)]
+		      [(center)
+		       (set! tw (nvg-text-bounds vg 0.0 0.0  (list-ref titles i) NULL NULL ))
+		       (nvg-text vg
+				 (+ x  (* (/ w child-count) i ) (+ (* tw 1)) (* iw 0.25))
+				 (+ y (/ bar-height 2) )
+				 (list-ref titles i) NULL )])
+		    ))
+	      
+	      (if (= i active-index)
+		  (begin
+		    (view-visible-set! (car child) #t)
+
+		    (nvg-begin-path vg)
+		    (nvg-line-join vg NVG_ROUND)
+		    (nvg-move-to vg (+ x  (* (/ w child-count) i ) -2) (+ y bar-height ) )
+		    (nvg-line-to vg (+ x  (* (/ w child-count) i  ) -2) (+ y ))
+		    (nvg-line-to vg (+ x  (* (/ w child-count) (+ i 1 ) ) -2) (+ y) )
+		    (nvg-line-to vg (+ x  (* (/ w child-count)  (+ i 1 ) ) -2) (+ y bar-height ))
+
+		    (nvg-stroke-width vg 1.0)
+		    (nvg-stroke-color vg (nvg-rgba 255 255 255 160))
+		    (nvg-stroke vg) )
+		  (begin
+
+		    (nvg-begin-path vg)
+		    (nvg-stroke-width vg 1.0)
+		    (nvg-rounded-rect vg (+ x 0.5 (* (/ w child-count) i) ) (+ y 1.5)
+				      (+ (/ w child-count) -2) (+ bar-height 1) radius)
+		    (nvg-stroke-color vg (nvg-rgba 92 92 92 160))
+		    (nvg-stroke vg)
+		    
+		    (nvg-begin-path vg)
+		    (nvg-stroke-width vg 1.0)
+		    (nvg-rounded-rect vg (+ x 0.5 (* (/ w child-count) i) ) (+ y 0.5)
+		    (+ (/ w child-count) -2)  (+ 20.0 1) radius)
+		    (nvg-stroke-color vg (nvg-rgba  29 29 29 255 ))
+		    (nvg-stroke vg)
+		    )
+		  )
+	      
+	      (loop (cdr child ) (+ i 1) )) ))
+      
+      (nvg-begin-path vg)
+      (nvg-rounded-rect vg (+ x 0.5) (+ y 1.5) (- w 1.0) (- h 1.0) radius  )
+      (nvg-stroke-color vg (nvg-rgba 92 92 92 16 ))
+      (nvg-stroke vg)
+
+      (nvg-begin-path vg)
+      (nvg-rounded-rect vg (+ x 0.5) (+ y 0.5) (- w 1.0) (- h 1.0) radius  )
+      (nvg-stroke-color vg (nvg-rgba  29 29 29 255 ))
+      (nvg-stroke vg)
+      
+      (nvg-fill-color vg color)
+      (nvg-text-align vg (+ NVG_ALIGN_LEFT  NVG_ALIGN_MIDDLE))
+      (case text-align
+	[(left) 
+	 (nvg-text vg  x (+ y (* h 0.5)) text NULL)]
+	[(right)
+	 (set! tw (nvg-text-bounds vg 0.0 0.0 text NULL NULL ))
+	 (nvg-text vg  (+ x w (- tw )) (+ y (* h 0.5)) text NULL)]
+	[(center)
+	 (set! tw (nvg-text-bounds vg 0.0 0.0 text NULL NULL ))
+	 (nvg-text vg (+ x (* w 0.5) (- (* tw 0.5)) (* iw 0.25)) (+ y (* h 0.5)) text NULL  )])
+      ))
+
+
+  
   (define (is-black col)
     (if (and (= 0 (NVGcolor-r col)) 
 	     (= 0 (NVGcolor-g col)) 
 	     (= 0 (NVGcolor-b col)) 
 	     (= 0 (NVGcolor-a col)) ) #t #f))
+  (define (cp2utf8 int string)
+    string
+    )
 
-  (define (cpToUTF8 cp str)
-    str)
-  
+  ;;(def-function cp2utf8 "cpToUTF8" (int string) string )
+
   ;;draw button
   (define (draw-button view)
     (let* (
@@ -1036,7 +1809,7 @@
 	  (begin
 	    (nvg-font-size vg (* h 1.3))
 	    (nvg-font-face vg "icons")
-	    (set! iw (nvg-text-bounds vg 0.0 0.0  (cpToUTF8 preicon icon) NULL NULL))
+	    (set! iw (nvg-text-bounds vg 0.0 0.0  (cp2utf8 preicon icon) NULL NULL))
 	    (set! iw (* h 0.15))))
 
       (if (not (= 0 preicon))
@@ -1045,7 +1818,7 @@
 	    (nvg-font-face vg "icons")
 	    (nvg-fill-color vg (nvg-rgba 255 255 255 96))
 	    (nvg-text-align vg (+ NVG_ALIGN_LEFT NVG_ALIGN_MIDDLE) )
-	    (nvg-text vg (+ x (* w 0.5) (- (* tw 0.5) ) (- (* iw 0.75))) (+ y (* h 0.5)) (cpToUTF8 preicon icon) NULL  )))
+	    (nvg-text vg (+ x (* w 0.5) (- (* tw 0.5) ) (- (* iw 0.75))) (+ y (* h 0.5)) (cp2utf8 preicon icon) NULL  )))
 
       (nvg-font-size vg font-size)
       (nvg-font-face vg "sans-bold")

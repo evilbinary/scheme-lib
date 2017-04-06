@@ -23,7 +23,7 @@ ifeq ($(UNAME_S), Linux) #LINUX
 	LIBS += 
 	CXXFLAGS += 
 	CXXFLAGS += 
-	CFLAGS += -lm -lrt
+	CFLAGS +=  -fPIC
 	ifeq ($(BITS), 32)
 		PLATFORM=i3le
 	else

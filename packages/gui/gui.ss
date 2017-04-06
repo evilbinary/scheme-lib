@@ -848,25 +848,28 @@
        [(= keycode GLFW_KEY_UP)    (cursor->up view) ]
        
        [(= keycode GLFW_KEY_BACKSPACE)
-	(set! text (string-delete text (+ cursor-pos -1 )  ))
+	(set! text (string-delete text (+ cursor-pos -1)  ))
 	(view-attrib-set! view 'text text)
+	(cursor->position view (+ cursor-pos -1 ))
 	]
        
        [(= keycode GLFW_KEY_SPACE)
 	(set! text (string-insert text (+ cursor-pos ) " " ))
 	(view-attrib-set! view 'text text)
+	(cursor->position view (+ cursor-pos 1))
 	]
        
        [(= keycode GLFW_KEY_ENTER)
-	(set! text (string-insert text (+ cursor-pos ) "\n" ))
+	(set! text (string-insert text (+ cursor-pos 1) "\n" ))
 	(view-attrib-set! view 'text text)
+	(cursor->position view (+ cursor-pos 1))
 	]
        [else
 	(if (number? cursor-pos)
 	    (begin
 	      (set! text (string-insert text (+ cursor-pos ) (format "~a" (integer->char keycode ))  ))
 	      (view-attrib-set! view 'text text)
-	      (cursor->position view (+ cursor-pos ))
+	      (cursor->position view (+ cursor-pos 1))
 
 	      )
 	     )]))
@@ -1010,6 +1013,8 @@
 	  (nrows 0)
 	  (i 0)
 	  (j 0)
+	  (text-padding-left (view-attrib-ref view 'text-padding-left 5.0))
+	  (text-padding-right (view-attrib-ref view 'text-padding-right 5.0))
 	  (nglyphs 0)
 	  (lnum 0)
 	  (lineh (cffi-alloc 8))
@@ -1038,7 +1043,7 @@
       (set! start (cffi-string-pointer text))
       (set! end (+ start (string-length text ) ))
      
-      (set! nrows (nvg-text-break-lines vg start NULL  width rows 3))
+      (set! nrows (nvg-text-break-lines vg start NULL  (- width text-padding-left text-padding-right ) rows 3))
       (while (> nrows 0)
 	     (for i (0 to nrows)
 		  ;;(display (format "i=~a\n" i))
@@ -1152,6 +1157,8 @@
 	  (crows 0)
 	  (ccols 0)
 	  (cpos 0)
+	  (text-padding-left (view-attrib-ref view 'text-padding-left 5.0))
+	  (text-padding-right (view-attrib-ref view 'text-padding-right 5.0))
 	  (font-size (view-attrib-ref view 'font-size 20.0))
 	  (font-face (view-attrib-ref view 'font-face "sans"))
 	  (is-end #f) )
@@ -1168,7 +1175,7 @@
       
       (display (format "cursor->position cpos=~a cursor-pos=~a\n" (view-attrib-ref view 'cursor-pos) cursor-pos))
 
-      (set! nrows (nvg-text-break-lines vg start NULL  width rows 3))
+      (set! nrows (nvg-text-break-lines vg start NULL  (- width text-padding-left text-padding-right) rows 3))
       (while (> nrows 0)
 	     (for i (0 to nrows)
 		  (set! nglyphs
@@ -1467,6 +1474,9 @@
 	   (bg-color (view-attrib-ref view 'background-color nil ))
 	   (text (view-attrib-ref view 'text ""))
 	   (font-size (view-attrib-ref view 'font-size 18.0))
+	   (text-padding-left (view-attrib-ref view 'text-padding-left 5.0))
+	   (text-padding-right (view-attrib-ref view 'text-padding-right 5.0))
+
 	   (x (view-x view))
 	   (y (view-y view))
 	   (w (view-width view))
@@ -1476,8 +1486,8 @@
       (if (and (number? cursor-x) (>= cursor-x  0))
 	  (begin 
 	    (nvg-begin-path vg)
-	    (nvg-move-to vg (+ x cursor-x) (+ y cursor-y) )
-	    (nvg-line-to vg (+ x cursor-x) (+  y cursor-y 20.0) )
+	    (nvg-move-to vg (+ x text-padding-left cursor-x) (+ y cursor-y) )
+	    (nvg-line-to vg (+ x text-padding-left cursor-x) (+  y cursor-y 20.0) )
 	    (nvg-stroke-color vg cursor-color)
 	    (nvg-stroke-width vg cursor-width)
 	    (nvg-stroke vg)))
@@ -1490,6 +1500,7 @@
 	    (nvg-rounded-rect vg x y  w h 2.0)
 	    (nvg-fill vg )))
       (draw-edit-box-base vg x y w h)
+      (nvg-intersect-scissor vg x y w h)
 
       (draw-paragraph view)
       ;;(draw-paragraph vg x y w h   $cursor-x $cursor-y text)

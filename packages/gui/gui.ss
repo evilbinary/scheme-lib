@@ -1500,7 +1500,7 @@
 	    (nvg-rounded-rect vg x y  w h 2.0)
 	    (nvg-fill vg )))
       (draw-edit-box-base vg x y w h)
-      (nvg-intersect-scissor vg x y w h)
+      ;;(nvg-intersect-scissor vg x y w h)
 
       (draw-paragraph view)
       ;;(draw-paragraph vg x y w h   $cursor-x $cursor-y text)

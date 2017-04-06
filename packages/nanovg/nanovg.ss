@@ -5,7 +5,10 @@
 (library (nanovg nanovg)
     (export
         nvg-create-gles2 
-        nvg-delete-gles2 
+        nvg-delete-gles2
+
+	nvg-create-gles222
+	nvg-create-gles22
         
         nvg-begin-frame
         nvg-cancel-frame
@@ -133,6 +136,11 @@
         NVG_ALIGN_BOTTOM  
         NVG_ALIGN_BASELINE
         NULL
+	NVG_BUTT
+	NVG_ROUND
+	NVG_SQUARE
+	NVG_BEVEL
+	NVG_MITER
     )
 
     (import (scheme) (utils libutil) (cffi cffi) )
@@ -150,6 +158,12 @@
     (define NVG_ALIGN_BOTTOM 32)
     (define NVG_ALIGN_BASELINE 64)
     (define NULL 0)
+    
+    (define NVG_BUTT 0)
+    (define NVG_ROUND 1)
+    (define NVG_SQUARE 2)
+    (define NVG_BEVEL 3)
+    (define NVG_MITER 4)
 
     (define lib-name
      (case (machine-type)
@@ -157,7 +171,7 @@
        ((a6nt i3nt) "libnanovg.dll")
        ((a6osx i3osx)  "libnanovg.so")
        ((a6le i3le) "libnanovg.so")))
-    (define lib (load-librarys  lib-name))
+    (define lib (load-librarys  lib-name ))
 
 
     (def-struct NVGcolor
@@ -188,8 +202,15 @@
         (image int 32)
         )
 
+     (def-function nvg-create-gles22 
+       "nvgCreateGL22" (int) void*)
+
+ (def-function nvg-create-gles222 
+       "nvgCreateGLES222" (int) void*)
+     
     (def-function nvg-create-gles2 
-       "nvgCreateGL2" (int) void*)
+      "nvgCreateGL2" (int) void*)
+    
     (def-function nvg-delete-gles2 
       "nvgDeleteGL2" (void*) void)
 
@@ -788,7 +809,7 @@
 ;; Draws text string at specified location. If end is specified only the sub-string up to the end is drawn.
 ;; float nvgText(NVGcontext* ctx, float x, float y, const char* string, const char* end);
 (def-function nvg-text 
-                 "nvgText" (void* float float string void*) float)
+                 "nvgText" (void* float float string string) float)
 
 ;; Draws multi-line text string at specified location wrapped at the specified width. If end is specified only the sub-string up to the end is drawn.
 ;; White space is stripped at the beginning of the rows, the text is split at word boundaries or when new-line characters are encountered.

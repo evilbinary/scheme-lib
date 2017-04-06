@@ -39,7 +39,7 @@
   (syntax-rules (to)
     ;; loop in sequence
     ;; (for i (0 to 10) do something...)
-    ((_ i in (from to end) body ...)
+    ((_ i  (from to end) body ...)
      (let loop ((i from))
        (when (< i end)
              body ...

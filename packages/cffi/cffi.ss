@@ -15,8 +15,16 @@
    cffi-get-long
    cffi-get-double
    cffi-get-pointer
+   cffi-get-string
+   cffi-get-string-offset
+   cffi-set-pointer
+   cffi-set-string
+   cffi-get-pointer-offset
    cffi-get-string-pointer
-   
+   cffi-string-pointer
+   cffi-string
+   print-ptr
+   print-string
    ;; cffi-load-lib
    ;; cffi-open-lib
    ;; cffi-call
@@ -74,7 +82,7 @@
       ((a6osx i3osx)  "libffi.so")
       ((a6le i3le) "libffi.so")))
   (define lib (load-lib lib-name))
-
+  
   (define ffi-prep-cif (foreign-procedure "ffi_prep_cif" (void* int int void* void*) int))
   (define ffi-prep-cif-var (foreign-procedure "ffi_prep_cif_var" (void* int int int void* void*) int))
   (define ffi-call (foreign-procedure "ffi_call" (void* void* void* void*) void))
@@ -91,7 +99,8 @@
 
   (define $ffi-alloc (foreign-procedure "ffi_alloc" (int ) void*))
   (define $ffi-free (foreign-procedure "ffi_free" (void*) void))
-
+  ;;(define $ffi-free (lambda (addr)
+  ;;(display (format "addr=~x\n" addr))))
 
   
   (define (ffi-cif-alloc)
@@ -123,9 +132,9 @@
     ;;(display (format "ffi-free-all=~a\n" (length $ffi-alloc-list)))
     (let loop ((l $ffi-alloc-list))
       (if (pair? l)
-	  (begin 
+	  (begin
+	    ;;(display (format "addr=~x\n" (car l)))
 	    ($ffi-free (car l) )
-	    ;;(display (format "addr=~x " (car l)))
 	    (loop (cdr l))
 	    )
 	  )
@@ -153,9 +162,6 @@
   (define ffi-type-double (ffi-type-double-ptr))
   (define ffi-type-longdouble (ffi-type-longdouble-ptr))
 
-  (define add-ptr (foreign-procedure "add_ptr" () void*))
-  (define print-ptr (foreign-procedure "print_ptr" (void*) int))
-  (define print-array (foreign-procedure "printf_array" (void*) int))
 
 
 
@@ -163,7 +169,6 @@
 
 
   (define ffi-set-char (foreign-procedure "ffi_set_char" (void* int) void))
-
   (define ffi-set-int (foreign-procedure "ffi_set_int" (void* int) void))
   (define ffi-set-float (foreign-procedure "ffi_set_float" (void* float) void))
   (define ffi-set-double (foreign-procedure "ffi_set_double" (void* double) void))
@@ -183,8 +188,24 @@
   (define ffi-get-double (foreign-procedure "ffi_get_double" (void* ) double))
   (define ffi-get-string (foreign-procedure "ffi_get_string" (void* ) string ))
   (define ffi-get-pointer (foreign-procedure "ffi_get_pointer" (void* ) void* ))
-  (define ffi-get-string-pointer (foreign-procedure "ffi_get_string_pointer" (string ) void* ))
+  (define ffi-get-string-pointer
+    (foreign-procedure "ffi_get_string_pointer" (string ) void* ))
+  
+  (define ffi-get-string-offset
+    (foreign-procedure "ffi_get_string_offset" (string int) string))
 
+  (define ffi-get-pointer-offset
+    (foreign-procedure "ffi_get_pointer_offset" (void* int) void*))
+
+
+  (define ffi-string-pointer
+      (foreign-procedure "ffi_string_pointer" (string) void*))
+
+  (define ffi-string
+    (foreign-procedure "ffi_string" (void*) string))
+
+
+  
   (define ffi-dlsym (foreign-procedure "ffi_dlsym" (void*  string) void*))
   (define ffi-dlopen (foreign-procedure "ffi_dlopen" (string int ) void*))
   (define ffi-dlerror (foreign-procedure "ffi_dlerror" ( ) string ))
@@ -192,6 +213,11 @@
   
   (define ffi-dl-test (foreign-procedure "ffi_dl_test" ( ) void))
 
+
+  (define print-string (foreign-procedure "print_string" (string) int ))
+  (define print-ptr (foreign-procedure "print_ptr" (void*) int))
+  (define print-array (foreign-procedure "printf_array" (void*) int))
+  
   ;;cffi define here
   (define cffi-alloc $ffi-alloc)
   (define cffi-free $ffi-free)
@@ -200,7 +226,23 @@
   (define cffi-get-float ffi-get-float)
   (define cffi-get-double ffi-get-double)
   (define cffi-get-pointer ffi-get-pointer)
+  (define cffi-get-string ffi-get-string)
   (define cffi-get-string-pointer ffi-get-string-pointer)
+
+  (define cffi-get-string-offset
+    (case-lambda
+     [(addr) (ffi-get-string-offset addr 0)]
+     [(addr offset) (ffi-get-string-offset addr offset)]))
+
+  (define cffi-get-pointer-offset
+    (case-lambda
+     [(addr) (ffi-get-pointer-offset addr 0)]
+     [(addr offset) (ffi-get-pointer-offset addr offset)]))
+  
+  (define cffi-set-pointer  ffi-set-pointer)
+  (define cffi-set-string  ffi-set-string)
+  (define cffi-string-pointer  ffi-string-pointer)
+  (define cffi-string  ffi-string)
   
   (define handler '() )
   (define precedures '() )
@@ -211,11 +253,12 @@
     (let  loop ((libs (map car (library-directories)) ) )
       (if (pair? libs )
 	  (begin
-	   ;; (display (format "   lib##>>>~a ~a\n" (car libs)  (length (cdr libs))))
+	    ;;(display (format "   lib##>>>~a ~a\n" (car libs)  (length (cdr libs))))
 	    (if (and (file-exists? (string-append (car libs) "/" name)) 
 		     (eq? "" (hashtable-ref loaded-libs (string-append (car libs) "/" name) "") ) )
-		(begin 
-		  ;;(display (format "cffi-load-lib ~a\n" (string-append (car libs) "/" name)) )
+		(begin
+		  (if  cffi-enable-log
+		       (display (format "cffi-load-lib ~a\n" (string-append (car libs) "/" name)) ))
 		  (cffi-open-lib (string-append (car libs) "/" name)) 
 		  (hashtable-set! loaded-libs (string-append (car libs) "/" name) name )))
 	    (loop (cdr libs)) ))) )
@@ -687,7 +730,7 @@
             (loop (+ i 1) (cdr e) offset (cdr s) )
           ))
       )
-  )
+    )
 
 
 )

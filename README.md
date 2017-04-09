@@ -1,5 +1,5 @@
 # scheme-lib
-scheme-lib 是一个scheme使用的库。目前支持android mac linux，其它平台在规划中。
+scheme-lib 是一个scheme使用的库。目前支持android mac linux windows，其它平台在规划中。
 # linux、mac
 ### 安装编译
 1. linux下安装`apt-get install freeglut3-dev  libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev  libalut-dev libopenal-dev libffi-dev`依赖库。

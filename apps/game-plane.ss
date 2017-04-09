@@ -49,6 +49,12 @@
            ((arm32le) "/data/data/org.evilbinary.chez/files/")
            (else "./")
             ))
+(define scale
+    (case (machine-type)
+      ((arm32le) 1 )
+      ((a6nt i3nt)  1)
+      ((a6osx i3osx)  2 )
+      ((a6le i3le) 1 )))
 
 (define bgmusic (string-append res-dir "game_bg.wav"))
 (define shot-snd  (string-append res-dir "bullet.wav" ))
@@ -362,6 +368,7 @@
          ; (list p3 (create-plane 0.0 0.0 0.0 0.9) )
          ; (list p2 (create-plane 0.0 0.0 0.0 0.9) )
          ))
+
   (alut-init )
   ;bg music
   (let ((buffer (alut-create-buffer-from-file bgmusic))
@@ -381,7 +388,7 @@
       (glut-set-window-title "game")
       
     
-      ;(imgui-scale 1.5 1.5)
+      ;;(imgui-scale 1.5 1.5)
       (glut-touch-event (lambda (type x y)
           (imgui-touch-event type x y)
 
@@ -414,10 +421,11 @@
               (100 (set! deltax 0.01))
               (119 (set! deltay 0.01))
               (115 (set! deltay -0.01))
-              (32  (let ((l (create-bullet x (+ y 0.12) 2.0 0.0003 shot 1)))
-                      (append! objects (list l) )
-                      (alut-play-file  shot-snd)
-                  ))
+              (32 (if (> (list-ref mplay 2) 0)
+		      (let ((l (create-bullet x (+ y 0.12) 2.0 0.0003 shot 1)))
+			(append! objects (list l) )
+			(alut-play-file  shot-snd)
+                  )))
               )
             (begin 
               (set! deltax 0.0)
@@ -428,6 +436,7 @@
 
       (glut-display (lambda ()
          (collect)
+
              (imgui-render-start)
 
                  (glClearColor 1.0  1.0  1.0  1.0 );
@@ -496,16 +505,18 @@
           ))
 
       (glut-reshape (lambda(w h)
+                         
                     (imgui-resize w h)
                     (glut-log (format "reshape ~a ~a" w h))
-                    (glClearDepthf 1.0)
+                    ;;(glClearDepthf 1.0)
                     (glClearColor 0.0 0.0 0.0 0.0 )
                     (glFrontFace GL_CCW);
                     (glEnable GL_BLEND);
                     (glBlendFunc GL_SRC_ALPHA  GL_ONE_MINUS_SRC_ALPHA);
-                    ;(glViewport 0 0 w h)
+                    (glViewport 0 0 (* w scale) (* h scale) )
                     (glMatrixMode GL_PROJECTION)
                     (glLoadIdentity)
+                    
                      ))
       (glut-main-loop)
       (imgui-exit)

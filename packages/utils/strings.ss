@@ -48,9 +48,17 @@
                     (loop (cdr x) (string-append s (car x)) (+ i 1))))))
 
 	  (define (string-insert s i new)
-	    (string-append (substring s 0 i)
-			   new
-			   (substring s i (string-length s) )))
+	    (let ((len (string-length s)))
+	      (cond
+	       	[(= i 0)
+		 (string-append new s)]
+		[(< i len)
+		 (string-append (substring s 0 i)
+			       new
+			       (substring s i (string-length s) ))]
+		[(>= i len)
+		 (string-append s new)]
+		)))
 	  
 	    (define (string-insert! s1 i1 s2 n2)
               (do ([i2 0 (fx+ i2 1)] [i1 i1 (fx+ i1 1)])
@@ -58,7 +66,12 @@
                 (string-set! s1 i1 (string-ref s2 i2))))
 	    
 	    (define (string-delete str i)
-	      (string-append (substring str 0 i)
-			     (substring str (+ i 1)  (string-length str) )))
-	    
-	 )
+	       (let ((len (string-length str)))
+		 (cond
+		  [(< i len)
+		   (string-append (substring str 0 i)
+				  (substring str (+ i 1)  (string-length str) ))]
+		  [(>= i len)
+		   str])) )
+
+	    )

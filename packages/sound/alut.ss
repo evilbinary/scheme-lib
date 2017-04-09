@@ -13,12 +13,12 @@
     	alut-get-error
     	)
     (import (scheme) (utils libutil))
-
+    
     (define lib-name
            (case (machine-type)
              ((arm32le) "libalut.so")
              ((a6nt i3nt)  "libalut.dll")
-             ((a6osx i3osx)  "libalut.so")
+             ((a6osx i3osx) "libalut.so")
              ((a6le i3le) "libalut.so")))
     (define lib (load-lib lib-name))
 

@@ -23,7 +23,7 @@
                     (if (and (file-exists? (string-append (car libs) "/" name)) 
                               (eq? "" (hashtable-ref loaded-libs (string-append (car libs) "/" name) "") ) )
                       (begin 
-                        ;(display (format "load-lib ~a\n" (string-append (car libs) "/" name)) )
+                        ;;(display (format "load-lib ~a\n" (string-append (car libs) "/" name)) ) 
                         (load-shared-object (string-append (car libs) "/" name)) 
                         (hashtable-set! loaded-libs (string-append (car libs) "/" name) name )))
                   (loop (cdr libs))))) )

@@ -23,11 +23,11 @@
     (define lib-name
            (case (machine-type)
              ((arm32le) "libalut.so")
-             ((a6nt i3nt)  "libalut.dll")
+             ((a6nt i3nt)  (load-lib "libopenal.dll")   "libalut.dll" )
              ((a6osx i3osx)  "libalut.so")
              ((a6le i3le) "libalut.so")))
     (define lib (load-lib lib-name))
-
+ 
     
     (define al-source-i (foreign-procedure "alSourcei" (int int int ) void ))
     (define al-gen-source  (foreign-procedure "al_gen_source" (int ) int ) )

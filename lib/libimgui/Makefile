@@ -46,8 +46,8 @@ endif
 
 ifeq ($(UNAME_S), MINGW32_NT-6.1)
    ECHO_MESSAGE = "Windows"
-	LIBS += -lglut32 -lopengl32
-	CXXFLAGS += -DNO_IMGUI_OPENGL_GLGENERATEMIPMAP
+	LIBS += 
+	CXXFLAGS+= -DGLAD -I../3rdparty/include -I../libglfw  -I../libglut  -L../libglfw/  -L../libglut/ -lglut -lglfw
 	CFLAGS += -DNO_IMGUI_OPENGL_GLGENERATEMIPMAP
 	TARGET = libimgui.dll
 endif

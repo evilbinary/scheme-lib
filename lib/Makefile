@@ -18,12 +18,23 @@ SUB_DIR :=  libscm \
 
 LIBSCM =./libscm/libscm.so
 LIBGLUT =./libglut/libglut.so
+LIBFFI = ./libffi/libffi.so
+LIBGLFW = ./libglfw/libglfw.so
+LIBGLES= ./libgl/libgles.so
 
 UNAME_S := $(shell uname -s)
 OS_NAME :=$(shell echo $(UNAME_S) | tr '[A-Z]' '[a-z]')
-
 LIBS_ALL= libscm.so libimgui.so libglfw.so libffi.so libgles.so libnanovg.so \
 	libalut.so libgui.so
+
+ifeq ($(UNAME_S), MINGW32_NT-6.1)
+  OS_NAME:=windows
+  LIBSCM =./libscm/libscm.dll
+  LIBGLUT =./libglut/libglut.dll
+  LIBFFI = ./libffi/libffi.dll
+  LIBGLFW = ./libglfw/libglfw.dll
+  LIBGLES= ./libgl/libgles.dll
+endif
 
 all: $(TARGET)	
 	@echo Build complete for $(TARGET)
@@ -41,13 +52,13 @@ libimgui.so: libglut.so libscm.so
 libnanovg.so: libgles.so
 	$(MAKE) -C libnanovg
 
-libglfw.so: ./libglfw/libglfw.so
+libglfw.so: $(LIBGLFW)
 	$(MAKE) -C libglfw
 
-libffi.so: ./libffi/libffi.so
+libffi.so: $(LIBFFI)
 	$(MAKE) -C libffi
 
-libgles.so: ./libgl/libgles.so
+libgles.so: $(LIBGLES) 
 	$(MAKE) -C libgl
 
 libalut.so: libalut.so
@@ -58,6 +69,7 @@ libgui.so: libgui.so libnanovg.so
 
 $(OS_NAME):
 	@echo link... $(OS_NAME) $(LN_SRC)
+ifeq (,$(wildcard boot))
 	@ln -sf platform/$(OS_NAME)/boot/ boot
 	@ln -sf platform/$(OS_NAME)/libscm libscm
 	@ln -sf platform/$(OS_NAME)/libglut libglut
@@ -65,6 +77,7 @@ $(OS_NAME):
 	@ln -sf platform/$(OS_NAME)/libgl/ libgl
 	@ln -sf platform/$(OS_NAME)/libglfw/ libglfw
 	@ln -sf platform/$(OS_NAME)/3rdparty/ 3rdparty
+endif
 
 android:
 	@echo link... android

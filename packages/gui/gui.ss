@@ -13,6 +13,9 @@
    tab-titles
    stack
    stack-titles
+   pop
+   menu
+   menu-titles
    
    make-view
    window-root-view
@@ -62,7 +65,7 @@
        ((a6nt i3nt) "libgui.dll")
        ((a6osx i3osx)  "libgui.so")
        ((a6le i3le) "libgui.so")))
-   (define lib (load-librarys  lib-name))
+  (define lib (load-librarys  lib-name))
   
   (define nil '())
 
@@ -466,7 +469,8 @@
 	])
    
       ))
-  
+
+
   
   (define (default-mouse-event view button action mods)
     ;;(display (format "  mouse-event ~a ~a\n" button action))
@@ -636,9 +640,18 @@
 	(view-attrib-set! view 'title text)
 	view)]))
 
- (define (view-child-move view dx dy)
+ (define (view-move view dx dy)
     (view-x-set! view (+ (view-x view) dx))
     (view-y-set! view (+ (view-y view) dy))
+    (let loop ((childs (view-childs view)))
+      (if (pair? childs)
+	  (begin
+	    (view-move (car childs) dx dy)
+	    (loop (cdr childs)))
+	  ))
+    )
+  
+   (define (view-child-move view dx dy)
     (let loop ((childs (view-childs view)))
       (if (pair? childs)
 	  (begin
@@ -646,8 +659,6 @@
 	    (loop (cdr childs)))
 	  ))
     )
-  
-  
   ;;label
   (define label
     (case-lambda
@@ -817,14 +828,139 @@
 	(if (pair? child)
 	    (begin
 	      ;;(cffi-log #t)
-	     
+
+	      
 	      (view-layout-set! (car child) nil)
 	      (view-y-set! (car child) (+ bar-height  (view-y view ) offset) )
-	      (view-x-set! (car child) (+ (view-x view ) ) )
+	      (view-x-set! (car child) (+ (view-x view )  ) )
+	      
 	      ;;(layout-views (car child))
 	     
+	      
 	      (loop (cdr child ) (+ i 1)
 		    (+ offset  bar-height  (if (view-visible (car child ) ) (view-height (car child))  0.0 ) ))
+	      )))
+      
+      ))
+  
+  ;;menu
+  (define menu
+    (case-lambda
+     [(parent  width height)
+      (let ((view (make-view parent  width height ) ))
+	(view-draw-set! view draw-stack )
+	(view-attrib-set! view 'bar-height 20.0)
+	(view-layout-set! view stack-layout)
+	;;(view-attrib-set! view 'cursor 0)
+	(view-mouse-event-set! view stack-mouse-event)
+	;;(view-key-event-set! view edit-key-event)
+	view) ]
+     [(parent  width height layout)
+      (let ((view (make-view parent  width height layout) ))
+	(view-draw-set! view draw-stack )
+	(view-attrib-set! view 'bar-height 20.0)
+	(view-layout-set! view stack-layout)
+	;;(view-attrib-set! view 'cursor 0)
+	(view-mouse-event-set! view stack-mouse-event)
+	;;(view-key-event-set! view edit-key-event)
+	view)]
+     [(parent  width height layout color bgcolor)
+      (let ((view (make-view parent  width height layout) ))
+	(view-draw-set! view draw-stack )
+	(view-attrib-set! view 'bar-height 20.0)
+	(view-layout-set! view stack-layout)
+	(view-attrib-set! view 'background-color bgcolor)
+	(view-attrib-set! view 'color color)
+	;;(view-attrib-set! view 'cursor 0)
+	(view-mouse-event-set! view stack-mouse-event)
+	;;(view-key-event-set! view edit-key-event)
+	view)]))
+
+  ;;menu-titles
+  (define menu-titles
+    (case-lambda
+     [(parent l)
+      (view-attrib-set! parent 'titles l)]))
+  
+  ;;pop
+  (define pop
+    (case-lambda
+     [(parent text width height)
+      (let ((view (make-view parent  width height ) ))
+	(view-draw-set! view draw-pop )
+	(view-attrib-set! view 'itme-height 20.0)
+	(view-layout-set! view pop-layout)
+	(view-attrib-set! view 'text text)
+	
+	;;(view-attrib-set! view 'cursor 0)
+	;;(view-mouse-event-set! view stack-mouse-event)
+	;;(view-key-event-set! view edit-key-event)
+	view) ]
+     [(parent text width height layout)
+      (let ((view (make-view parent  width height layout) ))
+	(view-draw-set! view draw-pop )
+	(view-attrib-set! view 'item-height 20.0)
+	(view-layout-set! view pop-layout)
+	(view-attrib-set! view 'text text)
+
+	;;(view-attrib-set! view 'cursor 0)
+	;;(view-mouse-event-set! view stack-mouse-event)
+	;;(view-key-event-set! view edit-key-event)
+	view)]
+     [(parent text width height layout color bgcolor)
+      (let ((view (make-view parent  width height layout) ))
+	(view-draw-set! view draw-pop )
+	(view-attrib-set! view 'item-height 20.0)
+	(view-layout-set! view pop-layout)
+	(view-attrib-set! view 'text text)
+	(view-attrib-set! view 'background-color bgcolor)
+	(view-attrib-set! view 'color color)
+	;;(view-attrib-set! view 'cursor 0)
+	;;(view-mouse-event-set! view stack-mouse-event)
+	;;(view-key-event-set! view edit-key-event)
+	view)]))
+
+   (define (pop-layout view)
+    (let* ((p (view-parent view))
+	   (x (view-x view))
+	   (y (view-y view))
+	   (p-x (view-x p))
+	   (p-y (view-y p))
+	   (layout (view-layout-attrib view))
+	   (childs (view-childs view))
+	   (w (view-width view))
+	   (h (view-height view))
+	   (p-w (view-width p) )
+	   (p-h (view-height p))
+	   (item-height (view-attrib-ref view 'item-height))
+	   (ml (view-margin-left view))
+	   (mr (view-margin-right view))
+	   (mt (view-margin-top view))
+	   (mb (view-margin-bottom view)))
+      (view-calc-layout view)
+      
+      (let loop ((child childs)
+		 (i 0)
+		 (offset 0.0))
+	(if (pair? child)
+	    (begin
+
+	      (if (> (view-childs-count (car child)) 0)
+		  (begin
+		    (view-x-set! (car child) (+ (view-x view ) w ) )
+		    (view-y-set! (car child) (+ (view-y view ) offset) )
+		    )
+		  (begin
+		    (view-layout-set! (car child) nil)
+		    (view-x-set! (car child) (+ (view-x view )  ) )
+		    (view-y-set! (car child) (+ (view-y view ) offset) )
+		    ))
+
+
+	     
+	      
+	      (loop (cdr child ) (+ i 1)
+		    (+ offset    (if (view-visible (car child ) ) item-height  0.0 ) ))
 	      )))
       
       ))
@@ -982,13 +1118,15 @@
 			;;(display (format "stack index=~a\n" i))
 			)
 		      )
+		 
 		  ;;moving child here
-		  (view-child-move (car child) 0 (-  (+ bar-height  (view-y view ) offset)  (view-y (car child))  ) )
-
-		  (view-y-set! (car child) (+ bar-height  (view-y view ) offset) )
-		  (view-x-set! (car child) (+ (view-x view ) ) )
-		  ;;(view-layout-set! (car child) nil)
+		  (view-move (car child) 0 (-  (+ bar-height  (view-y view ) offset)  (view-y (car child))  ) )
+		
 		  
+		  (view-y-set! (car child) (+ bar-height  (view-y view ) offset) )
+		  ;;(view-x-set! (car child) (+ (view-x view ) ) )
+		  ;;(view-layout-set! (car child) nil)
+		  ;;(view-calc-layout (car child))
 		  
 		  (loop (cdr child ) (+ i 1)
 			(+ offset  bar-height  (if (view-visible (car child ) ) (view-height (car child))  0.0 ) )))
@@ -1290,7 +1428,9 @@
       (cffi-free lineh)
       )
     )
-  
+
+  (def-function get "getGlyphPosition" () void*)
+   
   (define (draw-paragraph view)
     (let ((rows (cffi-alloc (* 40  3 )))
 	  (glyphs (cffi-alloc (* 1 100)))
@@ -1316,6 +1456,7 @@
 	  (font-size (view-attrib-ref view 'font-size 20.0))
 	  (font-face (view-attrib-ref view 'font-face "sans"))
 	  (a 0.0))
+      ;;(get)
       
       (nvg-save vg)
       (nvg-font-size vg font-size)
@@ -1365,21 +1506,41 @@
       
       ))
 
-  ;;64bit define here
+  ;;64 32bit define here
   (define (nvg-text-row-next rows i)
-   (cffi-get-pointer (+ rows (* 40  i) (* 8 2 ))))
+    (case (machine-type)
+      [(i3nt i3osx)
+       (cffi-get-pointer (+ rows (* 24  i) (* 4 2 )))  ]
+      [(a6osx a6le)
+       (cffi-get-pointer (+ rows (* 40  i) (* 8 2 )))]))
 
   (define (nvg-text-row-start rows i)
-   (cffi-get-pointer (+ rows (* 40  i) (* 8 0))))
+    (case (machine-type)
+      [(i3nt i3osx)
+       (cffi-get-pointer (+ rows (* 24  i) (* 4 0 )))  ]
+      [(a6osx a6le)
+       (cffi-get-pointer (+ rows (* 40  i) (* 8 0 )))]))
 
   (define (nvg-text-row-end rows i)
-    (cffi-get-pointer (+ rows (* 40  i) (* 8 1))))
+    (case (machine-type)
+      [(i3nt i3osx)
+       (cffi-get-pointer (+ rows (* 24  i) (* 4 1 )))  ]
+      [(a6osx a6le)
+       (cffi-get-pointer (+ rows (* 40  i) (* 8 1 )))]))
 
   (define (nvg-text-row-width rows i)
-     (cffi-get-float (+ rows (* 40  i) (* 8 3))))
+    (case (machine-type)
+      [(i3nt i3osx)
+       (cffi-get-pointer (+ rows (* 24  i) (* 4 3 )))  ]
+      [(a6osx a6le)
+       (cffi-get-pointer (+ rows (* 40  i) (* 8 3 )))]))
 
   (define (nvg-glyph-positions-x glyphs i)
-    (cffi-get-float (+ glyphs (* 24 i) (* 8 1) )))  
+     (case (machine-type)
+      [(i3nt i3osx)
+        (cffi-get-float (+ glyphs (* 16 i) (* 4 1) ))  ]
+      [(a6osx a6le)
+       (cffi-get-float (+ glyphs (* 24 i) (* 8 1) ))]))  
   
   (define (draw-views view)
     ((view-draw view ) view)
@@ -1765,6 +1926,77 @@
 	 (nvg-text vg (+ x (* w 0.5) (- (* tw 0.5)) (* iw 0.25)) (+ y (* h 0.5)) text NULL  )])
       ))
 
+
+    ;;draw-pop
+  (define (draw-pop view)
+    (let (  (vg (view-context view) )
+	    (preicon 0)
+	    (text (view-attrib-ref view 'text ""))
+	    (tw 0.0)
+	    (iw 0.0)
+	    (x (view-x view))
+	    (y (view-y view))
+	    (px (view-x (view-parent view) ))
+	    (py (view-y (view-parent view)))
+	    (w (view-width view))
+	    (h (view-height view))
+	    (titles (view-attrib-ref view 'titles nil))
+	    (childs (view-childs view))
+	    (item-height (view-attrib-ref view 'item-height))
+	    ;;(bar-text-padding-left (view-attrib-ref view 'bar-text-padding-left 5.0))
+	    (active-index (view-attrib-ref view 'active-index 0))
+	    (child-count (view-childs-count view) )
+	    (text-align (view-attrib-ref view 'text-align 'center))
+	    (bar-text-align  (view-attrib-ref view 'bar-text-align 'left ))
+	    (radius (view-attrib-ref view 'corner-radius 4.0))
+	    (font-size (view-attrib-ref view 'font-size 18.0))
+	    (font-face (view-attrib-ref view 'font-face "sans"))
+	    (font-icon (view-attrib-ref view 'font-icon "icons"))
+	    (color (view-attrib-ref view 'color (nvg-rgba 255 255 255 160) ))
+	    (bg-color (view-attrib-ref view 'background-color nil )) )
+      
+      (nvg-font-size vg font-size)
+      (nvg-font-face vg font-face)
+
+      
+      (nvg-fill-color vg color)
+      (nvg-text-align vg (+ NVG_ALIGN_LEFT  NVG_ALIGN_MIDDLE))
+      (case text-align
+	[(left) 
+	 (nvg-text vg  px (+ y  (* item-height 0.5)) text NULL)]
+	[(right)
+	 (set! tw (nvg-text-bounds vg 0.0 0.0 text NULL NULL ))
+	 (nvg-text vg  (+ px w (- tw )) (+ y  (* item-height 0.5))  text NULL)]
+	[(center)
+	 (set! tw (nvg-text-bounds vg 0.0 0.0 text NULL NULL ))
+	 (nvg-text vg (+ px (* w 0.5) (- (* tw 0.5)) (* iw 0.25)) (+ y  (* item-height 0.5)) text NULL  )])
+      
+      (let loop ((child childs)
+		 (i 0)
+		 (offset 0.0))
+	(if (pair? child)
+	    (begin
+	      
+	      (nvg-begin-path vg)
+	      (nvg-stroke-width vg 1.0)
+	      (nvg-rounded-rect vg (+ x 0.5 ) (+ y  offset 1.5 )
+				(+  w -2)  (+ item-height 1.0)  radius)
+	      (nvg-fill-color vg  (nvg-rgba  29 29 29 160 ) )
+	      (nvg-fill vg)
+	      (nvg-stroke-color vg (nvg-rgba 92 92 92 160))
+	      (nvg-stroke vg)
+
+	      
+	      (loop (cdr child ) (+ i 1)
+		    (+ offset  (if (view-visible (car child ) )  item-height  0.0 ) ))
+	      )))
+
+      (nvg-begin-path vg)
+      (nvg-rounded-rect vg (+ x 0.5) (+ y 0.5) (- w 1.0) (- h 1.0) radius  )
+      (nvg-stroke-color vg (nvg-rgba  29 29 29 255 ))
+      (nvg-stroke vg)
+    
+      ))
 
   
   (define (is-black col)

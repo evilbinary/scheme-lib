@@ -8,8 +8,8 @@
 TARGET = libnanovg.so
 OBJS = nanovg.o nanovg_gl.o
 
-LIBS =-L../libgl/  -lgles
-CFLAGS = -Wall -Wformat   -I../libgl -g -DLOG -DNANOVG_GL2_IMPLEMENTATION -DNANOVG_GL2 -O2
+LIBS =-L../libgl/   -lgles
+CFLAGS = -Wall -Wformat   -I../libgl -g -DLOG -DNANOVG_GL2_IMPLEMENTATION -DNANOVG_GL2 
 CXXFLAGS= -Wall -Wformat
 OTHERS=
 
@@ -17,17 +17,15 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
 	LIBS += 
-	CXXFLAGS += 
-	CXXFLAGS += 
-	CFLAGS += -lGL -I/usr/include/GL -fPIC  -lglut -lGLESv1_CM -lGLESv2
+	CXXFLAGS +=
+	CFLAGS +=  -fPIC   -DGLAD 
 endif
 
 ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"
 	LIBS += 
 	CXXFLAGS += 
-	CXXFLAGS += 
-	CFLAGS+= -DGLAD -L../libglfw/ -I../libglfw -lglfw -L../3rdparty/lib -I../3rdparty/include
+	CFLAGS+= -DGLAD 
 	#CFLAGS += -DMESA_EGL_NO_X11_HEADERS   -DMESA_EGL_NO_X11_HEADERS  -L/opt/local/lib -lGL  -L/opt/local/lib  -lGLUT -lGL
 	# CFLAGS+= -DANGLE -I../thirdpart/include -L../thirdpart/lib  -framework OpenGL -lfreeglut-gles -lEGL -langle_deqp_libgles2
 #	CXXFLAGS += -D__APPLE__
@@ -35,12 +33,11 @@ endif
 
 ifeq ($(UNAME_S), MINGW32_NT-6.1)
    ECHO_MESSAGE = "Windows"
-	LIBS +=  -lglut32  -lopengl32  -losmesa
+	LIBS +=  
 	CXXFLAGS += 
-	CXXFLAGS += 
-	CFLAGS += -lscm  -DBUILD_GLLUT32
-	OTHERS+= -Wl,--out-implib,libglut.dll.a #-Wl,-verbose 
-	TARGET = libglut.dll
+	CFLAGS += -DGLAD
+	OTHERS+= #-Wl,--out-implib,libnanovg.dll.a #-Wl,-verbose 
+	TARGET = libnanovg.dll
 endif
 
 .cpp.o:

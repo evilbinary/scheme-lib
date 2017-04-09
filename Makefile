@@ -6,20 +6,34 @@
 
 
 TARGET =bin/scheme
+EXT=.so
+UNAME_S := $(shell uname -s)
 
-SOFILES= lib/libscm/libscm.so \
-		 lib/libglut/libglut.so  \
-		 lib/libimgui/libimgui.so \
-		 lib/libffi/libffi.so  \
-		 lib/libglfw/libglfw.so  \
-		 lib/libgl/libgles.so  \
-		 lib/libnanovg/libnanovg.so  \
-		 lib/libgui/libgui.so  \
-		 lib/libalut/libalut.so  \
+ifeq ($(UNAME_S), MINGW32_NT-6.1)
+  EXT=.dll
+endif
+SOFILES= lib/libscm/libscm$(EXT) \
+		 lib/libglut/libglut$(EXT)  \
+		 lib/libimgui/libimgui$(EXT) \
+		 lib/libffi/libffi$(EXT)  \
+		 lib/libglfw/libglfw$(EXT)  \
+		 lib/libgl/libgles$(EXT)  \
+		 lib/libnanovg/libnanovg$(EXT)  \
+		 lib/libgui/libgui$(EXT)  \
+		 lib/libalut/libalut$(EXT)  \
 		 lib/scheme/scheme	\
 		 lib/boot/scheme.boot	\
 		 lib/boot/petite.boot	\
-
+		 
+BINFILES=bin/libscm$(EXT) \
+		 bin/libglut$(EXT)  \
+		 bin/libimgui$(EXT) \
+		 bin/libffi$(EXT)  \
+		 bin/libglfw$(EXT)  \
+		 bin/libgles$(EXT)  \
+		 bin/libnanovg$(EXT)  \
+		 bin/libgui$(EXT)  \
+		 bin/libalut$(EXT)  \
 
 all: $(TARGET)
 	@echo "All build finish ^_^ have fun!"
@@ -29,8 +43,10 @@ $(TARGET):  $(SOFILES)
 
 $(SOFILES):
 	$(MAKE) -C lib
+
 clean:
 	$(MAKE) -C lib clean
-	rm -rf bin/*.boot bin/scheme bin/*.so
+	rm -rf bin/*.boot bin/scheme bin/*.so $(BINFILES) 
+
 android:
 	$(MAKE) -C lib android	

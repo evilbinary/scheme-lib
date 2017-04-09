@@ -18,13 +18,11 @@ ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
 	LIBS += 
 	CXXFLAGS += 
-	CXXFLAGS += 
 	CFLAGS +=  -fPIC -lalut -lopenal
 endif
 ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"
 	LIBS += 
-	CXXFLAGS += 
 	CXXFLAGS += 
 	CFLAGS += -D__APPLE__   -L../3rdparty/lib  -Wl,-all_load ../3rdparty/lib/libalut.a -Wl,-noall_load -I../3rdparty/include -framework OpenAL
 #	CXXFLAGS += -D__APPLE__
@@ -32,12 +30,13 @@ endif
 
 ifeq ($(UNAME_S), MINGW32_NT-6.1)
    ECHO_MESSAGE = "Windows"
-	LIBS +=  -lalut32 
+	LIBS +=  -lopenal
 	CXXFLAGS += 
-	CXXFLAGS += 
-	CFLAGS += -lscm  -DBUILD_GLLUT32
-	OTHERS+= -Wl,--out-implib,libglut.dll.a #-Wl,-verbose 
-	TARGET = libglut.dll
+	CFLAGS +=  -I../3rdparty/include -DALUT_BUILD_LIBRARY -Wl,--enable-auto-import \
+		-Wl,--whole-archive  ../3rdparty/lib/libalut.a  -Wl,--no-whole-archive   -Wl,--export-all-symbols \
+
+	OTHERS+= #-Wl,--out-implib,libalut.dll.a #-Wl,-verbose 
+	TARGET = libalut.dll
 endif
 
 .cpp.o:
@@ -48,7 +47,7 @@ all: $(TARGET)
 	@echo Build complete for $(ECHO_MESSAGE)
 
 $(TARGET): $(OBJS)
-	$(CC)  $(CFLAGS) $(OTHERS) $(OBJS) -shared -o $(TARGET)   $(LIBS)
+	$(CC)  $(CFLAGS) $(OTHERS) $(OBJS)  -shared -o $(TARGET)   $(LIBS)
 
 clean:
 	rm -rf $(TARGET) $(OBJS) *.a 

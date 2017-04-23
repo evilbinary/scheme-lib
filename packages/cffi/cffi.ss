@@ -23,6 +23,7 @@
    cffi-get-string-pointer
    cffi-string-pointer
    cffi-string
+   cffi-sym
    print-ptr
    print-string
    ;; cffi-load-lib
@@ -34,7 +35,9 @@
    def-struct
    cffi-alloc
    cffi-free
-   cffi-log)
+   cffi-log
+
+   )
   (import  (scheme) (utils libutil) (utils macro) )
 
   (define FFI_DEFAULT_ABI  2)
@@ -244,8 +247,9 @@
   (define cffi-string-pointer  ffi-string-pointer)
   (define cffi-string  ffi-string)
   
-  (define handler '() )
+  (define handlers (list ) )
   (define precedures '() )
+  (define handler '() )
 
   (define loaded-libs (make-hashtable equal-hash equal?))
   
@@ -368,28 +372,63 @@
                   )
           )) )
 
-
-  ;;def-function funname args 
-  (define-syntax def-function
-    (lambda (x)
-      (syntax-case x ()
-	((_ name sym args ret)
-	 #'(define name 
-	     (lambda values
-	       (cffi-call sym 'args 'ret values )
-	       ))))  ) )
-
-
-
   ;;cffi functions begin
   (define (cffi-open-lib path)
     (set! handler (ffi-dlopen path  RTLD_LAZY) )
+    (set! handlers (append handlers (list handler)))
     handler
     )
-
+  
+  ;;cffi-sym
   (define (cffi-sym name)
-    (ffi-dlsym handler name)
-    )
+    ;;(display (format "handler=~a name=~a sym=~a\n" handler  name (ffi-dlsym handler name) ))
+    (let ((s (ffi-dlsym handler name )))
+      (if (= 0 s)
+	  (let loop ((h handlers))
+	    (let ((sym (ffi-dlsym (car h) name)))
+	      (if (= sym 0)
+		  (if (pair? h)
+		      (loop (cdr h))
+		      0)
+		  sym)))
+	  s)))
+
+  ;; (define-syntax  def-function
+  ;;   (syntax-rules ()
+  ;;     [(_  name sym args ret)
+  ;;      #'(define name
+  ;; 	 (lambda values
+  ;; 	   (cffi-call 1 sym args ret values)
+  ;; 	   ))
+  ;;      ]))
+
+  ;;def-function funname args 
+  ;; (define-syntax def-function
+  ;;   (lambda (x)
+  ;;     (syntax-case x ()
+  ;; 	((_ name sym args ret)
+  ;; 	 (with-syntax
+  ;; 	  ((h (datum->syntax-object
+  ;; 		     #'k
+  ;; 		     `(let ( (hh 1) ) 
+  ;; 			,(cffi-sym name)  ) )))
+  ;; 	 #'(define name 
+  ;; 	     (lambda values
+  ;; 	       (cffi-call h sym 'args 'ret values )
+  ;; 	       ))))  ) ))
+
+
+  
+  (define-syntax def-function
+    (lambda (x)
+      (syntax-case x ()
+   	((_ name sym args ret)
+   	 #'(define name 
+   	     (lambda values
+   	       (cffi-call  sym 'args 'ret values )
+   	       ))))  ) )
+
+ 
   ;;cal-size 
   (define (cffi-size l)
     ;(display (format "cffi-size ~a\n" (syntax->datum l)  ) )
@@ -546,9 +585,11 @@
                     (ffi-values-set cargs i alloc) ]
                   [(void* )
 		   (set! alloc (ffi-alloc 64) )
+		   (if (string? (car arg))
+		       (ffi-set-string alloc  (car arg))
+		       (ffi-set-pointer alloc  (car arg)))
 		   ;;(display (format "===>~x\n" (car arg)))
-			    
-		   (ffi-set-pointer alloc  (car arg))
+		   
 		   (ffi-values-set cargs i alloc) ]
                   [else
                       ;(display (format "  %%%else type=~a size=~a \n" (car type) (cffi-size (struct-ref (car arg) 1) ) ) )
@@ -570,7 +611,7 @@
     )
 
   ;;ffi call
-  (define (cffi-call sym arg-type ret-type args )
+  (define (cffi-call sym arg-type ret-type args )    
     (if cffi-enable-log
 	(begin
 	  (display "\n")(display (format "cffi-call ~a arg-type=~a ret-type=~a args=~a \n"  sym  arg-type ret-type args) )  ) )
@@ -586,34 +627,34 @@
           (call-ret '() )
           (ret-val '() )
           )
+      
+      (set! call-ret (cadr cret-info))
+      (set! cret (car cret-info))
 
-          (set! call-ret (cadr cret-info))
-          (set! cret (car cret-info))
-
-          ;;(display (format "ffi-prep-cif len=~a  cret-type=~a carg-type=~a\n" (length arg-type) cret-type carg-type) )
-          ;;(display (test-float cif FFI_DEFAULT_ABI  cret-type carg-type cargs) )
-          ;;init cif
-          (if (= FFI_OK (ffi-prep-cif cif FFI_DEFAULT_ABI (length arg-type) cret-type carg-type ) )
-              (begin
-                ;;(display "ffi-ok\n")
-                (if (> fptr 0)
-                  (begin 
-                    ;;(display (format "ffi-call cret=~x cargs=~x\n" cret cargs ))
-                    (ffi-call cif fptr cret cargs)  
-                    )
-                  (display (format "cannot find symbol ~a\n" sym ))
+      ;;(display (format "ffi-prep-cif len=~a  cret-type=~a carg-type=~a\n" (length arg-type) cret-type carg-type) )
+      ;;(display (test-float cif FFI_DEFAULT_ABI  cret-type carg-type cargs) )
+      ;;init cif
+      (if (= FFI_OK (ffi-prep-cif cif FFI_DEFAULT_ABI (length arg-type) cret-type carg-type ) )
+	  (begin
+	    ;;(display "ffi-ok\n")
+	    (if (> fptr 0)
+		(begin 
+		  ;;(display (format "ffi-call cret=~x cargs=~x\n" cret cargs ))
+		  (ffi-call cif fptr cret cargs)  
+		  )
+		(display (format "cannot find symbol ~a\n" sym ))
                 ))
-              (error 'cffi (format "ffi-prep-cif return error\n"))
-	      )
-	  ;;(display (format "cret=~x\n" cret))
-          (if (procedure? call-ret)
-            (set! ret-val (call-ret cret))
-            )
-          (ffi-free-all)
-	   (if cffi-enable-log
-	       (display (format "ffi-call ret=~x\n" ret-val)))
-          ret-val
-        )
+	  (error 'cffi (format "ffi-prep-cif return error\n"))
+	  )
+      ;;(display (format "cret=~x\n" cret))
+      (if (procedure? call-ret)
+	  (set! ret-val (call-ret cret))
+	  )
+      (ffi-free-all)
+      (if cffi-enable-log
+	  (display (format "ffi-call ret=~x\n" ret-val)))
+      ret-val
+      )
 
     )    
 

@@ -108,7 +108,7 @@
   (define hunk (apply string-append body))
   (string-append (http:header
 		  (cons (cons "Content-Length"
-			      (number->string (string-length hunk)))
+			      (number->string  (- (bytevector-length (string->utf8 hunk)) 1) )) ;;(string-length hunk)
 			alist))
 		 hunk))
 

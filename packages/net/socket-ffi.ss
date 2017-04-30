@@ -19,6 +19,8 @@
    cfdopen
    cread
    cwrite
+   cstrlen
+   cwrite-all
    
    close
    socket
@@ -69,6 +71,9 @@
  (def-function close
    "_close" (int) int)
 
+  (def-function cstrlen
+   "_strlen" (void*) int)
+
 
  (def-function cfdopen
     "_fdopen" (int string) int)
@@ -78,7 +83,10 @@
 
   (def-function cwrite
     "_write" (int void* int) int)
-  
+
+  (def-function cwrite-all
+    "_write_all" (int void*) int)
+    
 ;;int socket(int  ,int  ,int )
 (def-function socket
              "_socket" (int int int) int)

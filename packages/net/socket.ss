@@ -66,24 +66,49 @@
 		      ))
 		     "")))
 
+
+ ;; (define (make-fd-output-port fd)      
+ ;;   (make-custom-binary-output-port
+ ;;      "fd-output-port"
+ ;;      (lambda (bv start n)
+ ;; 	(display bv)
+ ;; 	(display " n=")
+ ;; 	(display n)
+ ;; 	(display " b=>")
+ ;; 	(display (cstrlen bv))
+	
+ ;;        (cwrite fd bv  (cstrlen bv) )
+ ;; 	n
+ ;; 	)
+ ;;      #f #f
+ ;;      (lambda ()
+ ;; 	(display "close--->")
+ ;;        (close fd)
+ ;; 	)
+ ;;      )
+  
+ ;;   )
+ 
   (define (make-fd-output-port fd)
   (let ((buf (cffi-alloc 8)))
     (make-output-port (lambda (msg . args)
-		     (record-case
-		      (cons msg args)
-		      [block-write (p s n) 
-				   (cwrite fd s n)]
-		      [write-char (c p)
-				  (cffi-set-char buf c)
-				  (cwrite fd buf 1)
-				 ]
-		      [close-port (p) (mark-port-closed! p)]
-		      [else (assertion-violationf 'make-fd-output-port
-						  "operation ~s not handled"
-						  msg)]
-		      )  
-		     )
-		   "")))
+  		     (record-case
+  		      (cons msg args)
+  		      [block-write (p s n)
+  				   (cwrite-all fd s)
+  				   n
+  				   ]
+  		      [write-char (c p)
+  				  (cffi-set-char buf c)
+  				  (cwrite fd buf 1)
+  				 ]
+  		      [close-port (p) (mark-port-closed! p)]
+  		      [else (assertion-violationf 'make-fd-output-port
+  						  "operation ~s not handled"
+  						  msg)]
+  		      )  
+  		     )
+  		   "")))
  
  (define (make-socket family type port)
    (let* ((socket-fd (socket family type 0))

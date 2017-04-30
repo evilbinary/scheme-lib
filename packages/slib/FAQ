@@ -1,0 +1,249 @@
+FAQ (Frequently Asked Questions and answers) for SLIB Scheme Library (slib-3b5).
+Written by Aubrey Jaffer (http://people.csail.mit.edu/jaffer).
+
+		TOPICS:
+
+	INTRODUCTION AND GENERAL INFORMATION
+	SLIB INSTALLATION PROBLEMS
+	USING SLIB PROCEDURES
+	MACROS
+	SRFI
+
+		INTRODUCTION AND GENERAL INFORMATION
+
+[]	What is SLIB?
+
+SLIB is a portable scheme library meant to provide compatibiliy and
+utility functions for all standard scheme implementations.
+
+[]	What is Scheme?
+
+The Algorithmic Language Scheme is a programming language in the Lisp
+family.
+
+[]	Which implementations has SLIB been ported to?
+
+SLIB supports Bigloo, Chez, ELK 3.0, Gambit 4.0, Guile, JScheme,
+MacScheme, MITScheme, PLT Scheme (DrScheme and MzScheme), Pocket
+Scheme, RScheme, S7, scheme->C, Scheme48, SCM, SCM Mac, scsh, SISC,
+Stk, T3.1, umb-scheme, and VSCM.
+
+[]	How can I obtain SLIB?
+
+SLIB is available via http from:
+ http://people.csail.mit.edu/jaffer/SLIB.html
+SLIB is available via ftp from:
+ swiss.csail.mit.edu:/pub/scm/
+
+[]	How do I install SLIB?
+
+Read the INSTALLATION INSTRUCTIONS in "slib/README".
+
+[]	What are slib.texi and slib.info?
+
+"slib.texi" is the `texinfo' format documentation for SLIB.
+"slib.info" is produced from "slib.texi" by either Gnu Emacs or the
+program `makeinfo'.  "slib.info" can be viewed using either Gnu Emacs
+or `info' or a text editor.
+
+Programs for printing and viewing TexInfo documentation (which SLIB
+has) come with GNU Emacs or can be obtained via ftp from:
+ ftp.gnu.org:/pub/gnu/texinfo/texinfo-3.12.tar.gz
+
+[]	How often is SLIB released?
+
+Several times a year.
+
+[]	What is the latest version?
+
+The newest released version as of this writing is slib-3b5.  The
+documentation for the latest release is available online at:
+http://people.csail.mit.edu/jaffer/SLIB.html
+
+[]	Which version am I using?
+
+The Version is in the first line of the files slib/FAQ, slib/ANNOUNCE,
+and slib/README.  If you have Scheme and SLIB running, type
+(slib:report-version)
+
+		SLIB INSTALLATION PROBLEMS
+
+[]	When I load an SLIB initialization file for my Scheme
+	implementation, I get ERROR: Couldn't find "require.scm"
+
+Did you remember to set either the environment variable
+SCHEME_LIBRARY_PATH or the library-vicinity in your initialization
+file to the correct location?  If you set SCHEME_LIBRARY_PATH, make
+sure that the Scheme implementation supports getenv.
+
+[]	When I load an SLIB initialization file for my Scheme
+	implementation, I get ERROR: Couldn't find
+	"/usr/local/lib/slibrequire.scm"
+
+Notice that it is looking for "slibrequire.scm" rather than
+"slib/require.scm".  You need to put a trailing slash on either the
+environment variable SCHEME_LIBRARY_PATH or in the library-vicinity in
+your initialization file.
+
+[]	SLIB used to work, but now I get ERROR: Couldn't find
+	"slib/require.scm".  What happened?
+
+You changed directories and now the relative pathname
+"slib/require.scm" no longer refers to the same directory.  The
+environment variable SCHEME_LIBRARY_PATH and library-vicinity in your
+initialization file should be absolute pathnames.
+
+[]	When I type (require 'macro) I get "ERROR: unbound variable:
+	require".
+
+You need to arrange to have your Scheme implementation load the
+appropriate SLIB initialization file ("foo.init") before using SLIB.
+If your implementation loads an initialization file on startup, you
+can have it load the SLIB initialization file automatically.  For
+example (load "/usr/local/lib/slib/foo.init").
+
+[]	Why do I get a string-ref (or other) error when I try to load
+	or use SLIB.
+
+Check that the version of the Scheme implementation you are using
+matches the version for which the SLIB initialization file was
+written.  There are some notes in the SLIB initialization files about
+earlier versions.  You may need to get a more recent version of your
+Scheme implementation.
+
+		USING SLIB PROCEDURES
+
+[]	I installed SLIB.  When I type (random 5) I get "ERROR:
+	unbound variable:  random".  Doesn't SLIB have a `random'
+	function?
+
+Before you can use most SLIB functions, the associated module needs to
+be loaded.  You do this by typing the line that appears at the top of
+the page in slib.info (or slib.texi) where the function is documented.
+In the case of random, that line is (require 'random).
+
+[]	Why doesn't SLIB just load all the functions so I don't have
+	to type require statements?
+
+SLIB has more than 1 Megabyte of Scheme source code.  Many scheme
+implementations take unacceptably long to load 1 Megabyte of source;
+some implementations cannot allocate enough storage.  If you use a
+package often, you can put the require statement in your Scheme
+initialization file.  Consult the manual for your Scheme
+implementation to find out the initialization file's name.
+
+`Autoloads' will work with many Scheme implementations.  You could put
+the following in your initialization file:
+ (define (random . args) (require 'random) (apply random args))
+
+I find that I only type require statements at top level when
+debugging.  I put require statements in my Scheme files so that the
+appropriate modules are loaded automatically.
+
+[]	Why does SLIB have PRINTF when it already has the more
+	powerful (CommonLisp) FORMAT?
+
+CommonLisp FORMAT does not support essential features which PRINTF
+does.  For instance, how do you format a signed 0 extended number?
+
+  (format t "~8,'0,X~%" -3)	==>	000000-3
+
+But printf gets it right:
+
+  (printf "%08x\n" -3)		==>	-0000003
+
+How can one trunctate a non-numeric field using FORMAT?  This feature
+is essential for printing reports.  The first 20 letters of a name is
+sufficient to identify it.  But if that name doesn't get trucated to
+the desired length it can displace other fields off the page.  Once
+again, printf gets it right:
+
+  (printf "%.20s\n" "the quick brown fox jumped over the lazy dog")
+				==>	the quick brown fox
+
+[]	Why doesn't SLIB:ERROR call FORMAT?
+
+Format does not provide a method to truncate fields.  When an error
+message contains non-terminating or large expressions, the essential
+information of the message may be lost in the ensuing deluge.
+
+		MACROS
+
+[]	Why are there so many macro implementations in SLIB?
+
+The R4RS committee specified only the high level pattern language in
+the Revised^4 Report on Scheme and left to the free marketplace of
+ideas the details of the low-level facility.  Each macro package has a
+different low-level facility.  The low-level facilities are sometimes
+needed because the high level pattern language is insufficiently
+powerful to accomplish tasks macros are often written to do.
+
+[]	Why are there both R4RS macros and Common-Lisp style defmacros
+	in SLIB?
+
+Most Scheme implementations predate the adoption of the R4RS macro
+specification.  All of the implementations except scheme48 version
+0.45 support defmacro natively.
+
+[]	I did (LOAD "slib/yasos.scm").  The error I get is "variable
+	define-syntax is undefined".
+
+The way to load the struct macro package is (REQUIRE 'YASOS).
+
+[]	I did (REQUIRE 'YASOS).  Now when I type (DEFINE-PREDICATE
+	CELL?)  The error I get is "variable define-predicate is
+	undefined".
+
+If your Scheme does not natively support R4RS macros, you will need to
+install a macro-capable read-eval-print loop.  This is done by:
+ (require 'macro)	;already done if you did (require 'yasos)
+ (require 'repl)
+ (repl:top-level macro:eval)
+
+This would also be true for a Scheme implementation which didn't
+support DEFMACRO.  The lines in this case would be:
+ (require 'repl)
+ (repl:top-level defmacro:eval)
+
+[]	I always use R4RS macros with an implementation which doesn't
+	natively support them.  How can I avoid having to type require
+	statements every time I start Scheme?
+
+As explained in the Repl entry in slib.info (or slib.texi):
+
+ To have your top level loop always use macros, add any interrupt
+ catching code and the following script to your Scheme init file:
+  (require 'macro)
+  (require 'repl)
+  (repl:top-level macro:eval)
+
+		SRFI
+
+[]	What is SRFI?
+
+"Scheme Requests for Implementation" is a process and informal
+standard for defining extensions to Scheme.
+
+[]	Which SRFIs does SLIB support?
+
+These can be REQUIREd by the listed (srfi) feature name:
+
+srfi-0:  Feature-based conditional expansion construct
+srfi-1:  List Library
+srfi-2:  AND-LET*: an AND with local bindings, a guarded LET* special form
+srfi-8:  receive: Binding to multiple values
+srfi-9:  Defining Record Types
+srfi-11: Syntax for receiving multiple values
+srfi-23: Error reporting mechanism
+srfi-28: Basic Format Strings
+srfi-39: Parameter objects
+srfi-47: Array
+srfi-59: Vicinity
+srfi-60: Integers as Bits
+srfi-61: A more general cond clause
+srfi-63: Homogeneous and Heterogeneous Arrays
+srfi-94: Type-Restricted Numerical Functions
+srfi-95: Sorting and Merging
+
+srfi-96 "SLIB Prerequisites" is the interface which Scheme
+implementations provide in order to host SLIB.

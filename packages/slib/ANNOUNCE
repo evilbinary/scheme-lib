@@ -1,0 +1,62 @@
+This message announces the availability of Scheme Library release slib-3b5.
+
+SLIB is a portable Scheme library providing compatibiliy and utility
+functions for all standard Scheme implementations.
+
+SLIB supports Bigloo, Chez, ELK-3.0, Gambit-4.0, Gauche-0.9, Guile,
+JScheme, MacScheme, MITScheme, Pocket-Scheme, RScheme, S7, scheme->C,
+Scheme48, SCM, SCM-Mac, scsh, SISC, Stk, T3.1, umb-scheme, and VSCM.
+
+SLIB is free software.  It has a Permissive-Non-Warranty license
+<http://people.csail.mit.edu/jaffer/SLIB_COPYING.txt>.
+
+Documentation and distributions in several formats are linked from
+SLIB's home page:
+
+	      <http://people.csail.mit.edu/jaffer/SLIB>
+
+Links to distributions of SLIB and related softwares are at the end of
+this message.
+
+			      -=-=-=-=-
+
+slib-3b5 news:
+
+SLIB's new multidimensional space-filling package has algorithms which
+unify the encoding and decoding of Hilbert and Peano curves of any
+rank, their inverses, and novel variations.  Read the paper at
+<http://arxiv.org/abs/1402.1807>
+
+Otherwise, slib-3b5 is a minor release.  Details at
+<http://cvs.savannah.gnu.org/viewvc/*checkout*/slib/slib/ChangeLog>
+
+  * rmdsff.scm (make-cell, integer->coordinates)
+  (coordinates->integer): Don't depend on LETREC* behavior.
+
+  * Makefile, mklibcat.scm, rmdsff.scm, slib.texi (space-filling):
+  Added "rmdsff.scm" and documentation.
+
+  * phil-spc.scm, schmooz.scm, slib.texi: Because TeXinfo-5 changed
+  the rules, don't allow text between @defun and @defunx.
+
+  * usercat: Use local copy of "schmooz.scm".
+
+			      -=-=-=-=-
+
+SLIB is available from:
+ <http://groups.csail.mit.edu/mac/ftpdir/scm/slib-3b5.zip>
+Also available as RPM:
+ <http://groups.csail.mit.edu/mac/ftpdir/scm/slib-3b5-1.src.rpm>
+ <http://groups.csail.mit.edu/mac/ftpdir/scm/slib-3b5-1.noarch.rpm>
+Also available as MS-Windows installer:
+ <http://groups.csail.mit.edu/mac/ftpdir/scm/slib-3b5-1.exe>
+
+SLIB-PSD is a portable debugger for Scheme (requires emacs editor):
+ <http://groups.csail.mit.edu/mac/ftpdir/scm/slib-psd1-3.tar.gz>
+
+SCHELOG is an embedding of Prolog in Scheme+SLIB:
+ <http://www.ccs.neu.edu/home/dorai/schelog/schelog.html>
+
+Programs for printing and viewing TexInfo documentation (which SLIB
+has) come with GNU Emacs or can be obtained via ftp from:
+ <ftp://ftp.gnu.org/pub/gnu/texinfo>

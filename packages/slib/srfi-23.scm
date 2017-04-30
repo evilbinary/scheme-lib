@@ -1,0 +1,1 @@
+(define error slib:error)

@@ -1,0 +1,1406 @@
+"Resene RGB Values List"
+"For further information refer to http://www.resene.co.nz"
+"Copyright Resene Paints Ltd 2001"
+
+"Permission to copy this software, to modify it, to redistribute it,"
+"to distribute modified versions, and to use it for any purpose is"
+"granted, subject to the following restrictions and understandings."
+
+"1. Any text copy made of this dictionary must include this copyright"
+"notice in full."
+
+"2. Any redistribution in binary form must reproduce this copyright"
+"notice in the documentation or other materials provided with the"
+"distribution."
+
+"3. Resene Paints Ltd makes no warranty or representation that this"
+"dictionary is error-free, and is under no obligation to provide"
+"any services, by way of maintenance, update, or otherwise."
+
+"4. There shall be no use of the name of Resene or Resene Paints Ltd in"
+"any advertising, promotional, or sales literature without prior"
+"written consent in each case."
+
+"5. These RGB colour formulations may not be used to the detriment of"
+"Resene Paints Ltd."
+
+"Colour Name"	"R"	"G"	"B"
+"Abbey"	73	81	84
+"Acadia"	53	49	44
+"Acapulco"	117	170	148
+"Acorn"	115	99	48
+"Aero Blue"	192	232	213
+"Affair"	116	80	133
+"Afghan Tan"	144	94	38
+"Akaroa"	190	178	154
+"Alabaster"	242	240	230
+"Albescent White"	225	218	203
+"Alert Tan"	149	78	44
+"Allports"	31	106	125
+"Almond Frost"	154	134	120
+"Alpine"	173	138	59
+"Alto"	205	198	197
+"Aluminium"	132	135	137
+"Amazon"	56	123	84
+"Americano"	138	125	114
+"Amethyst Smoke"	149	135	156
+"Amour"	245	230	234
+"Amulet"	125	157	114
+"Anakiwa"	140	206	234
+"Antique Brass"	108	70	31
+"Anzac"	198	142	63
+"Apache"	211	169	92
+"Apple"	102	179	72
+"Apple Blossom"	169	82	73
+"Apple Green"	222	234	220
+"Apricot"	228	143	103
+"Apricot White"	247	240	219
+"Aqua"	146	211	202
+"Aqua Haze"	217	221	213
+"Aqua Spring"	232	243	232
+"Aqua Squeeze"	219	228	220
+"Aquamarine"	32	89	72
+"Arapawa"	39	74	93
+"Armadillo"	72	74	70
+"Arrowtown"	130	122	103
+"Ash"	190	186	167
+"Ash Brown"	73	63	47
+"Asphalt"	42	41	34
+"Astra"	237	213	166
+"Astral"	55	111	137
+"Astronaut"	68	81	114
+"Astronaut Blue"	33	69	89
+"Athens Grey"	220	221	221
+"Aths Special"	213	203	178
+"Atlantis"	156	208	59
+"Atoll"	43	121	122
+"Atomic"	61	75	82
+"Au Chico"	158	103	89
+"Aubergine"	55	37	40
+"Australian Mint"	239	248	170
+"Avocado"	149	152	107
+"Axolotl"	99	119	90
+"Azalea"	249	192	196
+"Aztec"	41	52	50
+"Azure"	78	105	154
+"Bahama Blue"	37	89	127
+"Bahia"	169	192	28
+"Baja White"	240	223	187
+"Bali Hai"	132	156	169
+"Baltic Sea"	60	61	62
+"Bamboo"	186	111	63
+"Bandicoot"	135	132	102
+"Banjul"	52	50	45
+"Barberry"	210	198	31
+"Barley Corn"	182	147	92
+"Barley White"	247	229	183
+"Barossa"	69	46	57
+"Bastille"	44	44	50
+"Battleship Grey"	81	87	79
+"Bay Leaf"	123	177	141
+"Bay Of Many"	53	62	100
+"Bazaar"	143	119	119
+"Bean"	74	53	49
+"Beauty Bush"	235	185	179
+"Beeswax"	233	215	171
+"Bermuda"	134	210	193
+"Bermuda Grey"	111	140	159
+"Beryl Green"	188	191	168
+"Bianca"	244	239	224
+"Big Stone"	51	64	70
+"Bilbao"	62	128	39
+"Biloba Flower"	174	153	210
+"Birch"	63	55	38
+"Bird Flower"	208	193	23
+"Biscay"	47	60	83
+"Bismark"	72	108	122
+"Bison Hide"	181	172	148
+"Bitter"	136	137	108
+"Bitter Lemon"	210	219	50
+"Bizarre"	231	210	200
+"Black Bean"	35	46	38
+"Black Forest"	44	50	39
+"Black Haze"	224	222	215
+"Black Magic"	51	44	34
+"Black Marlin"	56	55	64
+"Black Pearl"	30	39	44
+"Black Pepper"	60	55	49
+"Black Rock"	44	45	60
+"Black Rose"	83	41	52
+"Black Russian"	36	37	43
+"Black Squeeze"	229	230	223
+"Black White"	229	228	219
+"Blackberry"	67	24	47
+"Blackcurrant"	46	24	59
+"Blackwood"	63	55	46
+"Blanc"	217	208	193
+"Bleach White"	235	225	206
+"Bleached Cedar"	69	70	71
+"Blossom"	223	177	182
+"Blue Bark"	30	39	44
+"Blue Bayoux"	98	119	126
+"Blue Bell"	57	45	115
+"Blue Chalk"	227	214	233
+"Blue Charcoal"	38	43	47
+"Blue Chill"	64	143	144
+"Blue Diamond"	75	45	114
+"Blue Dianne"	53	81	79
+"Blue Gem"	75	60	142
+"Blue Haze"	189	186	206
+"Blue Lagoon"	0	98	111
+"Blue Marguerite"	106	91	177
+"Blue Romance"	216	240	210
+"Blue Smoke"	120	133	122
+"Blue Stone"	22	100	97
+"Blue Whale"	30	52	66
+"Blue Zodiac"	60	67	84
+"Blumine"	48	92	113
+"Blush"	181	80	103
+"Bokara Grey"	42	39	37
+"Bombay"	174	174	173
+"Bon Jour"	223	215	210
+"Bondi Blue"	38	65	107
+"Bone"	219	194	171
+"Bordeaux"	76	28	36
+"Bossanova"	76	61	78
+"Boston Blue"	67	142	172
+"Botticelli"	146	172	180
+"Bottle Green"	37	70	54
+"Boulder"	124	129	124
+"Bouquet"	167	129	153
+"Bourbon"	175	108	62
+"Bracken"	91	61	39
+"Brandy"	220	182	138
+"Brandy Punch"	192	124	64
+"Brandy Rose"	182	133	122
+"Brazil"	129	91	40
+"Breaker Bay"	81	123	120
+"Bridal Heath"	248	235	221
+"Bridesmaid"	250	230	223
+"Bright Grey"	87	89	93
+"Bright Red"	146	42	49
+"Bright Sun"	236	189	44
+"Bronco"	167	151	129
+"Bronze"	73	59	47
+"Bronze Olive"	88	76	37
+"Bronzetone"	67	76	40
+"Broom"	238	204	36
+"Brown Bramble"	83	51	30
+"Brown Derby"	89	69	55
+"Brown Pod"	60	36	27
+"Bubbles"	230	242	234
+"Buccaneer"	110	81	80
+"Bud"	165	168	143
+"Buddha Gold"	188	155	27
+"Bulgarian Rose"	72	36	39
+"Bull Shot"	117	68	43
+"Bunker"	41	44	47
+"Bunting"	43	52	73
+"Burgundy"	101	37	37
+"Burnham"	35	69	55
+"Burning Sand"	208	131	99
+"Burnt Crimson"	88	33	36
+"Bush"	37	70	54
+"Buttercup"	218	148	41
+"Buttered Rum"	157	112	46
+"Butterfly Bush"	104	87	140
+"Buttermilk"	246	224	164
+"Buttery White"	241	235	218
+"Cab Sav"	74	46	50
+"Cabaret"	205	82	108
+"Cabbage Pont"	76	85	68
+"Cactus"	91	111	85
+"Cadillac"	152	73	97
+"Cafe Royale"	106	73	40
+"Calico"	213	177	133
+"California"	233	140	58
+"Calypso"	61	113	136
+"Camarone"	32	105	55
+"Camelot"	128	58	75
+"Cameo"	204	164	131
+"Camouflage"	79	77	50
+"Can Can"	208	138	155
+"Canary"	226	230	77
+"Candlelight"	224	157	55
+"Cannon Black"	51	44	34
+"Cannon Pink"	142	81	100
+"Canvas"	163	153	119
+"Cape Cod"	78	85	82
+"Cape Honey"	254	224	165
+"Cape Palliser"	117	72	47
+"Caper"	175	193	130
+"Capri"	48	67	106
+"Caramel"	255	213	154
+"Cararra"	235	229	213
+"Cardin Green"	27	52	39
+"Cardinal"	138	36	78
+"Careys Pink"	201	154	160
+"Carissma"	230	128	149
+"Carla"	245	249	203
+"Carnaby Tan"	91	58	36
+"Carousel Pink"	248	219	224
+"Casablanca"	240	178	83
+"Casal"	63	84	90
+"Cascade"	140	168	160
+"Cashmere"	209	179	153
+"Casper"	170	181	184
+"Castro"	68	35	47
+"Catalina Blue"	39	60	90
+"Catskill White"	224	228	220
+"Cavern Pink"	224	184	177
+"Ce Soir"	146	113	167
+"Cedar"	70	52	48
+"Celery"	180	192	76
+"Celeste"	210	210	192
+"Cello"	58	78	95
+"Celtic"	43	63	54
+"Cement"	133	113	88
+"Ceramic"	223	221	214
+"Chablis"	253	233	224
+"Chalet Green"	90	110	65
+"Chalky"	223	194	129
+"Chambray"	71	88	119
+"Chamois"	232	205	154
+"Champagne"	238	217	182
+"Chantilly"	237	184	199
+"Charade"	57	64	67
+"Chardon"	248	234	223
+"Chardonnay"	255	200	120
+"Charlotte"	164	220	230
+"Charm"	208	116	139
+"Chateau Green"	65	159	89
+"Chatelle"	179	171	182
+"Chathams Blue"	44	89	113
+"Chelsea Cucumber"	136	169	91
+"Chelsea Gem"	149	83	47
+"Chenin"	222	195	113
+"Cherokee"	245	205	130
+"Cherry Pie"	55	45	82
+"Cherrywood"	78	49	46
+"Cherub"	245	215	220
+"Chetwode Blue"	102	111	180
+"Chicago"	91	93	86
+"Chiffon"	240	245	187
+"Chilean Fire"	208	94	52
+"Chilean Heath"	249	247	222
+"China Ivory"	251	243	211
+"Chino"	184	173	138
+"Chinook"	157	211	168
+"Chocolate"	61	35	39
+"Christalle"	56	33	97
+"Christi"	113	169	29
+"Christine"	191	101	46
+"Chrome White"	202	199	183
+"Cigar"	125	78	56
+"Cinder"	36	42	46
+"Cinderella"	251	215	204
+"Cinnamon"	123	72	43
+"Cioccolato"	93	59	46
+"Citron"	142	154	33
+"Citrus"	159	183	10
+"Clairvoyant"	104	59	125
+"Clam Shell"	210	179	169
+"Claret"	110	34	51
+"Classic Rose"	244	200	219
+"Clay Creek"	137	126	89
+"Clear Day"	223	239	234
+"Clementine"	193	79	59
+"Clinker"	70	54	35
+"Cloud"	194	188	177
+"Cloud Burst"	53	62	79
+"Cloudy"	176	169	159
+"Clover"	71	86	47
+"Cobalt"	39	60	90
+"Cocoa Bean"	79	56	53
+"Cocoa Brown"	53	40	30
+"Coconut Cream"	225	218	187
+"Cod Grey"	45	48	50
+"Coffee"	114	103	81
+"Coffee Bean"	54	45	38
+"Cognac"	154	70	61
+"Cola"	60	47	35
+"Cold Purple"	157	138	191
+"Cold Turkey"	202	181	178
+"Colonial White"	233	215	171
+"Comet"	99	99	115
+"Como"	76	120	92
+"Conch"	160	177	174
+"Concord"	130	127	121
+"Concrete"	210	209	205
+"Confetti"	221	203	70
+"Congo Brown"	101	77	73
+"Conifer"	177	221	82
+"Contessa"	193	111	104
+"Copper Canyon"	119	66	44
+"Copper Rust"	149	82	76
+"Coral"	192	176	147
+"Coral Candy"	245	208	201
+"Coral Tree"	171	110	103
+"Corduroy"	64	77	73
+"Coriander"	187	181	141
+"Cork"	90	76	66
+"Corn"	223	170	40
+"Corn Field"	248	243	196
+"Corn Harvest"	141	112	42
+"Cornflower"	255	171	160
+"Corvette"	233	186	129
+"Cosmic"	121	77	96
+"Cosmos"	252	213	207
+"Costa Del Sol"	98	93	42
+"Cotton Seed"	191	186	175
+"County Green"	27	75	53
+"Cove Grey"	52	63	92
+"Cowboy"	68	55	54
+"Crab Apple"	135	56	47
+"Crail"	166	86	72
+"Cranberry"	180	56	100
+"Crater Brown"	77	62	60
+"Cream Brulee"	255	227	155
+"Cream Can"	238	192	81
+"Creme De Banane"	224	193	97
+"Creole"	57	50	39
+"Crete"	119	113	43
+"Crocodile"	112	105	80
+"Crown Of Thorns"	118	60	51
+"Crowshead"	50	49	46
+"Cruise"	180	226	213
+"Crusoe"	22	91	49
+"Crusta"	243	134	83
+"Cuban Tan"	54	45	38
+"Cumin"	120	68	48
+"Cumulus"	245	244	193
+"Cupid"	245	178	197
+"Curious Blue"	61	133	184
+"Cutty Sark"	92	129	115
+"Cyprus"	15	70	69
+"Daintree"	39	63	65
+"Dairy Cream"	237	210	164
+"Daisy Bush"	91	62	144
+"Dallas"	102	74	45
+"Danube"	91	137	192
+"Dark Ebony"	55	49	43
+"Dark Oak"	85	52	43
+"Dark Rimu"	112	65	40
+"Dark Rum"	69	54	43
+"Dark Slate"	70	83	82
+"Dark Tan"	97	45	45
+"Dawn"	159	157	145
+"Dawn Pink"	230	214	205
+"De York"	133	202	135
+"Deco"	204	207	130
+"Deep Blush"	227	111	138
+"Deep Bronze"	81	65	45
+"Deep Cove"	58	78	88
+"Deep Fir"	25	57	37
+"Deep Koamaru"	52	52	103
+"Deep Oak"	61	50	44
+"Deep Sea"	22	126	101
+"Deep Teal"	25	68	60
+"Del Rio"	181	153	142
+"Dell"	72	101	49
+"Delta"	153	155	149
+"Deluge"	130	114	164
+"Derby"	249	228	198
+"Desert"	161	95	59
+"Desert Storm"	237	231	224
+"Dew"	231	242	233
+"Di Serria"	212	145	93
+"Diesel"	50	44	43
+"Dingley"	96	124	71
+"Disco"	137	45	79
+"Dixie"	205	132	49
+"Dolly"	245	241	113
+"Dolphin"	106	104	115
+"Domino"	108	91	76
+"Don Juan"	90	79	81
+"Donkey Brown"	129	110	92
+"Dorado"	110	95	86
+"Double Colonial White"	228	207	153
+"Double Pearl Lusta"	233	220	190
+"Double Spanish White"	210	195	163
+"Dove Grey"	119	118	114
+"Downriver"	42	52	74
+"Downy"	111	210	190
+"Driftwood"	143	111	72
+"Drover"	251	235	155
+"Dune"	81	79	74
+"Dust Storm"	229	202	192
+"Dusty Grey"	172	155	155
+"Dutch White"	240	223	187
+"Eagle"	176	172	148
+"Earls Green"	184	167	34
+"Early Dawn"	251	242	219
+"East Bay"	71	82	110
+"East Side"	170	140	188
+"Eastern Blue"	0	135	159
+"Ebb"	230	216	212
+"Ebony"	49	51	55
+"Ebony Clay"	50	52	56
+"Echo Blue"	164	175	205
+"Eclipse"	63	57	57
+"Ecru White"	214	209	192
+"Ecstasy"	201	97	56
+"Eden"	38	98	85
+"Edgewater"	193	216	197
+"Edward"	151	164	154
+"Egg Sour"	249	228	197
+"Egg White"	224	200	141
+"El Paso"	57	57	44
+"El Salva"	143	78	69
+"Elephant"	36	54	64
+"Elf Green"	27	138	107
+"Elm"	41	123	118
+"Embers"	140	63	48
+"Eminence"	110	57	116
+"Emperor"	80	73	74
+"Empress"	124	113	115
+"Endeavour"	41	89	139
+"Energy Yellow"	245	215	82
+"English Holly"	39	66	52
+"English Walnut"	71	59	47
+"Envy"	139	165	143
+"Equator"	218	177	96
+"Espresso"	78	49	45
+"Eternity"	45	47	40
+"Eucalyptus"	50	151	96
+"Eunry"	205	165	156
+"Evening Sea"	38	96	79
+"Everglade"	38	67	52
+"Fair Pink"	243	229	220
+"Falcon"	110	90	91
+"Fantasy"	242	230	221
+"Fedora"	98	86	101
+"Feijoa"	165	215	133
+"Fern"	54	92	52
+"Fern Frond"	87	94	46
+"Ferra"	135	106	104
+"Festival"	234	204	74
+"Feta"	219	224	208
+"Fiery Orange"	177	89	47
+"Fiji Green"	99	111	34
+"Finch"	117	120	90
+"Finlandia"	97	117	91
+"Finn"	105	69	84
+"Fiord"	75	90	98
+"Fire"	143	63	42
+"Fire Bush"	224	152	66
+"Firefly"	49	70	67
+"Flame Pea"	190	92	72
+"Flame Red"	134	40	46
+"Flamenco"	234	134	69
+"Flamingo"	225	99	79
+"Flax"	130	133	98
+"Flint"	113	110	97
+"Flirt"	122	46	77
+"Foam"	208	234	232
+"Fog"	213	199	232
+"Foggy Grey"	167	166	157
+"Forest Green"	51	66	49
+"Forget Me Not"	253	239	219
+"Fountain Blue"	101	173	178
+"Frangipani"	255	215	160
+"French Grey"	191	189	193
+"French Lilac"	222	183	217
+"French Pass"	164	210	224
+"Friar Grey"	134	131	122
+"Fringy Flower"	180	225	187
+"Froly"	229	109	117
+"Frost"	225	228	197
+"Frosted Mint"	226	242	228
+"Frostee"	219	229	210
+"Fruit Salad"	75	163	81
+"Fuchsia"	123	92	183
+"Fuego"	194	214	46
+"Fuel Yellow"	209	144	51
+"Fun Blue"	51	80	131
+"Fun Green"	21	99	61
+"Fuscous Grey"	60	59	60
+"Gable Green"	44	70	65
+"Gallery"	220	215	209
+"Galliano"	216	167	35
+"Geebung"	197	131	46
+"Genoa"	49	121	109
+"Geraldine"	231	123	117
+"Geyser"	203	208	207
+"Ghost"	192	191	199
+"Gigas"	86	71	134
+"Gimblet"	185	173	97
+"Gin"	217	223	205
+"Gin Fizz"	248	234	202
+"Givry"	235	212	174
+"Glacier"	120	177	191
+"Glade Green"	95	129	81
+"Go Ben"	120	110	76
+"Goblin"	52	83	61
+"Gold Drop"	213	108	48
+"Gold Tips"	226	178	39
+"Golden Bell"	202	129	54
+"Golden Dream"	241	204	43
+"Golden Fizz"	235	222	49
+"Golden Glow"	249	215	126
+"Golden Sand"	234	206	106
+"Golden Tainoi"	255	193	82
+"Gondola"	55	51	50
+"Gordons Green"	41	51	43
+"Gorse"	253	227	54
+"Gossamer"	57	159	134
+"Gossip"	159	211	133
+"Gothic"	105	136	144
+"Governor Bay"	81	85	155
+"Grain Brown"	202	184	162
+"Grandis"	255	205	115
+"Granite Green"	139	130	101
+"Granny Apple"	197	231	205
+"Granny Smith"	123	148	140
+"Grape"	65	61	75
+"Graphite"	56	52	40
+"Grass Hopper"	122	114	41
+"Gravel"	74	75	70
+"Green House"	62	99	52
+"Green Kelp"	57	61	42
+"Green Leaf"	82	107	45
+"Green Mist"	191	194	152
+"Green Pea"	38	98	66
+"Green Smoke"	156	166	100
+"Green Spring"	169	175	153
+"Green Vogue"	35	65	78
+"Green Waterloo"	44	45	36
+"Green White"	222	221	203
+"Greenstone"	36	108	70
+"Grenadier"	193	77	54
+"Grey Chateau"	159	163	167
+"Grey Green"	82	86	54
+"Grey Nickel"	189	186	174
+"Grey Nurse"	209	211	204
+"Grey Olive"	161	154	127
+"Grey Suit"	147	145	160
+"Guardsman Red"	149	46	49
+"Gulf Blue"	52	63	92
+"Gulf Stream"	116	178	168
+"Gull Grey"	164	173	176
+"Gum Leaf"	172	201	178
+"Gumbo"	113	143	138
+"Gun Powder"	72	71	83
+"Gunmetal"	44	53	57
+"Gunsmoke"	122	124	118
+"Gurkha"	152	145	113
+"Hacienda"	158	128	34
+"Hairy Heath"	99	53	40
+"Haiti"	44	42	53
+"Half And Half"	237	231	200
+"Half Baked"	85	143	147
+"Half Colonial White"	242	229	191
+"Half Dutch White"	251	240	214
+"Half Pearl Lusta"	241	234	215
+"Half Spanish White"	230	219	199
+"Hampton"	232	212	162
+"Harp"	203	206	192
+"Harvest Gold"	234	183	106
+"Havana"	59	43	44
+"Havelock Blue"	87	132	193
+"Hawaiian Tan"	153	82	43
+"Hawkes Blue"	210	218	237
+"Heath"	79	42	44
+"Heather"	174	187	193
+"Heathered Grey"	148	140	126
+"Heavy Metal"	70	71	62
+"Hemlock"	105	104	75
+"Hemp"	152	125	115
+"Hibiscus"	179	54	84
+"Highball"	146	140	60
+"Highland"	122	148	97
+"Hillary"	167	160	126
+"Himalaya"	115	99	48
+"Hint Of Green"	223	241	214
+"Hint Of Grey"	223	221	214
+"Hint Of Red"	245	239	235
+"Hint Of Yellow"	246	245	215
+"Hippie Blue"	73	136	154
+"Hippie Green"	96	138	90
+"Hippie Pink"	171	73	92
+"Hit Grey"	161	169	168
+"Hit Pink"	253	164	112
+"Hokey Pokey"	187	142	52
+"Hoki"	100	125	134
+"Holly"	37	52	43
+"Honey Flower"	92	60	109
+"Honeysuckle"	232	237	105
+"Hopbush"	205	109	147
+"Horizon"	100	136	148
+"Horses Neck"	109	86	44
+"Hot Chile"	107	37	44
+"Hot Curry"	129	91	40
+"Hot Purple"	78	46	83
+"Hot Toddy"	167	117	44
+"Humming Bird"	206	239	228
+"Hunter Green"	47	49	37
+"Hurricane"	139	126	119
+"Husk"	178	153	75
+"Ice Cold"	175	227	214
+"Iceberg"	202	225	217
+"Illusion"	239	149	174
+"Indian Tan"	79	48	31
+"Indochine"	156	91	52
+"Irish Coffee"	98	66	43
+"Iroko"	91	82	68
+"Iron"	203	205	205
+"Ironbark"	109	77	44
+"Ironside Grey"	112	110	102
+"Ironstone"	134	80	64
+"Island Spice"	248	237	219
+"Jacaranda"	54	45	56
+"Jacarta"	61	50	93
+"Jacko Bean"	65	54	40
+"Jacksons Purple"	61	63	125
+"Jade"	64	114	109
+"Jaffa"	226	121	69
+"Jagged Ice"	202	231	226
+"Jagger"	63	46	76
+"Jaguar"	41	41	47
+"Jambalaya"	103	72	52
+"Janna"	222	209	183
+"Japanese Laurel"	47	117	50
+"Japanese Maple"	103	47	48
+"Japonica"	206	114	89
+"Jarrah"	59	43	44
+"Java"	37	151	151
+"Jazz"	95	44	47
+"Jelly Bean"	68	121	142
+"Jet Stream"	187	208	201
+"Jewel"	19	104	67
+"Joanna"	214	209	192
+"Jon"	70	61	62
+"Jonquil"	238	242	147
+"Jordy Blue"	122	170	224
+"Judge Grey"	93	83	70
+"Jumbo"	135	135	133
+"Jungle Green"	41	41	36
+"Jungle Mist"	176	196	196
+"Juniper"	116	145	142
+"Just Right"	220	191	172
+"Kabul"	108	94	83
+"Kaitoke Green"	36	83	54
+"Kangaroo"	197	195	176
+"Karaka"	45	45	36
+"Karry"	254	220	193
+"Kashmir Blue"	87	109	142
+"Kelp"	77	80	60
+"Kenyan Copper"	108	50	46
+"Keppel"	95	182	156
+"Kidnapper"	191	192	171
+"Kilamanjaro"	58	53	50
+"Killarney"	73	118	79
+"Kimberly"	105	93	135
+"Kingfisher Daisy"	88	53	128
+"Kobi"	224	147	171
+"Kokoda"	123	120	90
+"Korma"	128	78	44
+"Koromiko"	254	181	82
+"Kournikova"	249	208	84
+"Kumera"	117	91	39
+"La Palma"	66	137	41
+"La Rioja"	186	192	14
+"Las Palmas"	198	218	54
+"Laser"	198	169	94
+"Laurel"	110	141	113
+"Lavender"	159	144	208
+"Leather"	144	106	84
+"Lemon"	217	178	32
+"Lemon Ginger"	150	132	40
+"Lemon Grass"	153	154	134
+"Licorice"	46	55	73
+"Lightning Yellow"	247	162	51
+"Lilac Bush"	148	112	196
+"Lily"	193	159	179
+"Lily White"	233	238	235
+"Lima"	122	172	33
+"Lime"	183	197	44
+"Limeade"	95	151	39
+"Limed Ash"	103	109	99
+"Limed Gum"	107	91	61
+"Limed Oak"	140	114	84
+"Limed Spruce"	78	96	94
+"Limerick"	137	172	39
+"Linen"	186	183	162
+"Link Water"	199	205	216
+"Lipstick"	150	44	84
+"Lisbon Brown"	84	79	58
+"Livid Brown"	49	42	41
+"Loafer"	219	217	194
+"Loblolly"	179	187	183
+"Lochinvar"	72	144	132
+"Lochmara"	49	110	160
+"Locust"	162	165	128
+"Log Cabin"	57	62	46
+"Logan"	157	156	180
+"Lola"	185	172	187
+"London Hue"	174	148	171
+"Lonestar"	82	36	38
+"Lotus"	139	80	75
+"Loulou"	76	51	71
+"Lucky"	171	154	28
+"Lucky Point"	41	45	79
+"Lunar Green"	78	85	65
+"Lusty"	120	46	44
+"Luxor Gold"	171	141	63
+"Lynch"	105	125	137
+"Mabel"	203	232	232
+"Madang"	183	227	168
+"Madison"	45	60	84
+"Madras"	71	62	35
+"Magnolia"	238	232	235
+"Mahogany"	73	38	37
+"Mai Tai"	165	101	49
+"Maire"	42	41	34
+"Maize"	227	185	130
+"Makara"	105	95	80
+"Mako"	80	85	85
+"Malachite Green"	151	151	111
+"Malibu"	102	183	225
+"Mallard"	58	69	49
+"Malta"	165	151	132
+"Mamba"	118	109	124
+"Mandalay"	181	123	46
+"Mandy"	205	82	91
+"Mandys Pink"	245	183	153
+"Manhattan"	226	175	128
+"Mantis"	127	193	92
+"Mantle"	150	167	147
+"Manz"	228	219	85
+"Mardi Gras"	53	34	53
+"Marigold"	184	138	61
+"Mariner"	66	99	159
+"Marlin"	54	45	38
+"Maroon"	64	35	39
+"Marshland"	43	46	38
+"Martini"	183	168	163
+"Martinique"	60	55	72
+"Marzipan"	235	200	129
+"Masala"	87	83	75
+"Mash"	90	76	66
+"Matisse"	54	92	125
+"Matrix"	142	77	69
+"Matterhorn"	82	75	75
+"Maverick"	200	177	192
+"McKenzie"	140	99	56
+"Melanie"	224	183	194
+"Melanzane"	52	41	49
+"Melrose"	195	185	221
+"Meranti"	107	52	42
+"Mercury"	213	210	209
+"Merino"	225	219	208
+"Merlin"	79	78	72
+"Merlot"	115	52	58
+"Metallic Bronze"	85	74	60
+"Metallic Copper"	110	61	52
+"Meteor"	187	116	49
+"Meteorite"	74	59	106
+"Mexican Red"	155	61	61
+"Mid Grey"	102	106	109
+"Midnight"	33	48	62
+"Midnight Express"	33	38	58
+"Midnight Moss"	36	46	40
+"Mikado"	63	54	35
+"Milan"	246	244	147
+"Milano Red"	158	51	50
+"Milk Punch"	243	229	192
+"Milk White"	220	217	205
+"Millbrook"	89	86	72
+"Mimosa"	245	245	204
+"Mindaro"	218	234	111
+"Mine Shaft"	55	62	65
+"Mineral Green"	80	99	85
+"Ming"	64	117	119
+"Minsk"	62	50	103
+"Mint Julep"	224	216	167
+"Mint Tulip"	198	234	221
+"Mirage"	55	63	67
+"Mischka"	165	169	178
+"Mist Grey"	186	185	169
+"Mobster"	96	90	103
+"Moccaccino"	88	47	43
+"Mocha"	111	55	45
+"Mojo"	151	70	60
+"Mona Lisa"	255	152	137
+"Monarch"	107	37	44
+"Mondo"	85	77	66
+"Mongoose"	165	139	111
+"Monsoon"	122	118	121
+"Montana"	57	59	60
+"Monte Carlo"	122	197	180
+"Monza"	134	40	46
+"Moody Blue"	131	120	199
+"Moon Glow"	245	243	206
+"Moon Mist"	206	205	184
+"Moon Raker"	192	178	215
+"Moon Yellow"	240	196	32
+"Morning Glory"	158	209	211
+"Morocco Brown"	68	45	33
+"Mortar"	86	80	81
+"Mosaic"	41	55	65
+"Mosque"	0	95	91
+"Mountain Mist"	160	159	156
+"Muddy Waters"	169	132	79
+"Muesli"	158	126	83
+"Mulberry"	94	42	64
+"Mule Fawn"	136	79	64
+"Mulled Wine"	82	77	91
+"Mustard"	124	103	32
+"My Pink"	214	139	128
+"My Sin"	253	174	69
+"Mystic"	216	221	218
+"Nandor"	78	93	78
+"Napa"	163	154	135
+"Narvik"	233	230	220
+"Natural"	136	89	49
+"Nebula"	184	198	190
+"Negroni"	238	199	162
+"Nepal"	147	170	185
+"Neptune"	119	168	171
+"Nero"	37	37	37
+"Neutral Green"	170	165	131
+"Nevada"	102	111	111
+"New Amber"	109	59	36
+"New Orleans"	228	195	133
+"New York Pink"	221	131	116
+"Niagara"	41	169	139
+"Night Rider"	51	46	46
+"Night Shadz"	162	61	84
+"Nightclub"	106	31	68
+"Nile Blue"	37	63	78
+"Nobel"	169	157	157
+"Nomad"	161	153	134
+"Nordic"	29	57	60
+"Norway"	164	184	143
+"Nugget"	188	146	41
+"Nutmeg"	126	74	59
+"Oasis"	252	237	197
+"Observatory"	0	143	112
+"Ocean Green"	76	169	115
+"Off Green"	223	240	226
+"Off Yellow"	250	243	220
+"Oil"	49	51	48
+"Oiled Cedar"	102	54	45
+"Old Brick"	138	51	53
+"Old Copper"	115	80	59
+"Olive Green"	53	63	42
+"Olive Haze"	136	128	100
+"Olivetone"	116	112	40
+"Onahau"	194	230	236
+"Onion"	72	65	43
+"Opal"	168	195	188
+"Opium"	152	126	126
+"Oracle"	57	85	85
+"Orange Roughy"	168	83	53
+"Orange White"	234	227	205
+"Orchid White"	241	235	217
+"Oregon"	177	108	57
+"Orient"	37	91	119
+"Oriental Pink"	194	142	136
+"Orinoco"	210	211	179
+"Oslo Grey"	129	137	136
+"Ottoman"	211	219	203
+"Outer Space"	31	38	59
+"Oxford Blue"	40	53	58
+"Oxley"	109	154	120
+"Oyster Bay"	209	234	234
+"Oyster Pink"	212	181	176
+"Paarl"	134	75	54
+"Pablo"	122	113	92
+"Pacifika"	102	112	40
+"Paco"	79	64	55
+"Padua"	126	179	148
+"Pale Leaf"	189	202	168
+"Pale Oyster"	156	141	114
+"Pale Prim"	249	245	159
+"Pale Rose"	239	214	218
+"Pale Sky"	99	109	112
+"Pale Slate"	195	190	187
+"Palm Green"	32	57	44
+"Palm Leaf"	54	72	47
+"Pampas"	234	228	220
+"Panache"	235	247	228
+"Pancho"	223	185	146
+"Panda"	84	79	58
+"Paprika"	124	45	55
+"Paradiso"	72	128	132
+"Parchment"	208	200	176
+"Paris Daisy"	251	235	80
+"Paris M"	49	39	96
+"Paris White"	191	205	192
+"Parsley"	48	93	53
+"Patina"	99	146	131
+"Pattens Blue"	211	229	239
+"Paua"	42	37	81
+"Pavlova"	186	171	135
+"Pea Soup"	185	184	128
+"Peach"	251	229	194
+"Peach Schnapps"	198	128	89
+"Peanut"	122	68	52
+"Pearl Bush"	222	209	198
+"Pearl Lusta"	234	224	200
+"Peat"	118	109	82
+"Pelorous"	37	153	178
+"Peppermint"	215	231	208
+"Perano"	172	185	232
+"Perfume"	194	169	219
+"Periglacial Blue"	172	182	178
+"Persian Plum"	104	51	50
+"Persian Red"	79	33	42
+"Persimmon"	239	115	94
+"Peru Tan"	115	61	31
+"Pesto"	122	114	41
+"Petite Orchid"	218	151	144
+"Pewter"	145	160	146
+"Pharlap"	130	102	99
+"Picasso"	248	234	151
+"Pickled Aspen"	91	100	82
+"Pickled Bean"	115	85	62
+"Pickled Bluewood"	79	90	95
+"Picton Blue"	91	160	208
+"Pigeon Post"	119	132	142
+"Pine Cone"	117	101	86
+"Pine Glade"	189	192	126
+"Pine Tree"	42	47	35
+"Pink Flare"	216	180	182
+"Pink Lace"	246	204	215
+"Pink Lady"	243	215	182
+"Pink Swan"	191	179	178
+"Piper"	157	84	50
+"Pipi"	245	230	196
+"Pippin"	252	219	210
+"Pirate Gold"	186	120	42
+"Pistachio"	103	105	39
+"Pixie Green"	187	205	165
+"Pizazz"	229	127	61
+"Pizza"	191	141	60
+"Plantation"	62	89	76
+"Planter"	98	93	42
+"Plum"	56	26	56
+"Pohutukawa"	101	28	38
+"Polar"	229	242	231
+"Polo Blue"	138	167	204
+"Pompadour"	106	31	68
+"Porcelain"	221	220	219
+"Porsche"	223	157	91
+"Port Gore"	59	67	108
+"Portafino"	244	240	155
+"Portage"	139	152	216
+"Portica"	240	213	85
+"Pot Pourri"	239	220	212
+"Potters Clay"	132	92	64
+"Powder Blue"	146	159	162
+"Prairie Sand"	136	60	50
+"Prelude"	202	180	212
+"Prim"	226	205	213
+"Primrose"	228	222	142
+"Promenade"	248	246	223
+"Provincial Pink"	246	227	218
+"Prussian Blue"	25	47	65
+"Pueblo"	110	51	38
+"Puerto Rico"	89	186	163
+"Pumice"	186	192	180
+"Pumpkin"	171	107	53
+"Punch"	168	50	57
+"Punga"	83	73	49
+"Putty"	205	174	112
+"Quarter Pearl Lusta"	242	237	221
+"Quarter Spanish White"	235	226	210
+"Quicksand"	195	152	139
+"Quill Grey"	203	201	192
+"Quincy"	106	84	69
+"Racing Green"	35	47	44
+"Raffia"	220	198	160
+"Rain Forest"	102	112	40
+"Raincloud"	163	152	129
+"Rainee"	179	193	177
+"Rajah"	252	174	96
+"Rangitoto"	58	65	51
+"Rangoon Green"	43	46	37
+"Raven"	111	116	123
+"Rebel"	69	52	48
+"Red Beech"	161	98	59
+"Red Berry"	112	31	40
+"Red Damask"	203	111	74
+"Red Devil"	102	42	44
+"Red Oxide"	93	31	30
+"Red Robin"	125	65	56
+"Red Stage"	173	82	46
+"Redwood"	91	52	46
+"Reef"	209	239	159
+"Reef Gold"	169	141	54
+"Regal Blue"	32	63	88
+"Regent Grey"	121	132	136
+"Regent St Blue"	160	205	217
+"Remy"	246	222	218
+"Reno Sand"	178	110	51
+"Resolution Blue"	50	63	117
+"Revolver"	55	54	63
+"Rhino"	61	70	83
+"Ribbon"	113	51	60
+"Rice Cake"	239	236	222
+"Rice Flower"	239	245	209
+"Rich Gold"	161	82	38
+"Rio Grande"	183	198	26
+"Riptide"	137	217	200
+"River Bed"	85	96	97
+"Rob Roy"	221	173	86
+"Robins Egg Blue"	158	170	158
+"Rock"	90	77	65
+"Rock Blue"	147	162	186
+"Rock Salt"	230	214	184
+"Rock Spray"	157	68	45
+"Rodeo Dust"	199	163	132
+"Rolling Stone"	109	120	118
+"Roman"	216	98	91
+"Roman Coffee"	125	103	87
+"Romance"	244	240	230
+"Romantic"	255	198	158
+"Ronchi"	234	184	82
+"Roof Terracotta"	161	71	67
+"Rope"	142	89	60
+"Rose"	211	161	148
+"Rose Bud"	254	171	154
+"Rose Bud Cherry"	138	45	82
+"Rose Of Sharon"	172	81	45
+"Rose White"	251	238	232
+"Rosewood"	143	62	63
+"Roti"	182	150	66
+"Rouge"	169	64	100
+"Royal Heath"	181	75	115
+"Rum"	113	102	117
+"Rum Swizzle"	241	237	212
+"Russett"	125	101	92
+"Rustic Red"	58	24	26
+"Rusty Nail"	141	95	44
+"Saddle"	93	78	70
+"Saddle Brown"	80	56	30
+"Saffron"	220	159	69
+"Sage"	152	159	122
+"Sahara"	183	152	38
+"Sail"	165	206	236
+"Salem"	23	123	77
+"Salomie"	255	214	123
+"Salt Box"	105	98	104
+"Saltpan"	238	243	229
+"Sambuca"	59	46	37
+"San Felix"	44	110	49
+"San Juan"	68	87	97
+"San Marino"	78	108	157
+"Sand Dune"	134	118	101
+"Sandal"	163	135	106
+"Sandrift"	175	147	125
+"Sandstone"	120	109	95
+"Sandwisp"	222	203	129
+"Sandy Beach"	254	219	183
+"Sangria"	130	42	50
+"Sanguine Brown"	108	55	54
+"Santas Grey"	153	152	167
+"Sante Fe"	169	106	80
+"Sapling"	225	213	166
+"Sapphire"	63	82	129
+"Saratoga"	85	91	44
+"Sauvignon"	244	234	228
+"Sazerac"	245	222	196
+"Scampi"	111	99	160
+"Scandal"	173	217	209
+"Scarlet Gum"	74	45	87
+"Scarlett"	126	37	48
+"Scarpa Flow"	107	106	108
+"Schist"	135	135	111
+"Schooner"	141	132	120
+"Scooter"	48	142	160
+"Scorpion"	106	100	102
+"Scotch Mist"	238	231	200
+"Scrub"	61	64	49
+"Sea Buckthorn"	239	149	72
+"Sea Fog"	223	221	214
+"Sea Green"	31	99	97
+"Sea Mist"	194	213	196
+"Sea Nymph"	138	174	164
+"Sea Pink"	219	129	126
+"Seagull"	119	183	208
+"Seance"	105	50	110
+"Seashell"	227	225	224
+"Seaweed"	55	65	42
+"Selago"	230	223	231
+"Sepia"	58	47	45
+"Serenade"	252	233	215
+"Shadow Green"	154	192	182
+"Shady Lady"	159	155	157
+"Shakespeare"	96	154	184
+"Shalimar"	248	246	168
+"Shark"	52	54	58
+"Sherpa Blue"	0	73	78
+"Sherwood Green"	27	70	54
+"Shilo"	230	178	166
+"Shingle Fawn"	116	89	55
+"Ship Cove"	121	136	171
+"Ship Grey"	78	78	76
+"Shiraz"	132	40	51
+"Shocking"	232	153	190
+"Shuttle Grey"	97	102	107
+"Siam"	104	107	80
+"Sidecar"	233	217	169
+"Silk"	187	173	161
+"Silver Chalice"	172	174	169
+"Silver Sand"	190	189	182
+"Silver Tree"	103	190	144
+"Sinbad"	166	213	208
+"Siren"	105	41	59
+"Sirocco"	104	118	110
+"Sisal"	197	186	160
+"Skeptic"	157	180	170
+"Slugger"	66	52	43
+"Smalt Blue"	73	98	103
+"Smoke Tree"	187	95	52
+"Smokey Ash"	93	89	82
+"Smoky"	96	93	107
+"Snow Drift"	227	227	220
+"Snow Flurry"	234	247	201
+"Snowy Mint"	214	240	205
+"Snuff"	228	215	229
+"Soapstone"	236	229	218
+"Soft Amber"	207	190	165
+"Soft Peach"	238	223	222
+"Solid Pink"	133	73	76
+"Solitaire"	234	218	194
+"Solitude"	233	236	241
+"Sorbus"	221	107	56
+"Sorrell Brown"	157	127	97
+"Sour Dough"	201	181	154
+"Soya Bean"	111	99	75
+"Space Shuttle"	75	67	59
+"Spanish Green"	123	137	118
+"Spanish White"	222	209	183
+"Spectra"	55	93	79
+"Spice"	108	79	63
+"Spicy Mix"	139	95	77
+"Spicy Pink"	137	117	120
+"Spindle"	179	196	216
+"Splash"	241	215	158
+"Spray"	126	205	221
+"Spring Green"	92	138	100
+"Spring Rain"	163	189	156
+"Spring Sun"	241	241	198
+"Spring Wood"	233	225	217
+"Sprout"	184	202	157
+"Spun Pearl"	162	161	172
+"Squirrel"	143	125	107
+"St Tropaz"	50	84	130
+"Stack"	133	136	133
+"Star Dust"	160	161	151
+"Stark White"	210	198	182
+"Starship"	227	221	57
+"Steel Grey"	67	70	75
+"Stiletto"	131	61	62
+"Stinger"	141	112	42
+"Stonewall"	128	118	97
+"Storm Dust"	101	100	95
+"Storm Grey"	116	120	128
+"Stratos"	33	38	58
+"Straw"	218	190	130
+"Strikemaster"	148	106	129
+"Stromboli"	64	99	86
+"Studio"	114	74	161
+"Submarine"	140	156	156
+"Sugar Cane"	238	239	223
+"Sulu"	198	234	128
+"Summer Green"	143	182	156
+"Sun"	239	142	56
+"Sundance"	196	170	77
+"Sundown"	248	175	169
+"Sunflower"	218	192	26
+"Sunglo"	199	97	85
+"Sunset"	192	81	74
+"Sunshade"	250	157	73
+"Supernova"	255	180	55
+"Surf"	184	212	187
+"Surf Crest"	195	214	189
+"Surfie Green"	0	123	119
+"Sushi"	124	159	47
+"Suva Grey"	139	134	133
+"Swamp"	37	47	47
+"Swans Down"	218	230	221
+"Sweet Corn"	249	225	118
+"Sweet Pink"	238	145	141
+"Swirl"	215	206	197
+"Swiss Coffee"	219	208	202
+"Sycamore"	146	140	60
+"Tabasco"	142	58	54
+"Tacao"	246	174	120
+"Tacha"	210	185	96
+"Tahiti Gold"	220	114	42
+"Tahuna Sands"	216	204	155
+"Tall Poppy"	133	53	52
+"Tallow"	163	153	119
+"Tamarillo"	117	43	47
+"Tamarind"	62	47	46
+"Tana"	184	181	161
+"Tangaroa"	30	47	60
+"Tangerine"	205	93	52
+"Tango"	212	111	49
+"Tapa"	124	124	114
+"Tapestry"	179	112	132
+"Tara"	222	241	221
+"Tarawera"	37	60	72
+"Tasman"	186	192	179
+"Taupe Grey"	137	132	120
+"Tawny Port"	100	58	72
+"Tax Break"	73	101	105
+"Te Papa Green"	43	75	64
+"Tea"	191	181	162
+"Teak"	171	137	83
+"Teal Blue"	37	72	85
+"Temptress"	60	33	38
+"Tequila"	244	208	164
+"Texas"	236	230	126
+"Texas Rose"	252	176	87
+"Thatch"	177	148	143
+"Thatch Green"	84	78	49
+"Thistle"	199	189	149
+"Thunder"	77	77	75
+"Thunderbird"	146	56	48
+"Tia Maria"	151	66	45
+"Tiara"	185	195	190
+"Tiber"	24	67	67
+"Tidal"	240	245	144
+"Tide"	190	180	171
+"Timber Green"	50	67	54
+"Titan White"	221	214	225
+"Toast"	159	113	95
+"Tobacco Brown"	109	88	67
+"Tobago"	68	54	45
+"Toledo"	62	38	49
+"Tolopea"	45	37	65
+"Tom Thumb"	79	99	72
+"Tonys Pink"	231	158	136
+"Topaz"	129	124	135
+"Torea Bay"	53	61	117
+"Tory Blue"	55	78	136
+"Tosca"	116	64	66
+"Totem Pole"	136	53	49
+"Touch Wood"	58	55	46
+"Tower Grey"	156	172	165
+"Tradewind"	109	175	167
+"Tranquil"	221	237	233
+"Travertine"	226	221	199
+"Tree Poppy"	226	129	59
+"Treehouse"	60	52	46
+"Trendy Green"	126	132	36
+"Trendy Pink"	128	93	128
+"Trinidad"	197	79	51
+"Tropical Blue"	174	201	235
+"Trout"	76	83	86
+"True V"	142	114	199
+"Tuatara"	69	70	66
+"Tuft Bush"	249	211	190
+"Tulip Tree"	227	172	61
+"Tumbleweed"	75	65	42
+"Tuna"	70	73	78
+"Tundora"	88	84	82
+"Turbo"	245	204	35
+"Turkish Rose"	165	110	117
+"Turmeric"	174	144	65
+"Turtle Green"	54	62	29
+"Tuscany"	173	98	66
+"Tusk"	227	229	177
+"Tussock"	191	145	75
+"Tutu"	248	228	227
+"Twilight"	218	192	205
+"Twilight Blue"	244	246	236
+"Twine"	193	145	86
+"Valencia"	212	87	78
+"Valentino"	56	44	56
+"Valhalla"	42	43	65
+"Van Cleef"	82	57	54
+"Vanilla"	204	182	155
+"Vanilla Ice"	235	210	209
+"Varden"	253	239	211
+"Venetian Red"	91	31	34
+"Venice Blue"	44	87	120
+"Venus"	139	125	130
+"Verdigris"	98	96	62
+"Verdun Green"	72	83	26
+"Vesuvius"	168	85	51
+"Victoria"	86	73	133
+"Vida Loca"	95	146	40
+"Viking"	77	177	200
+"Vin Rouge"	149	82	100
+"Viola"	197	143	157
+"Violent Violet"	46	34	73
+"Violet"	47	38	60
+"Viridian Green"	75	95	86
+"Vis Vis"	249	228	150
+"Vista Blue"	151	213	179
+"Vista White"	227	223	217
+"Volcano"	78	39	40
+"Voodoo"	68	50	64
+"Vulcan"	54	56	60
+"Wafer"	212	187	177
+"Waikawa Grey"	91	110	145
+"Waiouru"	76	78	49
+"Walnut"	121	77	46
+"Wan White"	228	226	220
+"Wasabi"	132	145	55
+"Water Leaf"	182	236	222
+"Watercourse"	0	110	78
+"Waterloo"	114	114	130
+"Wattle"	214	202	61
+"Watusi"	242	205	187
+"Wax Flower"	238	179	158
+"We Peep"	253	215	216
+"Wedgewood"	76	107	136
+"Well Read"	142	53	55
+"West Coast"	92	81	47
+"West Side"	229	130	58
+"Westar"	212	207	197
+"Western Red"	107	37	44
+"Wewak"	241	145	154
+"Wheatfield"	223	215	189
+"Whiskey"	210	144	98
+"Whiskey Sour"	212	145	93
+"Whisper"	239	230	230
+"White Ice"	215	238	228
+"White Lilac"	231	229	232
+"White Linen"	238	231	220
+"White Nectar"	248	246	216
+"White Pointer"	218	214	204
+"White Rock"	212	207	180
+"Wild Rice"	227	212	116
+"Wild Sand"	231	228	222
+"Wild Willow"	190	202	96
+"William"	83	115	111
+"Willow Brook"	223	230	207
+"Willow Grove"	105	117	92
+"Windsor"	70	44	119
+"Wine Berry"	82	44	53
+"Winter Hazel"	208	195	131
+"Wisp Pink"	249	232	226
+"Wisteria"	164	135	139
+"Wistful"	162	158	205
+"Witch Haze"	251	240	115
+"Wood Bark"	48	38	33
+"Woodburn"	70	54	41
+"Woodland"	98	103	70
+"Woodrush"	69	64	43
+"Woodsmoke"	43	50	48
+"Woody Bay"	51	52	58
+"Woody Brown"	85	69	69
+"Xanadu"	117	135	110
+"Yellow Metal"	115	99	62
+"Yellow Sea"	244	159	53
+"Your Pink"	255	197	187
+"Yukon Gold"	130	106	33
+"Yuma"	199	184	130
+"Zambezi"	107	90	90
+"Zanah"	178	198	177
+"Zest"	198	114	59
+"Zeus"	59	60	56
+"Ziggurat"	129	166	170
+"Zircon"	222	227	227
+"Zombie"	221	194	131
+"Zorba"	162	149	137
+"Zuccini"	23	70	46
+"Zumthor"	205	213	213
+"Zydeco"	32	72	63

@@ -10,6 +10,10 @@
    ffi-prep-cif-var
    ffi-call
 
+   cffi-set-char
+   cffi-set-int
+   
+   cffi-get-char
    cffi-get-int
    cffi-get-float
    cffi-get-long
@@ -171,7 +175,7 @@
   (define test-float (foreign-procedure "test_float" (void* int void* void* void*) void))
 
 
-  (define ffi-set-char (foreign-procedure "ffi_set_char" (void* int) void))
+  (define ffi-set-char (foreign-procedure "ffi_set_char" (void* char) void))
   (define ffi-set-int (foreign-procedure "ffi_set_int" (void* int) void))
   (define ffi-set-float (foreign-procedure "ffi_set_float" (void* float) void))
   (define ffi-set-double (foreign-procedure "ffi_set_double" (void* double) void))
@@ -184,7 +188,7 @@
 
 
 
-
+  (define ffi-get-char (foreign-procedure "ffi_get_char" (void* ) char))
   (define ffi-get-int (foreign-procedure "ffi_get_int" (void* ) int))
   (define ffi-get-long (foreign-procedure "ffi_get_long" (void* ) integer-64))
   (define ffi-get-float (foreign-procedure "ffi_get_float" (void* ) float))
@@ -224,6 +228,11 @@
   ;;cffi define here
   (define cffi-alloc $ffi-alloc)
   (define cffi-free $ffi-free)
+
+  (define cffi-set-char ffi-set-char)
+  (define cffi-set-int ffi-set-int)
+    
+  (define cffi-get-char ffi-get-char)
   (define cffi-get-int ffi-get-int)
   (define cffi-get-long ffi-get-long)
   (define cffi-get-float ffi-get-float)

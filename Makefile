@@ -21,6 +21,7 @@ SOFILES= lib/libscm/libscm$(EXT) \
 		 lib/libnanovg/libnanovg$(EXT)  \
 		 lib/libgui/libgui$(EXT)  \
 		 lib/libalut/libalut$(EXT)  \
+		 lib/libsocket/libsocket$(EXT)  \
 		 lib/scheme/scheme	\
 		 lib/boot/scheme.boot	\
 		 lib/boot/petite.boot	\
@@ -33,6 +34,7 @@ BINFILES=bin/libscm$(EXT) \
 		 bin/libgles$(EXT)  \
 		 bin/libnanovg$(EXT)  \
 		 bin/libgui$(EXT)  \
+		 bin/libsocket$(EXT)  \
 		 bin/libalut$(EXT)  \
 
 all: $(TARGET)

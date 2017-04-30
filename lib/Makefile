@@ -21,11 +21,12 @@ LIBGLUT =./libglut/libglut.so
 LIBFFI = ./libffi/libffi.so
 LIBGLFW = ./libglfw/libglfw.so
 LIBGLES= ./libgl/libgles.so
+LIBSOCKET=./libsocket/libsocket.so
 
 UNAME_S := $(shell uname -s)
 OS_NAME :=$(shell echo $(UNAME_S) | tr '[A-Z]' '[a-z]')
 LIBS_ALL= libscm.so libimgui.so libglfw.so libffi.so libgles.so libnanovg.so \
-	libalut.so libgui.so
+	libalut.so libgui.so libsocket.so
 
 ifeq ($(UNAME_S), MINGW32_NT-6.1)
   OS_NAME:=windows
@@ -67,6 +68,9 @@ libalut.so: libalut.so
 libgui.so: libgui.so libnanovg.so
 	$(MAKE) -C libgui
 
+libsocket.so:
+	$(MAKE) -C libsocket
+
 $(OS_NAME):
 	@echo link... $(OS_NAME) $(LN_SRC)
 ifeq (,$(wildcard boot))
@@ -76,6 +80,7 @@ ifeq (,$(wildcard boot))
 	@ln -sf platform/$(OS_NAME)/libffi/ libffi
 	@ln -sf platform/$(OS_NAME)/libgl/ libgl
 	@ln -sf platform/$(OS_NAME)/libglfw/ libglfw
+	@ln -sf platform/$(OS_NAME)/libsocket/ libsocket
 	@ln -sf platform/$(OS_NAME)/3rdparty/ 3rdparty
 endif
 
@@ -87,5 +92,5 @@ android:
 	@ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk	
 clean:
 	@for n in $(SUB_DIR); do $(MAKE) -C $$n clean; done
-	rm -rf libscm libglut boot libffi libgl libglfw 3rdparty 
+	rm -rf libscm libglut boot libffi libgl libglfw 3rdparty  libsocket
 

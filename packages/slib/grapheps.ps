@@ -1,0 +1,475 @@
+% "graph-eps" library for creating PostScript graphs
+% http://people.csail.mit.edu/jaffer/Docupage/grapheps
+% Copyright (C) 1991, 2001, 2005, 2006, 2009, 2010, 2011 Aubrey Jaffer
+%
+% Permission to copy this software, to modify it, to redistribute it,
+% to distribute modified versions, and to use it for any purpose is
+% granted, subject to the following restrictions and understandings.
+%
+% 1.  Any copy made of this software must include this copyright notice
+% in full.
+%
+% 2.  I have made no warranty or representation that the operation of
+% this software will be error-free, and I am under no obligation to
+% provide any services, by way of maintenance, update, or otherwise.
+%
+% 3.  In conjunction with products arising from the use of this
+% material, there shall be no use of my name in any advertising,
+% promotional, or sales literature without prior written consent in
+% each case.
+
+/plotdict 100 dict def
+plotdict begin
+
+% Get dimensions
+4 array astore /whole-page exch def
+
+% Definitions so that internal assignments are bound before setting.
+/DATA 0 def
+/DEN 0 def
+/DIAG 0 def
+/DIAG2 0 def
+/DLTA 0 def
+/EXPSN 0 def
+/GPROCS 0 def
+/GD 6 def
+/GR 3 def
+/IDX 0 def
+/ISIZ 0 def
+/MAX 0 def
+/MIN 0 def
+/NUM 0 def
+/PLOT-bmargin 0 def
+/PLOT-lmargin 0 def
+/PLOT-rmargin 0 def
+/PLOT-tmargin 0 def
+/PROC 0 def
+/ROW 0 def
+/TXT 0 def
+/WPAGE 0 def
+/X-COORD 0 def
+/XDX 0 def
+/XOFF 0 def
+/XPARTS 0 def
+/XRNG 0 def
+/XSCL 0 def
+/XSTEP 0 def
+/XSTEPH 0 def
+/XTSCL 0 def
+/XWID 0 def
+/Y-COORD 0 def
+/YDX 0 def
+/YHIT 0 def
+/YOFF 0 def
+/YPARTS 0 def
+/YRNG 0 def
+/YSCL 0 def
+/YSTEP 0 def
+/YSTEPH 0 def
+/YTSCL 0 def
+/STP3 0 def
+/STP2 0 def
+/SCL 0 def
+/Y0 0 def
+/NAME-ENCODING 0 def
+/ENCODING 0 def
+/NAME 0 def
+/graphrect 0 def
+/plotrect 0 def
+
+% ( TITLE ) ( SUBTITLE )
+/title-top
+{ dup stringwidth pop -2 div plotrect 0 get plotrect 2 get 2 div add add
+  plotrect 1 get plotrect 3 get add pointsize .4 mul add moveto show
+  dup stringwidth pop -2 div plotrect 0 get plotrect 2 get 2 div add add
+  plotrect 1 get plotrect 3 get add pointsize 1.4 mul add moveto show
+} bind def
+
+% ( TITLE ) ( SUBTITLE )
+/title-bottom
+{ dup stringwidth pop -2 div plotrect 0 get plotrect 2 get 2 div add add
+  plotrect 1 get pointsize -2 mul add moveto show
+  dup stringwidth pop -2 div plotrect 0 get plotrect 2 get 2 div add add
+  plotrect 1 get pointsize -1 mul add moveto show
+} bind def
+
+% Plots column K against column J of given two-dimensional ARRAY.
+% The arguments are:
+%   [ ARRAY J K ] J and K are column-indexes into ARRAY
+%   [ PREAMBLE RENDER POSTAMBLE ] Plotting procedures:
+%       PREAMBLE  - Executed once before plotting row
+%       RENDER    - Called with each pair of coordinates to plot
+%       POSTAMBLE - Called once after plotting row (often does stroke)
+/plot-column
+{ /GPROCS exch def aload pop /YDX exch def /XDX exch def /DATA exch def
+  /GD glyphsize def
+  /GR GD .5 mul def
+  gsave
+    /ROW DATA 0 get def ROW XDX get ROW YDX get gtrans moveto
+    GPROCS 0 get exec % preamble
+    /PROC GPROCS 1 get def DATA {dup XDX get exch YDX get gtrans PROC} forall
+    GPROCS 2 get exec stroke % postamble
+  grestore
+} bind def
+
+% Here are the procedure-arrays for passing as the third argument to
+% plot-column.  Plot-column moves to the first coordinate before
+% calls to the first procedure.  Thus both line and scatter graphs are
+% supported.  Many additional glyph types can be produced as
+% combinations of these types.  This is best accomplished by calling
+% plot-column with each component.
+
+% GD and GR are the graphic-glyph diameter and radius.
+% DIAG and DIAG2, used in /cross are diagonal and twice diagonal.
+% gtrans maps x, y coordinates on the stack to 72dpi page coordinates.
+
+% Render line connecting points
+/line    [{} {lineto} {}] bind def
+/mountain [{currentpoint 2 copy pop bottomedge moveto lineto}
+	   {lineto}
+	   {currentpoint pop bottomedge lineto closepath fill}] bind def
+/cloud    [{currentpoint 2 copy pop topedge moveto lineto}
+	   {lineto}
+	   {currentpoint pop topedge lineto closepath fill}] bind def
+% Render lines from x-axis to points
+/impulse [{} {2 copy moveto pop Y0 lineto} {}] bind def
+/bargraph
+    [{}
+     {2 copy pop GR sub Y0
+      4 2 roll Y0 sub exch pop GD exch rectstroke}
+     {}] bind def
+/barfill
+    [{}
+     {2 copy pop GR sub Y0
+      4 2 roll Y0 sub exch pop GD exch rectfill}
+     {}] bind def
+
+% Solid round dot.
+/disc    [{GD setlinewidth 1 setlinecap}
+			 {moveto 0 0 rlineto} {}] bind def
+% Minimal point -- invisible if linewidth is 0.
+/point   [{1 setlinecap} {moveto 0 0 rlineto} {}] bind def
+% Square box.
+/square  [{} {GR sub exch GR sub exch GD dup rectstroke} {}] bind def
+% Square box at 45.o
+/diamond [{}
+	  {2 copy GR add moveto
+	   GR neg GR neg rlineto GR GR neg rlineto
+		   GR GR rlineto GR neg GR rlineto
+	   closepath}
+	  {}] bind def
+% Plus Sign
+/plus	 [{}
+	  {       GR sub moveto  0 GD rlineto
+	   GR neg GR neg rmoveto GD 0 rlineto}
+	  {}] bind def
+% X Sign
+/cross   [{/DIAG GR .707 mul def /DIAG2 DIAG 2 mul def}
+	  {exch DIAG sub exch DIAG add moveto DIAG2 dup neg rlineto
+			  DIAG2 neg 0 rmoveto     DIAG2 dup rlineto}
+	  {}] bind def
+% Triangle pointing upward
+/triup   [{}
+	  {GR 1.12 mul add moveto GR neg GR -1.62 mul rlineto
+	   GR 2 mul 0 rlineto GR neg GR  1.62 mul rlineto
+	   closepath}
+	  {}] bind def
+% Triangle pointing downward
+/tridown [{}
+	  {GR 1.12 mul sub moveto GR neg GR  1.62 mul rlineto
+	   GR 2 mul 0 rlineto GR neg GR -1.62 mul rlineto
+	   closepath}
+	  {}] bind def
+/pentagon [{}
+	   {gsave translate 0 GR moveto 4 {72 rotate 0 GR lineto} repeat
+		  closepath stroke grestore}
+	   {}] bind def
+/circle   [{stroke} {GR 0 360 arc stroke} {}] bind def
+
+% Puts text in column-L at column-K vs column-J
+% The arguments are:
+%   [ ARRAY J K L ] J, K, and L are column-indexes into ARRAY
+%   [ PREAMBLE RENDER POSTAMBLE ] Plotting procedures:
+%       PREAMBLE  - Executed once before plotting row
+%       RENDER    - Called with each pair of coordinates and text
+%       POSTAMBLE - Called once after plotting row (often does stroke)
+/plot-text-column
+{ /GPROCS exch def aload pop
+    /TDX exch def /YDX exch def /XDX exch def /DATA exch def
+  /GD glyphsize def
+  /GR GD .5 mul def
+  gsave
+    /ROW DATA 0 get def ROW XDX get ROW YDX get gtrans moveto
+    GPROCS 0 get exec % preamble
+    /PROC GPROCS 1 get def
+    DATA
+    {/row exch def row XDX get row YDX get gtrans row TDX get PROC} forall
+    GPROCS 2 get exec stroke % postamble
+  grestore
+} bind def
+
+% Here are the procedure-arrays for passing as the third argument to
+% plot-text-column.  Plot-text-column moves to the first coordinate
+% before calls to the first procedure.
+
+% GD and GR are the graphic-glyph diameter and radius.
+% DIAG and DIAG2, used in /cross are diagonal and twice diagonal.
+% gtrans maps x, y coordinates on the stack to 72dpi page coordinates.
+
+/above [{}
+	 {/TXT exch def
+	 exch TXT stringwidth pop -2 div add exch pointsize 0.1 mul GR add add moveto
+	 TXT show}
+         {}] bind def
+
+/center [{}
+	 {/TXT exch def
+	 exch TXT stringwidth pop -2 div add exch pointsize -0.35 mul add moveto
+	 TXT show}
+         {}] bind def
+
+/below [{}
+	 {/TXT exch def
+	 exch TXT stringwidth pop -2 div add exch pointsize 0.7 mul GR add sub moveto
+	 TXT show}
+         {}] bind def
+
+/left [{}
+	 {/TXT exch def
+	 exch TXT stringwidth pop GR add sub exch pointsize -0.35 mul add moveto
+	 TXT show}
+         {}] bind def
+
+/right [{}
+	 {/TXT exch def
+	 exch GR add exch pointsize -0.35 mul add moveto
+	 TXT show}
+         {}] bind def
+
+/partition-page
+{ /YPARTS exch def /XPARTS exch def /WPAGE exch def
+  /XWID WPAGE 2 get XPARTS div def /YHIT WPAGE 3 get YPARTS div def
+  /Y-COORD WPAGE 1 get def
+  YPARTS
+  { /X-COORD WPAGE 0 get WPAGE 2 get add XWID sub def
+    XPARTS {[X-COORD Y-COORD XWID YHIT]
+	    /X-COORD X-COORD XWID sub def} repeat
+    /Y-COORD Y-COORD YHIT add def
+  } repeat
+} bind def
+
+/squelch-.0 % x
+{
+    dup dup cvi eq {cvi} if
+} bind def
+
+/fudge3 % SCL STP3 STP2
+{
+    /STP2 exch def /STP3 exch def /SCL exch def
+    SCL 3 mod 0 eq {STP3} {STP2} ifelse
+%% leads to range error in CVS.
+%    SCL abs 3000 gt {STP2} {SCL 3 mod 0 eq {STP3} {STP2} ifelse} ifelse
+} bind def
+
+% The arguments are:
+%   [ MIN-X MIN-Y DELTA-X DELTA-Y ] whole graph rectangle
+%   [ MIN-COLJ MAX-COLJ ] Numerical range of plot data
+%   [ MIN-COLK MAX-COLK ] Numerical range of plot data
+% and the implicit current clippath
+/setup-plot
+{ /YRNG exch def /XRNG exch def /graphrect exch def
+  /PLOT-bmargin pointsize 2.4 mul def
+  /PLOT-tmargin pointsize 2.4 mul def
+  /PLOT-lmargin lmargin-template stringwidth pop pointsize 1.2 mul add def
+  /PLOT-rmargin rmargin-template stringwidth pop pointsize 1.2 mul add def
+  /plotrect [ graphrect 0 get PLOT-lmargin add
+	      graphrect 1 get PLOT-bmargin add
+	      graphrect 2 get PLOT-lmargin sub PLOT-rmargin sub
+	      graphrect 3 get PLOT-bmargin sub PLOT-tmargin sub ] def
+  /XSCL plotrect 2 get XRNG aload pop exch sub div def
+  /YSCL plotrect 3 get YRNG aload pop exch sub div def
+  /XOFF XRNG 0 get plotrect 0 get XSCL div sub def
+  /YOFF YRNG 0 get plotrect 1 get YSCL div sub def
+  /YTSCL plotrect 3 get YRNG aload pop exch sub abs find-tick-scale def
+  /YSTEP YTSCL 0 get 6 8 fudge3 5 mul yunttrans YSCL sign mul def
+  /XTSCL plotrect 2 get XRNG aload pop exch sub abs find-tick-scale def
+  /XSTEP XTSCL 0 get 12 10 fudge3 5 mul xunttrans XSCL sign mul def
+  /YSTEPH YSTEP 2 div def
+  /XSTEPH XSTEP 2 div def
+%  /Y0 0 YOFF sub YSCL mul def
+  /Y0 YRNG 0 get YOFF sub YSCL mul def
+} bind def
+
+% gtrans is the utility routine mapping data coordinates to view space.
+% plot-column sets up XOFF, XSCL, and YSCL and uses it.
+/gtrans {exch XOFF sub XSCL mul exch YOFF sub YSCL mul} bind def
+%/guntrans {exch XSCL div XOFF add exch YSCL div YOFF add} bind def
+
+/yunttrans {YTSCL aload pop exch div mul} bind def
+/xunttrans {XTSCL aload pop exch div mul} bind def
+
+/sign {dup 0 lt {pop -1} {0 gt {1} {0} ifelse} ifelse} bind def
+
+/zero-in-range? {dup 0 get 0 le exch 1 get 0 ge and} bind def
+
+/y-axis
+{ XRNG zero-in-range?
+    { 0 YRNG 0 get gtrans moveto 0 YRNG 1 get gtrans lineto stroke} if
+} bind def
+/x-axis
+{ YRNG zero-in-range?
+    {XRNG 0 get 0 gtrans moveto XRNG 1 get 0 gtrans lineto stroke} if
+} bind def
+
+% Find data range in column K of two-dimensional ARRAY.
+%   ARRAY
+%   K  is the column-index into ARRAY
+/column-range
+{ /IDX exch def dup /MIN exch 0 get IDX get def /MAX MIN def
+  {IDX get dup dup MIN lt {/MIN exch def} {pop} ifelse
+	       dup MAX gt {/MAX exch def} {pop} ifelse} forall
+  [MIN MAX]
+} bind def
+
+/min {2 copy lt {pop} {exch pop} ifelse} bind def
+/max {2 copy gt {pop} {exch pop} ifelse} bind def
+
+/combine-ranges
+{ aload pop 3 2 roll aload pop exch 4 3 roll min 3 1 roll max 2 array astore}
+bind def
+
+/pad-range
+{ exch aload pop /MAX exch def /MIN exch def
+  /EXPSN exch 100 div MAX MIN sub mul def
+  [ MIN EXPSN sub  MAX EXPSN add ]
+} bind def
+
+/snap-range
+{dup aload pop exch sub 1 exch find-tick-scale aload pop
+     /DEN exch def /NUM exch def 1 NUM div DEN mul /DLTA exch def
+     aload pop /MAX exch def /MIN exch def
+     [ DLTA MAX MIN sub sub 2 div dup MIN exch sub exch MAX add ]
+} bind def
+
+% Given the width (or height) and the data-span, returns an array of
+% numerator and denominator [NUM DEN]
+%
+% NUM will be 1, 2, 3, 4, 5, 6, or 8 times a power of ten.
+% DEN will be a power of ten.
+%
+% NUM   ISIZ
+% === < ====
+% DEN   DLTA
+/find-tick-scale
+{/DLTA exch def /ISIZ exch def
+ /DEN 1 def
+ {DLTA abs ISIZ le {exit} if /DEN DEN 10 mul def /ISIZ ISIZ 10 mul def} loop
+ /NUM 1 def
+ {DLTA abs 10 mul ISIZ ge {exit} if /NUM NUM 10 mul def /DLTA DLTA 10 mul def} loop
+ [[8 6 5 4 3 2 1] {/MAX exch def MAX DLTA mul ISIZ le {MAX exit} if} forall
+  NUM mul DEN]
+} bind def
+
+/rule-vertical
+{ /XWID exch def
+  /TXT exch def
+  /X-COORD exch def
+  X-COORD type [] type eq {/X-COORD X-COORD 0 get def} if
+  gsave
+    X-COORD plotrect 1 get plotrect 3 get 2 div add translate
+    TXT stringwidth pop -2 div
+    XWID 0 gt { 90 rotate PLOT-lmargin} {-90 rotate PLOT-rmargin} ifelse
+    pointsize 1.2 mul sub moveto TXT show
+  grestore
+  YRNG 0 get YSTEP div ceiling YSTEP mul  YSTEP  YRNG 1 get
+  { /YDX exch def 0 YDX gtrans /Y-COORD exch def pop
+    X-COORD Y-COORD moveto XWID 0 rlineto stroke
+    /TXT YDX squelch-.0 20 string cvs def
+    X-COORD
+    XWID 0 gt {TXT stringwidth pop sub ( ) stringwidth pop sub
+	       Y-COORD pointsize .3 mul sub moveto}
+	      {Y-COORD pointsize .3 mul sub moveto ( ) show} ifelse
+    TXT show} for
+  YRNG 0 get YSTEPH div ceiling YSTEPH mul  YSTEPH  YRNG 1 get
+  { /YDX exch def 0 YDX gtrans /Y-COORD exch def pop
+    X-COORD Y-COORD moveto XWID 2 div 0 rlineto stroke} for
+} bind def
+
+/rule-horizontal
+{ /YHIT exch def
+  /TXT exch def
+  /Y-COORD exch def
+  Y-COORD type [] type eq {/Y-COORD Y-COORD 1 get def} if
+  plotrect 0 get plotrect 2 get 2 div add TXT stringwidth pop -2 div add
+  Y-COORD
+  YHIT 0 gt {pointsize -2 mul} {pointsize 1.4 mul} ifelse add moveto TXT show
+  XRNG 0 get XSTEP div ceiling XSTEP mul  XSTEP  XRNG 1 get
+  { dup 0 gtrans pop /X-COORD exch def
+    X-COORD Y-COORD moveto 0 YHIT rlineto stroke
+    /TXT exch squelch-.0 10 string cvs def
+    X-COORD TXT stringwidth pop 2.0 div sub
+    Y-COORD YHIT 0 gt {pointsize sub} {pointsize .3 mul add} ifelse
+    moveto TXT show
+  } for
+  XRNG 0 get XSTEPH div ceiling XSTEPH mul  XSTEPH  XRNG 1 get
+  { 0 gtrans pop Y-COORD moveto 0 YHIT 2 div rlineto stroke} for
+} bind def
+
+/grid-verticals
+{ XRNG 0 get XSTEPH div ceiling XSTEPH mul  XSTEPH  XRNG 1 get
+  { 0 gtrans pop /X-COORD exch def
+    X-COORD plotrect 1 get moveto 0 plotrect 3 get rlineto} for
+  stroke
+} bind def
+
+/grid-horizontals
+{ YRNG 0 get YSTEPH div ceiling YSTEPH mul  YSTEPH  YRNG 1 get
+  { 0 exch gtrans /Y-COORD exch def pop
+    plotrect 0 get Y-COORD moveto plotrect 2 get 0 rlineto} for
+  stroke
+} bind def
+
+/leftedge {plotrect 0 get} bind def
+/rightedge {plotrect dup 0 get exch 2 get add} bind def
+/topedge {plotrect dup 1 get exch 3 get add} bind def
+/bottomedge {plotrect 1 get} bind def
+
+/outline-rect {aload pop rectstroke} bind def
+/fill-rect {aload pop rectfill} bind def
+/clip-to-rect {aload pop rectclip} bind def
+
+/gstack [] def
+/gpush {gsave /gstack [ gstack pointsize glyphsize ] def} bind def
+/gpop {/gstack gstack aload pop /glyphsize exch def /pointsize exch def def grestore} bind def
+
+/combine-font-encoding		% NAME ENCODING NAME-ENCODING
+{
+    /NAME-ENCODING exch def
+    /ENCODING exch def
+    findfont
+    dup length dict begin
+    {1 index /FID ne {def} {pop pop} ifelse} forall
+    /Encoding ENCODING def
+    currentdict
+    end
+    NAME-ENCODING exch definefont pop
+} bind def
+
+% Default parameters
+
+% The legend-templates are strings used to reserve horizontal space
+/lmargin-template (-.0123456789) def
+/rmargin-template (-.0123456789) def
+
+% glyphsize is the graphic-glyph size; GR, graphic radius, is
+% glyphsize/2.  Line width, set by "setlinewidth", must be much less
+% than glyphsize for readable glyphs.
+/glyphsize 6 def
+% pointsize is the height of text characters in "points", 1/72 inch; 0.353.mm
+/pointsize 12 def
+% Set default font
+/Helvetica pointsize selectfont
+
+gsave
+% End of "graph-eps"
+

@@ -1,0 +1,445 @@
+This directory contains the distribution of Scheme Library slib-3b5.
+Slib conforms to Revised^5 Report on the Algorithmic Language Scheme
+and the IEEE P1178 specification.  Slib supports Unix and similar
+systems, VMS, and MS-DOS.
+
+The maintainer can be reached at agj @ alum.mit.edu.
+	    http://people.csail.mit.edu/jaffer/SLIB.html
+
+			       MANIFEST
+
+  `README' is this file.  It contains a MANIFEST and INSTALLATION
+	INSTRUCTIONS.
+  `FAQ' Frequently Asked Questions and answers.
+  `ChangeLog' documents changes to slib.
+  `slib.texi' has documentation on library packages in TexInfo format.
+
+  `Template.scm' Example configuration file.  Copy and customize to
+	reflect your system.
+  `bigloo.init' is a configuration file for Bigloo.
+  `chez.init' is a configuration file for Chez Scheme.
+  `mzscheme.init' is a configuration file for mzscheme.
+  `elk.init' is a configuration file for ELK 3.0.
+  `gambit.init' is a configuration file for Gambit Scheme.
+  `macscheme.init' is a configuration file for MacScheme.
+  `mitscheme.init' is a configuration file for MIT Scheme.
+  `pscheme.init' is configuration file for PocketScheme 0.2.5 (WinCE SIOD)
+  `RScheme.init' is a configuration file for RScheme.
+  `scheme2c.init' is a configuration file for DEC's scheme->c.
+  `scheme48.init' is a configuration file for Scheme48.
+  `scsh.init' is a configuration file for Scheme-Shell
+  `scm.init' is a configuration file for SCM.
+  `sisc.init' is a configuration file for SISC.
+  `t3.init' is a configuration file for T3.1 in Scheme mode.
+  `STk.init' is a configuration file for STk.
+  `s7.init' is a configuration file for S7, part of Snd sound-editor.
+  `umbscheme.init' is a configuration file for umb-scheme.
+  `vscm.init' is a configuration file for VSCM.
+  `guile-2.init' is a configuration file for Guile version 2.0 or later.
+  `guile.init' is a configuration file for older versions of Guile.
+  `jscheme.init' is a configuration file for JScheme.
+  `kawa.init' is a configuration file for Kawa.
+  `mklibcat.scm' builds the *catalog* cache.
+  `require.scm' has code which allows system independent access to
+	the library files.
+
+  `slib.sh' is a shell script for running various Schemes with SLIB.
+  `Bev2slib.scm' Converts Stephen Bevan's "*.map" files to SLIB catalog entries.
+  `pp.scm' has pretty-print.
+  `ppfile.scm' has pprint-file and pprint-filter-file.
+  `obj2str.scm' has object->string.
+  `strcase.scm' has functions for manipulating the case of strings.
+  `genwrite.scm' has a generic-write which is used by pp.scm,
+	pp2str.scm and obj2str.scm
+  `format.scm' has Common-Lisp format.
+  `formatst.scm' tests format.
+  `printf.scm' has printf, fprintf, and sprintf compatible with C.
+  `scanf.scm' has scanf, fscanf, and sscanf compatible by C.
+  `lineio' has line oriented input/output functions.
+  `qp.scm' has printer safe for circular structures.
+  `break.scm' has break and continue.
+  `trace.scm' has trace and untrace for tracing function execution.
+  `debug.scm' has handy higher level debugging aids.
+  `strport.scm' has routines for string-ports.
+  `strsrch.scm' search for chars or substrings in strings and ports.
+  `differ.scm' An O(NP) Sequence Comparison Algorithm.
+
+  `alist.scm' has functions accessing and modifying association lists.
+  `hash.scm' defines hash, hashq, and hashv.
+  `hashtab.scm' has hash tables.
+  `sierpinski.scm' 2-dimensional coordinate hash.
+  `phil-spc.scm' Hilbert Space-Filling Curve.
+  `peanosfc.scm' Peano Space-Filling Curve.
+  `soundex.scm' English name hash.
+  `logical.scm' emulates 2's complement logical operations.
+  `random.scm' has random number generator compatible with Common Lisp.
+  `randinex.scm' has inexact real number distributions.
+  `primes.scm' has primes and probably-prime?.
+  `factor.scm' has factor.
+  `root.scm' has Newton's and Laguerre's methods for finding roots.
+  `minimize.scm' has Golden Section Search for minimum value.
+  `limit.scm' computes one-sided limits.
+  `cring.scm' extend + and * to custom commutative rings.
+  `selfset.scm' sets single letter identifiers to their symbols.
+  `determ.scm' compute determinant of list of lists.
+  `charplot.scm' has procedure for plotting on character screens.
+  `grapheps.scm' has procedures for creating PostScript graphs.
+  `grapheps.ps' is PostScript runtime support for creating graphs.
+  `matfile.scm' reads MAT-File Format version 4 (MATLAB).
+  `solid.scm' has VRML97 solid-modeling.
+  `colorspc.scm' has CIE and sRGB color transforms.
+  `colornam.scm' has color-name database functions.
+  `mkclrnam.scm' creates color-name databases.
+  `color.scm' has color data-type.
+  `cie1931.xyz' CIE XYZ(1931) Spectra from 380.nm to 780.nm.
+  `cie1964.xyz' CIE XYZ(1964) Spectra from 380.nm to 780.nm.
+  `ciesia.dat' CIE Standard Illuminant A relative spectral power distribution
+  `ciesid65.dat' CIE Standard Illuminant D65 relative spectral power distribution
+  `daylight.scm' Model of sky colors.
+  `getopt.scm' has posix-like getopt for parsing command line arguments.
+  `timecore.scm' has shared time conversion routines.
+  `psxtime.scm' has Posix time conversion routines.
+  `cltime.scm' has Common-Lisp time conversion routines.
+  `timezone.scm' has the default time-zone, UTC.
+  `tzfile.scm' reads sysV style (binary) timezone file.
+  `comparse.scm' has shell-like command parsing.
+
+  `rdms.scm' has code to construct a relational database from a base
+	table implementation.
+  `alistab.scm' has association list base tables.
+  `dbutil.scm' has procedures for creating and opening relational
+	databases.
+  `dbsyn.scm' has Syntactic extensions for RDMS (within-database).
+  `dbcom.scm' embeds *commands* in relational databases.
+  `dbinterp.scm' Interpolate function from database table.
+  `htmlform.scm' generates HTML-3.2 with forms.
+  `db2html.scm' convert relational database to hyperlinked tables and
+	pages.
+  `http-cgi.scm' serves WWW pages with HTTP or CGI.
+  `html4each.scm' parses HTML files.
+  `xml-parse.scm' parses XML files.
+  `dirs.scm' maps over directory filenames.
+  `uri.scm' encodes and decodes Uniform Resource Identifiers.
+  `dbrowse.scm' browses relational databases.
+  `paramlst.scm' has procedures for passing parameters by name.
+  `getparam.scm' has procedures for converting getopt to parameters.
+  `manifest.scm' List SLIB module requires and exports; useful for compiling.
+  `top-defs.scm' Finds external references.
+  `vet.scm' Checks each module imports, exports, and documentation.
+  `schmooz.scm' is a simple, lightweight markup language for
+	interspersing Texinfo documentation with Scheme source code.
+  `glob.scm' has filename matching and manipulation.
+  `batch.scm' Group and execute commands on various operating systems.
+  `crc.scm' Calculate POSIX.2 checksums and other CRCs.
+
+  `record.scm' a MITScheme user-definable datatypes package
+  `promise.scm' has code from R4RS for supporting DELAY and FORCE.
+
+  `repl.scm' has a read-eval-print-loop.
+  `defmacex.scm' has defmacro:expand*.
+  `mbe.scm' has "Macro by Example" define-syntax.
+  `scmacro.scm' is a syntactic closure R4RS macro package.
+	r4rsyn.scm, synclo.scm, synrul.scm have syntax definitions
+	and support.
+  `scmactst.scm' is code for testing SYNTACTIC CLOSURE macros.
+  `scainit.scm' is a syntax-case R4RS macro package.
+	scaglob.scm scamacr.scm scaoutp.scm scaexpp.scm have
+	syntax definitions and support.  `syncase.sh' is a shell
+	script for producing the SLIB version from the original.
+  `macwork.scm' is a "Macros that work" package.
+	mwexpand.scm mwdenote.scm mwsynrul.scm have support.
+  `macrotst.scm' is code from R4RS for testing macros.
+
+  `values.scm' is multiple values.
+  `queue.scm' has queues and stacks.
+
+  `object.scm' is an object system.
+  `yasyn.scm' defines (syntax-rules) macros for object oriented programming.
+  `collect.scm' is collection operators (like CL sequences).
+  `priorque.scm' has code and documentation for priority queues.
+  `wttree.scm' has weight-balanced trees.
+  `wttree-test.scm' new test suite.
+  `process.scm' has multi-processing primitives.
+  `array.scm' has multi-dimensional arrays.
+  `subarray.scm' has subarray and accessory procedures.
+  `linterp.scm' has interpolate-array-ref and resample-array!.
+  `arraymap.scm' has array-map!, array-for-each, and array-indexes.
+
+  `sort.scm' has sorted?, sort, sort!, merge, and merge!.
+  `tsort.scm' has topological-sort.
+  `comlist.scm' has many common list and mapping procedures.
+  `tree.scm' has functions dealing with trees.
+  `coerce.scm' has coerce and type-of from Common-Lisp.
+  `chap.scm' has functions which compare and create strings in
+	"chapter order".
+
+  `sc4opt.scm' has optional rev4 procedures.
+  `sc4sc3.scm' has procedures to make a rev3 implementation run rev4
+	code.
+  `sc2.scm' has rev2 procedures eliminated in subsequent versions.
+  `mularg.scm' redefines - and / to take more than 2 arguments.
+  `mulapply.scm' redefines apply to take more than 2 arguments.
+  `ratize.scm' has function rationalize from Revised^4 spec.
+  `trnscrpt.scm' has transcript-on and transcript-off from Revised^4 spec.
+  `withfile.scm' has with-input-from-file and with-output-to-file from R4RS.
+  `dynwind.scm' has dynamic-wind from R5RS.
+  `eval.scm' has eval with environments from R5RS.
+  `dwindtst.scm' has routines for characterizing dynamic-wind.
+  `dynamic.scm' has DYNAMIC data type [obsolete].
+  `fluidlet.scm' has fluid-let syntax (defmacro).
+  `fluid-let.scm' has fluid-let syntax.
+  `structure.scm' has undocumented syntax-case macros.
+  `byte.scm' has arrays of small integers.
+  `bytenumb.scm' convert byte-arrays to integers; IEEE floating-point numbers.
+  `transact.scm' File locking and backup.
+  `pnm.scm' provides a Scheme interface to "portable bitmap" files.
+  `simetrix.scm' provides SI Metric Interchange Format.
+  `ncbi-dna.scm' reads and manipulates DNA and protein sequences.
+  `srfi.scm' implements Scheme Request for Implementation.
+  `srfi-N.scm' implements srfi-N.
+
+		      INSTALLATION INSTRUCTIONS
+
+There are five parts to installation:
+
+   * Unpack the SLIB distribution.
+
+   * Install documentation and `slib' script.
+
+   * Configure the Scheme implementation(s) to locate the SLIB directory
+     and implementation directories.
+
+   * Arrange for Scheme implementation to load its SLIB initialization
+     file.
+
+   * Build the SLIB catalog for the Scheme implementation.
+
+8.1.1 Unpacking the SLIB Distribution
+-------------------------------------
+
+If the SLIB distribution is a GNU/Linux RPM, it will create the SLIB
+directory `/usr/share/slib'.
+
+  If the SLIB distribution is a ZIP file, unzip the distribution to
+create the SLIB directory.  Locate this `slib' directory either in your
+home directory (if only you will use this SLIB installation); or put it
+in a location where libraries reside on your system.  On unix systems
+this might be `/usr/share/slib', `/usr/local/lib/slib', or
+`/usr/lib/slib'.  If you know where SLIB should go on other platforms,
+please inform agj @ alum.mit.edu.
+
+8.1.2 Install documentation and slib script
+-------------------------------------------
+
+     make infoz
+     make install
+
+8.1.3 Configure Scheme Implementation to Locate SLIB
+----------------------------------------------------
+
+If the Scheme implementation supports `getenv', then the value of the
+shell environment variable SCHEME_LIBRARY_PATH will be used for
+`(library-vicinity)' if it is defined.  Currently, Bigloo, Chez, Elk,
+Gambit, Guile, Jscheme, Larceny, MITScheme, MzScheme, RScheme, STk,
+VSCM, and SCM support `getenv'.  Scheme48 supports `getenv' but does
+not use it for determining `library-vicinity'.  (That is done from the
+Makefile.)
+
+  The `(library-vicinity)' can also be set from the SLIB initialization
+file or by implementation-specific means.
+
+  Support for locating an implementation's auxiliary directory is uneven
+among implementations.  Also, the person installing SLIB may not have
+write permission to some of these directories (necessary for writing
+slibcat).  Therefore, those implementations supporting `getenv' (except
+SCM and Scheme48) provide a means for specifying the
+`implementation-vicinity' through environment variables.  Define the
+indicated environment variable to the pathname (with trailing slash or
+backslash) of the desired directory.  Do not use `slib/' as an
+implementation-vicinity!
+
+Bigloo                 BIGLOO_IMPLEMENTATION_PATH
+Chez                   CHEZ_IMPLEMENTATION_PATH
+ELK                    ELK_IMPLEMENTATION_PATH
+Gambit                 GAMBIT_IMPLEMENTATION_PATH
+Guile                  GUILE_IMPLEMENTATION_PATH
+Jscheme                JSCHEME_IMPLEMENTATION_PATH
+MIT-Scheme             MITSCHEME_IMPLEMENTATION_PATH
+MzScheme               MZSCHEME_IMPLEMENTATION_PATH
+RScheme                RSCHEME_IMPLEMENTATION_PATH
+S7                     S7_IMPLEMENTATION_PATH
+STk                    STK_IMPLEMENTATION_PATH
+Vscm                   VSCM_IMPLEMENTATION_PATH
+
+8.1.4 Loading SLIB Initialization File
+--------------------------------------
+
+Check the manifest in `README' to find a configuration file for your
+Scheme implementation.  Initialization files for most IEEE P1178
+compliant Scheme Implementations are included with this distribution.
+
+  You should check the definitions of `software-type',
+`scheme-implementation-version', `implementation-vicinity', and
+`library-vicinity' in the initialization file.  There are comments in
+the file for how to configure it.
+
+  Once this is done, modify the startup file for your Scheme
+implementation to `load' this initialization file.
+
+8.1.5 Build New SLIB Catalog for Implementation
+-----------------------------------------------
+
+When SLIB is first used from an implementation, a file named `slibcat'
+is written to the `implementation-vicinity' for that implementation.
+Because users may lack permission to write in
+`implementation-vicinity', it is good practice to build the new catalog
+when installing SLIB.
+
+  To build (or rebuild) the catalog, start the Scheme implementation
+(with SLIB), then:
+
+     (require 'new-catalog)
+
+  The catalog also supports color-name dictionaries.  With an
+SLIB-installed scheme implementation, type:
+     (require 'color-names)
+     (make-slib-color-name-db)
+     (require 'new-catalog)
+     (slib:exit)
+
+8.1.6 Implementation-specific Instructions
+------------------------------------------
+
+Multiple implementations of Scheme can all use the same SLIB directory.
+Simply configure each implementation's initialization file as outlined
+above.
+
+ -- Implementation: SCM
+     The SCM implementation does not require any initialization file as
+     SLIB support is already built into SCM.  See the documentation
+     with SCM for installation instructions.
+
+ -- Implementation: Larceny
+     Starting with version 0.96, Larceny contains its own SLIB
+     initialization file, loaded by `(require 'srfi-96)'.  If
+     SCHEME_LIBRARY_PATH is not set, then Larceny looks for an `slib'
+     subdirectory of a directory in the list returned by
+     `(current-require-path)'
+
+          larceny -- -e "(require 'srfi-96)"
+
+ -- Implementation: ELK
+          elk -i -l ${SCHEME_LIBRARY_PATH}elk.init
+
+ -- Implementation: PLT Scheme
+ -- Implementation: DrScheme
+ -- Implementation: MzScheme
+     The `init.ss' file in the _slibinit_ collection is an SLIB
+     initialization file.  To run SLIB in MzScheme:
+
+          mzscheme -f ${SCHEME_LIBRARY_PATH}mzscheme.init
+
+ -- Implementation: MIT Scheme
+          scheme -load ${SCHEME_LIBRARY_PATH}mitscheme.init
+
+ -- Implementation: Gambit-C 3.0
+          gsi -:s ${SCHEME_LIBRARY_PATH}gambit.init -
+
+ -- Implementation: SISC
+          sisc -e "(load \"${SCHEME_LIBRARY_PATH}sisc.init\")" --
+
+ -- Implementation: Kawa
+          kawa -f ${SCHEME_LIBRARY_PATH}kawa.init --
+
+ -- Implementation: Guile
+     For Guile 1.8 or later, use:
+          guile -l ${SCHEME_LIBRARY_PATH}guile.init
+
+     For prehistoric Guile, you may have to remove a prehistoric copy of
+     SLIB that was included with Guile:
+
+          rm /usr/share/guile/slib
+          ln -s ${SCHEME_LIBRARY_PATH} /usr/share/guile/slib
+
+     In Debian installations:
+
+          rm /usr/share/guile/1.6/slib
+          ln -s ${SCHEME_LIBRARY_PATH} /usr/share/guile/1.6/slib
+
+     `${SCHEME_LIBRARY_PATH}' is where SLIB gets installed.
+
+ -- Implementation: Scheme48
+     To make a Scheme48 image for an installation under `<prefix>',
+
+       1. `cd' to the SLIB directory
+
+       2. type `make prefix=<prefix> slib48'.
+
+       3. To install the image, type `make prefix=<prefix> install48'.
+          This will also create a shell script with the name `slib48'
+          which will invoke the saved image.
+
+ -- Implementation: VSCM
+     From: Matthias Blume <blume @ cs.Princeton.EDU>
+     Date: Tue, 1 Mar 1994 11:42:31 -0500
+
+     Disclaimer: The code below is only a quick hack.  If I find some
+     time to spare I might get around to make some more things work.
+
+     You have to provide `vscm.init' as an explicit command line
+     argument.  Since this is not very nice I would recommend the
+     following installation procedure:
+
+       1. run scheme
+
+       2. `(load "vscm.init")'
+
+       3. `(slib:dump "dumpfile")'
+
+       4. mv dumpfile place-where-vscm-standard-bootfile-resides.  For
+          example:
+
+          `mv dumpfile /usr/local/vscm/lib/scheme-boot'
+
+          In this case vscm should have been compiled with flag:
+
+          -DDEFAULT_BOOTFILE='"/usr/local/vscm/lib/scheme-boot"'
+
+          See Makefile (definition of DDP) for details.
+
+			 PORTING INSTRUCTIONS
+
+If there is no initialization file for your Scheme implementation, you
+will have to create one.  Your Scheme implementation must be largely
+compliant with
+  `IEEE Std 1178-1990',
+  `Revised(4) Report on the Algorithmic Language Scheme', or
+  `Revised(5) Report on the Algorithmic Language Scheme'
+in order to support SLIB.
+
+  `Template.scm' is an example configuration file.  The comments inside
+will direct you on how to customize it to reflect your system.  Give
+your new initialization file the implementation's name with `.init'
+appended.  For instance, if you were porting `foo-scheme' then the
+initialization file might be called `foo.init'.
+
+  Your customized version should then be loaded as part of your scheme
+implementation's initialization.  It will load `require.scm' from the
+library; this will allow the use of `provide', `provided?', and
+`require' along with the "vicinity" functions.  The rest of the
+library will then be accessible in a system independent fashion.
+
+  Please mail new working configuration files to `agj @ alum.mit.edu'
+so that they can be included in the SLIB distribution.
+
+			      USING SLIB
+
+  All library packages are written in IEEE P1178 Scheme and assume
+that a configuration file and `require.scm' package have already been
+loaded.  Other versions of Scheme can be supported in library packages
+as well by using, for example, `(provided? 'r3rs)' or `(require 'r3rs)'.
+
+The first chapter of the SLIB manual "The Library System" explains the
+mechanics of using SLIB modules.
+
+	      http://people.csail.mit.edu/jaffer/slib_1

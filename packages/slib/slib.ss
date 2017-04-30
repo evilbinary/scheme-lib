@@ -1,0 +1,489 @@
+;;;"chez.init" Initialization file for SLIB for Chez Scheme 6.0a -*-scheme-*-
+;;; Authors: dorai@cs.rice.edu (Dorai Sitaram) and Aubrey Jaffer.
+;;;
+;;; This code is in the public domain.
+
+;;; Adapted to version 5.0c by stone@math.grin.edu (John David Stone) 1997
+;;; Adapted to version 6.0a by Gary T. Leavens <leavens@cs.iastate.edu>, 1999
+
+;;; (software-type) should be set to the generic operating system type.
+;;; UNIX, VMS, MACOS, AMIGA and MS-DOS are supported.
+(define (software-type) 'unix)
+
+;;; (scheme-implementation-type) should return the name of the scheme
+;;; implementation loading this file.
+(define (scheme-implementation-type) 'chez)
+
+;;; (scheme-implementation-home-page) should return a (string) URI
+;;; (Uniform Resource Identifier) for this scheme implementation's home
+;;; page; or false if there isn't one.
+(define (scheme-implementation-home-page)
+  "http://www.scheme.com/")
+
+;;; (scheme-implementation-version) should return a string describing
+;;; the version the scheme implementation loading this file.
+(define (scheme-implementation-version) "8.4")
+
+;;; (implementation-vicinity) should be defined to be the pathname of
+;;; the directory where any auxillary files to your Scheme
+;;; implementation reside.
+(define implementation-vicinity
+  (let ((impl-path
+	 (or (getenv "CHEZ_IMPLEMENTATION_PATH")
+	     "/usr/local/lib/chez/")))
+    (lambda () impl-path)))
+
+;;; (library-vicinity) should be defined to be the pathname of the
+;;; directory where files of Scheme library functions reside.
+(define library-vicinity
+  (let ((library-path
+	 (or
+	  ;; Use this getenv if your implementation supports it.
+	  (getenv "SCHEME_LIBRARY_PATH")
+	  ;; Use this path if your scheme does not support GETENV
+	  ;; or if SCHEME_LIBRARY_PATH is not set.
+	  (case (software-type)
+	    ((unix) "/usr/local/lib/slib/")
+	    ((vms) "lib$scheme:")
+	    ((ms-dos) "C:\\SLIB\\")
+	    (else "")))))
+    (lambda () library-path)))
+
+;;; (home-vicinity) should return the vicinity of the user's HOME
+;;; directory, the directory which typically contains files which
+;;; customize a computer environment for a user.
+(define (home-vicinity)
+  (let ((home (getenv "HOME")))
+    (and home
+	 (case (software-type)
+	   ((unix coherent ms-dos)	;V7 unix has a / on HOME
+	    (if (eqv? #\/ (string-ref home (+ -1 (string-length home))))
+		home
+		(string-append home "/")))
+	   (else home)))))
+;@
+(define in-vicinity string-append)
+;@
+(define (user-vicinity)
+  (case (software-type)
+    ((vms)	"[.]")
+    (else	"")))
+
+(define *load-pathname* #f)
+;@
+(define vicinity:suffix?
+  (let ((suffi
+	 (case (software-type)
+	   ((amiga)				'(#\: #\/))
+	   ((macos thinkc)			'(#\:))
+	   ((ms-dos windows atarist os/2)	'(#\\ #\/))
+	   ((nosve)				'(#\: #\.))
+	   ((unix coherent plan9)		'(#\/))
+	   ((vms)				'(#\: #\]))
+	   (else
+	    (slib:warn "require.scm" 'unknown 'software-type (software-type))
+	    "/"))))
+    (lambda (chr) (and (memv chr suffi) #t))))
+;@
+(define (pathname->vicinity pathname)
+  (let loop ((i (- (string-length pathname) 1)))
+    (cond ((negative? i) "")
+	  ((vicinity:suffix? (string-ref pathname i))
+	   (substring pathname 0 (+ i 1)))
+	  (else (loop (- i 1))))))
+(define (program-vicinity)
+  (if *load-pathname*
+      (pathname->vicinity *load-pathname*)
+      (slib:error 'program-vicinity " called; use slib:load to load")))
+;@
+(define sub-vicinity
+  (case (software-type)
+    ((vms) (lambda (vic name)
+	     (let ((l (string-length vic)))
+	       (if (or (zero? (string-length vic))
+		       (not (char=? #\] (string-ref vic (- l 1)))))
+		   (string-append vic "[" name "]")
+		   (string-append (substring vic 0 (- l 1))
+				  "." name "]")))))
+    (else (let ((*vicinity-suffix*
+		 (case (software-type)
+		   ((nosve) ".")
+		   ((macos thinkc) ":")
+		   ((ms-dos windows atarist os/2) "\\")
+		   ((unix coherent plan9 amiga) "/"))))
+	    (lambda (vic name)
+	      (string-append vic name *vicinity-suffix*))))))
+;@
+(define (make-vicinity <pathname>) <pathname>)
+;@
+(define with-load-pathname
+  (let ((exchange
+	 (lambda (new)
+	   (let ((old *load-pathname*))
+	     (set! *load-pathname* new)
+	     old))))
+    (lambda (path thunk)
+      (let ((old #f))
+	(dynamic-wind
+	    (lambda () (set! old (exchange path)))
+	    thunk
+	    (lambda () (exchange old)))))))
+
+;;@ SLIB:FEATURES is a list of symbols naming the (SLIB) features
+;;; initially supported by this implementation.
+(define slib:features
+      '(
+	source				;can load scheme source files
+					;(SLIB:LOAD-SOURCE "filename")
+	compiled			;can load compiled files
+					;(SLIB:LOAD-COMPILED "filename")
+	vicinity
+	srfi-59
+	srfi-96
+
+		       ;; Scheme report features
+   ;; R5RS-compliant implementations should provide all 9 features.
+
+	r5rs				;conforms to
+	eval				;R5RS two-argument eval
+	values				;R5RS multiple values
+	dynamic-wind			;R5RS dynamic-wind
+	macro				;R5RS high level macros
+	delay				;has DELAY and FORCE
+	multiarg-apply			;APPLY can take more than 2 args.
+	char-ready?
+	rev4-optional-procedures	;LIST-TAIL, STRING-COPY,
+					;STRING-FILL!, and VECTOR-FILL!
+
+      ;; These four features are optional in both R4RS and R5RS
+
+	multiarg/and-			;/ and - can take more than 2 args.
+	rationalize
+	transcript			;TRANSCRIPT-ON and TRANSCRIPT-OFF
+	with-file			;has WITH-INPUT-FROM-FILE and
+					;WITH-OUTPUT-TO-FILE
+
+	r4rs				;conforms to
+
+	ieee-p1178			;conforms to
+
+	r3rs				;conforms to
+
+;;;	rev2-procedures			;SUBSTRING-MOVE-LEFT!,
+					;SUBSTRING-MOVE-RIGHT!,
+					;SUBSTRING-FILL!,
+					;STRING-NULL?, APPEND!, 1+,
+					;-1+, <?, <=?, =?, >?, >=?
+;;;	object-hash			;has OBJECT-HASH
+
+	full-continuation		;can return multiple times
+;;;	ieee-floating-point		;conforms to IEEE Standard 754-1985
+					;IEEE Standard for Binary
+					;Floating-Point Arithmetic.
+
+			;; Other common features
+
+;;;	srfi-0				;srfi-0, COND-EXPAND finds all srfi-*
+;;;	sicp				;runs code from Structure and
+					;Interpretation of Computer
+					;Programs by Abelson and Sussman.
+	defmacro			;has Common Lisp DEFMACRO
+	;;record				;has user defined data structures
+	string-port			;has CALL-WITH-INPUT-STRING and
+					;CALL-WITH-OUTPUT-STRING
+	sort
+	pretty-print
+;;;	object->string
+	format				;Common-lisp output formatting
+	;;trace				;has macros: TRACE and UNTRACE
+;;;	compiler			;has (COMPILER)
+;;;	ed				;(ED) is editor
+	system				;posix (system <string>)
+	getenv				;posix (getenv <string>)
+;;;	program-arguments		;returns list of strings (argv)
+;;;	current-time			;returns time in seconds since 1/1/1970
+
+		  ;; Implementation Specific features
+
+;;;	random				;Not the same as SLIB random
+	fluid-let
+	))
+
+;;; (OUTPUT-PORT-WIDTH <port>) returns the number of graphic characters
+;;; that can reliably be displayed on one line of the standard output port.
+(define output-port-width
+  (lambda arg
+    (let ((env-width-string (getenv "COLUMNS")))
+      (if (and env-width-string
+	       (let loop ((remaining (string-length env-width-string)))
+		 (or (zero? remaining)
+		     (let ((next (- remaining 1)))
+		       (and (char-numeric? (string-ref env-width-string
+						       next))
+			    (loop next))))))
+	  (- (string->number env-width-string) 1)
+	  79))))
+
+;;; (OUTPUT-PORT-HEIGHT <port>) returns the number of lines of text that
+;;; can reliably be displayed simultaneously in the standard output port.
+(define output-port-height
+  (lambda arg
+    (let ((env-height-string (getenv "LINES")))
+      (if (and env-height-string
+	       (let loop ((remaining (string-length env-height-string)))
+		 (or (zero? remaining)
+		     (let ((next (- remaining 1)))
+		       (and (char-numeric? (string-ref env-height-string
+						       next))
+			    (loop next))))))
+	  (string->number env-height-string)
+	  24))))
+
+;;; (CURRENT-ERROR-PORT)
+(define current-error-port
+  (let ((port (console-output-port)))  ; changed from current-output-port
+    (lambda () port)))
+
+;;; (TMPNAM) makes a temporary file name.
+(define tmpnam
+  (let ((cntr 100))
+    (lambda ()
+      (set! cntr (+ 1 cntr))
+      (let ((tmp (string-append "slib_" (number->string cntr))))
+	(if (file-exists? tmp) (tmpnam) tmp)))))
+
+;;; (FILE-EXISTS? <string>) is built-in to Chez Scheme
+
+;;; (DELETE-FILE <string>) is built-in to Chez Scheme
+
+;; The FORCE-OUTPUT requires buffered output that has been written to a
+;; port to be transferred all the way out to its ultimate destination.
+(define force-output flush-output-port)
+
+(define (make-exchanger obj)
+  (lambda (rep) (let ((old obj)) (set! obj rep) old)))
+(define (open-file filename modes)
+  (case modes
+    ((r rb) (open-input-file filename))
+    ((w wb) (open-output-file filename))
+    (else (slib:error 'open-file 'mode? modes))))
+(define (port? obj) (or (input-port? port) (output-port? port)))
+(define (call-with-open-ports . ports)
+  (define proc (car ports))
+  (cond ((procedure? proc) (set! ports (cdr ports)))
+	(else (set! ports (reverse ports))
+	      (set! proc (car ports))
+	      (set! ports (reverse (cdr ports)))))
+  (let ((ans (apply proc ports)))
+    (for-each close-port ports)
+    ans))
+(define (close-port port)
+  (cond ((input-port? port)
+	 (close-input-port port)
+	 (if (output-port? port) (close-output-port port)))
+	((output-port? port) (close-output-port port))
+	(else (slib:error 'close-port 'port? port))))
+
+(define (browse-url url)
+  (define (try cmd end) (zero? (system (string-append cmd url end))))
+  (or (try "netscape-remote -remote 'openURL(" ")'")
+      (try "netscape -remote 'openURL(" ")'")
+      (try "netscape '" "'&")
+      (try "netscape '" "'")))
+
+;;; "rationalize" adjunct procedures.
+(define (find-ratio x e)
+  (let ((rat (rationalize x e)))
+    (list (numerator rat) (denominator rat))))
+(define (find-ratio-between x y)
+  (find-ratio (/ (+ x y) 2) (/ (- x y) 2)))
+
+;;; CHAR-CODE-LIMIT is one greater than the largest integer which can
+;;; be returned by CHAR->INTEGER.
+(define char-code-limit 256)
+
+;;; MOST-POSITIVE-FIXNUM is used in modular.scm
+;; Chez's MOST-POSITIVE-FIXNUM is a thunk rather than a number.
+
+;; (if (procedure? most-positive-fixnum)
+;;     (set! most-positive-fixnum (most-positive-fixnum)))
+
+;;; Return argument
+(define (identity x) x)
+
+;;; SLIB:EVAL is single argument eval using the top-level (user) environment.
+(define slib:eval eval)
+
+;;; define an error procedure for the library
+(define slib:error
+  (let ((error error))
+    (lambda args
+      (let ((cep (current-error-port)))
+	(if (provided? 'trace) (print-call-stack cep))
+	(display "Error: " cep)
+	(for-each (lambda (x) (display #\space cep) (write x cep)) args)
+	(error #f "")))))
+
+;;; define these as appropriate for your system.
+(define slib:tab #\tab)
+(define slib:form-feed #\page)
+
+;;; Support for older versions of Scheme.  Not enough code for its own file.
+;;; last-pair is built-in to Chez Scheme
+(define t #t)
+(define nil #f)
+
+;;; Define these if your implementation's syntax can support it and if
+;;; they are not already defined.
+;;; 1+, -1+, and 1- are built-in to Chez Scheme
+;(define (1+ n) (+ n 1))
+;(define (-1+ n) (+ n -1))
+;(define 1- -1+)
+
+;;; Define SLIB:EXIT to be the implementation procedure to exit or
+;;; return if exiting not supported.
+(define slib:chez:quit
+  (let ((arg (call-with-current-continuation identity)))
+    (cond ((procedure? arg) arg)
+	  (arg (exit))
+	  (else (exit 1)))))
+
+(define slib:exit
+  (lambda args
+    (cond ((null? args) (slib:chez:quit #t))
+	  ((eqv? #t (car args)) (slib:chez:quit #t))
+	  ((eqv? #f (car args)) (slib:chez:quit #f))
+	  ((zero? (car args)) (slib:chez:quit #t))
+	  (else (slib:chez:quit #f)))))
+
+;;; For backward compatability, the SCHEME-FILE-SUFFIX procedure is defined
+;;; to return the string ".scm".  Note, however, that ".ss" is a common Chez
+;;; file suffix.
+(define scheme-file-suffix
+  (let ((suffix (case (software-type)
+		  ((nosve) "_scm")
+		  (else ".scm"))))
+    (lambda () suffix)))
+
+;;; (SLIB:LOAD-SOURCE "foo") should load "foo.scm" or with whatever
+;;; suffix all the module files in SLIB have.  See feature 'SOURCE.
+(define (slib:load-source f) (load (string-append f ".scm")))
+
+;;; (SLIB:LOAD-COMPILED "foo") should load the file that was produced
+;;; by compiling "foo.scm" if this implementation can compile files.
+;;; See feature 'COMPILED.
+(define slib:load-compiled load)
+
+;;; At this point SLIB:LOAD must be able to load SLIB files.
+(define slib:load slib:load-source)
+
+;;; If your implementation provides R4RS macros:
+(define macro:eval slib:eval)
+;;; macro:load also needs the default suffix.
+(define macro:load slib:load-source)
+
+;;; If your implementation provides syntax-case macros:
+;;(define syncase:eval slib:eval)
+;;(define syncase:load slib:load-source)
+
+;;; The following make procedures in Chez Scheme compatible with
+;;; the assumptions of SLIB.
+
+;;; Chez's sorting routines take parameters in the order opposite to SLIB's.
+;;; The following definitions override the predefined procedures with the
+;;; parameters-reversed versions.  See the SORT feature.
+
+(define chez:sort sort)
+(define chez:sort! sort!)
+(define chez:merge merge)
+(define chez:merge! merge!)
+
+(define sort
+  (lambda (s p)
+    (chez:sort p s)))
+(define sort!
+  (lambda (s p)
+    (chez:sort! p s)))
+(define merge
+  (lambda (s1 s2 p)
+    (chez:merge p s1 s2)))
+(define merge!
+  (lambda (s1 s2 p)
+    (chez:merge! p s1 s2)))
+
+;;; Chez's (FORMAT F . A) corresponds to SLIB's (FORMAT #F F . A)
+;;; See the FORMAT feature.
+(define chez:format format)
+
+(define format
+  (lambda (where how . args)
+    (let ((str (apply chez:format how args)))
+      (cond ((not where) str)
+	    ((eq? where #t) (display str))
+	    (else (display str where))))))
+
+;; The following definitions implement a few widely useful procedures that
+;; Chez Scheme does not provide or provides under a different name.
+
+;;; CALL-WITH-INPUT-STRING and CALL-WITH-OUTPUT-STRING are the string
+;;; port versions of CALL-WITH-INPUT-FILE and CALL-WITH-OUTPUT-FILE.
+;;; See the STRING-PORT feature.
+(define call-with-output-string
+  (lambda (f)
+    (let ((outsp (open-output-string)))
+      (f outsp)
+      (let ((s (get-output-string outsp)))
+	(close-output-port outsp)
+	s))))
+
+(define call-with-input-string
+  (lambda (s f)
+    (let* ((insp (open-input-string s))
+	   (res (f insp)))
+      (close-input-port insp)
+      res)))
+
+(define *defmacros*
+  (list (cons 'defmacro
+	      (lambda (name parms . body)
+		`(set! *defmacros* (cons (cons ',name (lambda ,parms ,@body))
+					 *defmacros*))))))
+(define (defmacro? m) (and (assq m *defmacros*) #t))
+
+(define (macroexpand-1 e)
+  (if (pair? e) (let ((a (car e)))
+		  (cond ((symbol? a) (set! a (assq a *defmacros*))
+				     (if a (apply (cdr a) (cdr e)) e))
+			(else e)))
+      e))
+
+(define (macroexpand e)
+  (if (pair? e) (let ((a (car e)))
+		  (cond ((symbol? a)
+			 (set! a (assq a *defmacros*))
+			 (if a (macroexpand (apply (cdr a) (cdr e))) e))
+			(else e)))
+      e))
+
+;;; According to Kent Dybvig, you can improve the Chez Scheme init
+;;; file by defining gentemp to be gensym in Chez Scheme.
+(define gentemp gensym)
+
+(define base:eval slib:eval)
+(define (defmacro:eval x) (base:eval (defmacro:expand* x)))
+(define (defmacro:expand* x)
+  (require 'defmacroexpand) (apply defmacro:expand* x '()))
+(define (defmacro:load <pathname>)
+  (slib:eval-load <pathname> defmacro:eval))
+
+(define slib:warn
+  (lambda args
+    (let ((cep (current-error-port)))
+      (if (provided? 'trace) (print-call-stack cep))
+      (display "Warn: " cep)
+      (for-each (lambda (x) (display #\space cep) (write x cep)) args))))
+
+;;; Load the REQUIRE package.
+(slib:load (in-vicinity (library-vicinity) "require"))
+
+;; end of chez.init

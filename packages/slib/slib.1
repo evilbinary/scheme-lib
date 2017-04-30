@@ -1,0 +1,45 @@
+.\" dummy line
+.TH SLIB 1 "Feb 1 2007"
+.UC 4
+.SH NAME
+SLIB \- Scheme Library
+.SH SYNOPSIS
+.B slib
+[ scheme | scm | gsi | gosh | guile | scheme48 | larceny | scmlit | elk | sisc | kawa | mzscheme ]
+.br
+.sp 0.3
+.SH DESCRIPTION
+"SLIB" is a portable library for the programming language "Scheme".
+It provides a platform independent framework for using "packages" of
+Scheme procedures and syntax.  As distributed, SLIB contains many
+useful packages.  Its catalog can be transparently extended to
+accomodate packages specific to a site, implementation, user, or
+directory.
+.SH OPTIONS
+The optional argument to the
+.I slib
+script is the Scheme implementation to run.  Absent the argument, it
+searches for implementations in the above order.
+.SH ENVIRONMENT VARIABLES
+.TP
+.B SCHEME_LIBRARY_PATH
+is the SLIB Scheme library directory (with a trailing "/").
+.SH FILES
+.TP
+slib.info
+.br
+Texinfo documentation of
+.I slib.
+.SH AUTHORS
+Aubrey Jaffer (agj @ alum.mit.edu)
+and scores of others.
+.SH SEE ALSO
+The SLIB home-page:
+.br
+http://swiss.csail.mit.edu/~jaffer/SLIB.html
+.TP
+The full documentation for slib is maintained as a Texinfo manual. If the info and slib programs are properly installed at your site, the command
+.br
+info slib
+.TP
+should give you access to the complete manual.

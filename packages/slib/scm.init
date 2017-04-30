@@ -1,0 +1,5 @@
+;"scm.init" Configuration file for SLIB for SCM		-*-scheme-*-
+
+;;; SCM supports SLIB natively; no initialization file is actually
+;;; required.  So just stub this file:
+(slib:load (in-vicinity (library-vicinity) "require"))

@@ -1,0 +1,42 @@
+;"saturate.txt" Saturated-Colors Dictionary.
+;Copyright 2002, 2010 Aubrey Jaffer
+;
+;Permission to copy this dictionary, to modify it, to redistribute it,
+;to distribute modified versions, and to use it for any purpose is
+;granted, subject to the following restrictions and understandings.
+;
+;1.  Any copy made of this dictionary must include this copyright notice
+;in full.
+;
+;2.  I have made no warranty or representation that this data is
+;error-free, and I am under no obligation to provide any services, by
+;way of maintenance, update, or otherwise.
+;
+;3.  In conjunction with products arising from the use of this material,
+;there shall be no use of my name in any advertising, promotional, or
+;sales literature without prior written consent in each case.
+
+;Saturated colors from "Approximate Colors on CIE Chromaticity Diagram"
+;Francis S. Hill, "Computer Graphics" Macmillan, 1990, pg. 572
+
+XCMS_COLORDB_START 0.1
+red				CIEXYZ:0.735484/0.264516/0
+reddish orange			CIEXYZ:0.647123/0.3525/0.00037723
+orange				CIEXYZ:0.586144/0.413257/0.000598302
+yellowish orange		CIEXYZ:0.531897/0.467256/0.000847751
+yellow				CIEXYZ:0.499122/0.499899/0.000979355
+greenish yellow			CIEXYZ:0.465098/0.5338/0.00110199
+yellow green			CIEXYZ:0.373102/0.624451/0.0024476
+yellowish green			CIEXYZ:0.22962/0.754329/0.0160512
+green				CIEXYZ:0.0138702/0.750186/0.235943
+bluish green			CIEXYZ:0.0453772/0.294952/0.659671
+blue green			CIEXYZ:0.0687611/0.200711/0.730528
+greenish blue			CIEXYZ:0.0912562/0.132684/0.77606
+blue				CIEXYZ:0.0995467/0.11196/0.788494
+purplish blue			CIEXYZ:0.14396/0.029703/0.826337
+bluish purple			CIEXYZ:0.200614/0.0242655/0.77512
+purple				CIEXYZ:0.263205/0.0523799/0.684415
+reddish purple			CIEXYZ:0.354247/0.0932736/0.552479
+red purple			CIEXYZ:0.479429/0.149503/0.371068
+purplish red			CIEXYZ:0.604612/0.205731/0.189657
+XCMS_COLORDB_END

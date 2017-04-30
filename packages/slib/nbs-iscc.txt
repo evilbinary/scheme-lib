@@ -1,0 +1,295 @@
+;                      http://tx4.us/nbs-iscc.htm
+;                        NBS/ISCC Color System
+;
+;Copyright © 2003 Voluntocracy.  Permission is granted to copy and
+;distribute modified or unmodified versions of this color dictionary
+;provided the copyright notice and this permission notice are preserved
+;on all copies and the entire such work is distributed under the terms
+;of a permission notice identical to this one.
+;
+;"Pink" and "brown" are used instead of the more logical "pale red" and
+;"dark orange".
+;
+;http://www.anthus.com/Colors/Cent.html by David A. Mundie, converted
+;the NBS Centroid colors from Munsell to CIE XYZ, then converted to Mac
+;QuickDraw RGB.  The colors were visibly biased towards pink and had
+;duplications.
+;
+;John Foster reconverted supplied Munsell values via Munsell software
+;downloaded from www.gretagmacbeth.com <http://www.gretagmacbeth.com>
+;directly to RGB, and tried to resolve some duplicates.  Some of these
+;don't even look right, because some of the bright colors are on the
+;dark fringes with less chroma and are not centered and high up on the
+;hue curves.  Many of the original Munsell values (noted) are outside
+;the RGB gamut, and have been adjusted to the closest brightest RGB
+;value by changing chroma until 0 or 255 is reached in one out of
+;bounds RGB component.  Guesses were made in a few cases (noted) where
+;the color was still illogical compared to the name.
+
+"Vivid Pink"			sRGB:FFB5BA
+"Strong Pink"			sRGB:EA9399
+"Deep Pink"			sRGB:E4717A
+"Light Pink"			sRGB:F9CCCA
+"Moderate Pink"			sRGB:DEA5A4
+"Dark Pink"			sRGB:C08081
+"Pale Pink"			sRGB:EAD8D7
+"Grayish Pink"			sRGB:C4AEAD
+"Pinkish White"			sRGB:EAE3E1
+"Pinkish Gray"			sRGB:C1B6B3
+"Vivid Red"			sRGB:BE0032
+"Strong Red"			sRGB:BC3F4A
+"Deep Red"			sRGB:841B2D
+"Very Deep Red"			sRGB:5C0923
+"Moderate Red"			sRGB:AB4E52
+"Dark Red"			sRGB:722F37
+"Very Dark Red"			sRGB:3F1728
+"Light Grayish Red"		sRGB:AD8884
+"Grayish Red"			sRGB:905D5D
+"Dark Grayish Red"		sRGB:543D3F
+"Blackish Red"			sRGB:2E1D21
+"Reddish Gray"			sRGB:8F817F
+"Dark Reddish Gray"		sRGB:5C504F
+"Reddish Black"			sRGB:282022
+"Vivid Yellowish Pink"		sRGB:FFB7A5
+"Strong Yellowish Pink"		sRGB:F99379
+"Deep Yellowish Pink"		sRGB:E66721
+"Light Yellowish Pink"		sRGB:F4C2C2
+"Moderate Yellowish Pink"	sRGB:D9A6A9
+"Dark Yellowish Pink"		sRGB:C48379
+"Pale Yellowish Pink"		sRGB:ECD5C5
+"Grayish Yellowish Pink"	sRGB:C7ADA3
+"Brownish Pink"			sRGB:C2AC99
+"Vivid Reddish Orange"		sRGB:E25822
+"Strong Reddish Orange"		sRGB:D9603B
+"Deep Reddish Orange"		sRGB:AA381E
+"Moderate Reddish Orange"	sRGB:CB6D51
+"Dark Reddish Orange"		sRGB:9E4732
+"Grayish Reddish Orange"	sRGB:B4745E
+"Strong Reddish Brown"		sRGB:882D17
+"Deep Reddish Brown"		sRGB:56070C
+"Light Reddish Brown"		sRGB:A87C6D
+"Moderate Reddish Brown"	sRGB:79443B
+"Dark Reddish Brown"		sRGB:3E1D1E
+"Light Grayish Reddish Brown"	sRGB:977F73
+"Grayish Reddish Brown"		sRGB:674C47
+"Dark Grayish Reddish Brown"	sRGB:43302E
+"Vivid Orange"			sRGB:F38400
+"Brilliant Orange"		sRGB:FD943F
+"Strong Orange"			sRGB:ED872D
+"Deep Orange"			sRGB:BE6516
+"Light Orange"			sRGB:FAB57F
+"Moderate Orange"		sRGB:D99058
+"Brownish Orange"		sRGB:AE6938
+"Strong Brown"			sRGB:80461B
+"Deep Brown"			sRGB:593319
+"Light Brown"			sRGB:A67B5B
+"Moderate Brown"		sRGB:6F4E37
+"Dark Brown"			sRGB:422518
+"Light Grayish Brown"		sRGB:958070
+"Grayish Brown"			sRGB:635147
+"Dark Grayish Brown"		sRGB:3E322C
+"Light Brownish Gray"		sRGB:8E8279
+"Brownish Gray"			sRGB:5B504F
+"Brownish Black"		sRGB:28201C
+"Vivid Orange Yellow"		sRGB:F6A600
+"Brilliant Orange Yellow"	sRGB:FFC14F
+"Strong Orange Yellow"		sRGB:EAA221
+"Deep Orange Yellow"		sRGB:C98500
+"Light Orange Yellow"		sRGB:FBC97F
+"Moderate Orange Yellow"	sRGB:E3A857
+"Dark Orange Yellow"		sRGB:BE8A3D
+"Pale Orange Yellow"		sRGB:FAD6A5
+"Strong Yellowish Brown"	sRGB:996515
+"Deep Yellowish Brown"		sRGB:654522
+"Light Yellowish Brown"		sRGB:C19A6B
+"Moderate Yellowish Brown"	sRGB:826644
+"Dark Yellowish Brown"		sRGB:4B3621
+"Light Grayish Yellowish Brown"	sRGB:AE9B82
+"Grayish Yellowish Brown"	sRGB:7E6D5A
+"Dark Grayish Yellowish Brown"	sRGB:483C32
+"Vivid Yellow"			sRGB:F3C300
+"Brilliant Yellow"		sRGB:FADA5E
+"Strong Yellow"			sRGB:D4AF37
+"Deep Yellow"			sRGB:AF8D13
+"Light Yellow"			sRGB:F8DE7E
+"Moderate Yellow"		sRGB:C9AE5D
+"Dark Yellow"			sRGB:AB9144
+"Pale Yellow"			sRGB:F3E5AB
+"Grayish Yellow"		sRGB:C2B280
+"Dark Grayish Yellow"		sRGB:A18F60
+"Yellowish White"		sRGB:F0EAD6
+"Yellowish Gray"		sRGB:BFB8A5
+"Light Olive Brown"		sRGB:967117
+"Moderate Olive Brown"		sRGB:6C541E
+"Dark Olive Brown"		sRGB:3B3121
+"Vivid Greenish Yellow"		sRGB:DCD300
+"Brilliant Greenish Yellow"	sRGB:E9E450
+"Strong Greenish Yellow"	sRGB:BEB72E
+"Deep Greenish Yellow"		sRGB:9B9400
+"Light Greenish Yellow"		sRGB:EAE679
+"Moderate Greenish Yellow"	sRGB:B9B459
+"Dark Greenish Yellow"		sRGB:98943E
+"Pale Greenish Yellow"		sRGB:EBE8A4
+"Grayish Greenish Yellow"	sRGB:B9B57D
+"Light Olive"			sRGB:867E36
+"Moderate Olive"		sRGB:665D1E
+"Dark Olive"			sRGB:403D21
+"Light Grayish Olive"		sRGB:8C8767
+"Grayish Olive"			sRGB:5B5842
+"Dark Grayish Olive"		sRGB:363527
+"Light Olive Gray"		sRGB:8A8776
+"Olive Gray"			sRGB:57554C
+"Olive Black"			sRGB:25241D
+"Vivid Yellow Green"		sRGB:8DB600
+"Brilliant Yellow Green"	sRGB:BDDA57
+"Strong Yellow Green"		sRGB:7E9F2E
+"Deep Yellow Green"		sRGB:467129
+"Light Yellow Green"		sRGB:C9DC89
+"Moderate Yellow Green"		sRGB:8A9A5B
+"Pale Yellow Green"		sRGB:DADFB7
+"Grayish Yellow Green"		sRGB:8F9779
+"Strong Olive Green"		sRGB:404F00
+"Deep Olive Green"		sRGB:232F00
+"Moderate Olive Green"		sRGB:4A5D23
+"Dark Olive Green"		sRGB:2B3D26
+"Grayish Olive Green"		sRGB:515744
+"Dark Grayish Olive Green"	sRGB:31362B
+"Vivid Yellowish Green"		sRGB:27A64C
+"Brilliant Yellowish Green"	sRGB:83D37D
+"Strong Yellowish Green"	sRGB:44944A
+"Deep Yellowish Green"		sRGB:00622D
+"Very Deep Yellowish Green"	sRGB:003118
+"Very Light Yellowish Green"	sRGB:B6E5AF
+"Light Yellowish Green"		sRGB:93C592
+"Moderate Yellowish Green"	sRGB:679267
+"Dark Yellowish Green"		sRGB:355E3B
+"Very Dark Yellowish Green"	sRGB:173620
+"Vivid Green"			sRGB:008856
+"Brilliant Green"		sRGB:3EB489
+"Strong Green"			sRGB:007959
+"Deep Green"			sRGB:00543D
+"Very Light Green"		sRGB:8ED1B2
+"Light Green"			sRGB:6AAB8E
+"Moderate Green"		sRGB:3B7861
+"Dark Green"			sRGB:1B4D3E
+"Very Dark Green"		sRGB:1C352D
+"Very Pale Green"		sRGB:C7E6D7
+"Pale Green"			sRGB:8DA399
+"Grayish Green"			sRGB:5E716A
+"Dark Grayish Green"		sRGB:3A4B47
+"Blackish Green"		sRGB:1A2421
+"Greenish White"		sRGB:DFEDE8
+"Light Greenish Gray"		sRGB:B2BEB5
+"Greenish Gray"			sRGB:7D8984
+"Dark Greenish Gray"		sRGB:4E5755
+"Greenish Black"		sRGB:1E2321
+"Vivid Bluish Green"		sRGB:008882
+"Brilliant Bluish Green"	sRGB:00A693
+"Strong Bluish Green"		sRGB:007A74
+"Deep Bluish Green"		sRGB:00443F
+"Very Light Bluish Green"	sRGB:96DED1
+"Light Bluish Green"		sRGB:66ADA4
+"Moderate Bluish Green"		sRGB:317873
+"Dark Bluish Green"		sRGB:004B49
+"Very Dark Bluish Green"	sRGB:002A29
+"Vivid Greenish Blue"		sRGB:0085A1
+"Brilliant Greenish Blue"	sRGB:239EBA
+"Strong Greenish Blue"		sRGB:007791
+"Deep Greenish Blue"		sRGB:2E8495
+"Very Light Greenish Blue"	sRGB:9CD1DC
+"Light Greenish Blue"		sRGB:66AABC
+"Moderate Greenish Blue"	sRGB:367588
+"Dark Greenish Blue"		sRGB:004958
+"Very Dark Greenish Blue"	sRGB:002E3B
+"Vivid Blue"			sRGB:00A1C2
+"Brilliant Blue"		sRGB:4997D0
+"Strong Blue"			sRGB:0067A5
+"Deep Blue"			sRGB:00416A
+"Very Light Blue"		sRGB:A1CAF1
+"Light Blue"			sRGB:70A3CC
+"Moderate Blue"			sRGB:436B95
+"Dark Blue"			sRGB:00304E
+"Very Pale Blue"		sRGB:BCD4E6
+"Pale Blue"			sRGB:91A3B0
+"Grayish Blue"			sRGB:536878
+"Dark Grayish Blue"		sRGB:36454F
+"Blackish Blue"			sRGB:202830
+"Bluish White"			sRGB:E9E9ED
+"Light Bluish Gray"		sRGB:B4BCC0
+"Bluish Gray"			sRGB:81878B
+"Dark Bluish Gray"		sRGB:51585E
+"Bluish Black"			sRGB:202428
+"Vivid Purplish Blue"		sRGB:30267A
+"Brilliant Purplish Blue"	sRGB:6C79B8
+"Strong Purplish Blue"		sRGB:545AA7
+"Deep Purplish Blue"		sRGB:272458
+"Very Light Purplish Blue"	sRGB:B3BCE2
+"Light Purplish Blue"		sRGB:8791BF
+"Moderate Purplish Blue"	sRGB:4E5180
+"Dark Purplish Blue"		sRGB:252440
+"Very Pale Purplish Blue"	sRGB:C0C8E1
+"Pale Purplish Blue"		sRGB:8C92AC
+"Grayish Purplish Blue"		sRGB:4C516D
+"Vivid Violet"			sRGB:9065CA
+"Brilliant Violet"		sRGB:7E73B8
+"Strong Violet"			sRGB:604E97
+"Deep Violet"			sRGB:32174D
+"Very Light Violet"		sRGB:DCD0FF
+"Light Violet"			sRGB:8C82B6
+"Moderate Violet"		sRGB:604E81
+"Dark Violet"			sRGB:2F2140
+"Very Pale Violet"		sRGB:C4C3DD
+"Pale Violet"			sRGB:9690AB
+"Grayish Violet"		sRGB:554C69
+"Vivid Purple"			sRGB:9A4EAE
+"Brilliant Purple"		sRGB:D399E6
+"Strong Purple"			sRGB:875692
+"Deep Purple"			sRGB:602F6B
+"Very Deep Purple"		sRGB:401A4C
+"Very Light Purple"		sRGB:D5BADB
+"Light Purple"			sRGB:B695C0
+"Moderate Purple"		sRGB:86608E
+"Dark Purple"			sRGB:563C5C
+"Very Dark Purple"		sRGB:301934
+"Very Pale Purple"		sRGB:D6CADD
+"Pale Purple"			sRGB:AA98A9
+"Grayish Purple"		sRGB:796878
+"Dark Grayish Purple"		sRGB:50404D
+"Blackish Purple"		sRGB:291E29
+"Purplish White"		sRGB:E8E3E5
+"Light Purplish Gray"		sRGB:BFB9BD
+"Purplish Gray"			sRGB:8B8589
+"Dark Purplish Gray"		sRGB:5D555B
+"Purplish Black"		sRGB:242124
+"Vivid Reddish Purple"		sRGB:870074
+"Strong Reddish Purple"		sRGB:9E4F88
+"Deep Reddish Purple"		sRGB:702963
+"Very Deep Reddish Purple"	sRGB:54194E
+"Light Reddish Purple"		sRGB:B784A7
+"Moderate Reddish Purple"	sRGB:915C83
+"Dark Reddish Purple"		sRGB:5D3954
+"Very Dark Reddish Purple"	sRGB:341731
+"Pale Reddish Purple"		sRGB:AA8A9E
+"Grayish Reddish Purple"	sRGB:836479
+"Brilliant Purplish Pink"	sRGB:FFC8D6
+"Strong Purplish Pink"		sRGB:E68FAC
+"Deep Purplish Pink"		sRGB:DE6FA1
+"Light Purplish Pink"		sRGB:EFBBCC
+"Moderate Purplish Pink"	sRGB:D597AE
+"Dark Purplish Pink"		sRGB:C17E91
+"Pale Purplish Pink"		sRGB:E8CCD7
+"Grayish Purplish Pink"		sRGB:C3A6B1
+"Vivid Purplish Red"		sRGB:CE4676
+"Strong Purplish Red"		sRGB:B3446C
+"Deep Purplish Red"		sRGB:78184A
+"Very Deep Purplish Red"	sRGB:54133B
+"Moderate Purplish Red"		sRGB:A8516E
+"Dark Purplish Red"		sRGB:673147
+"Very Dark Purplish Red"	sRGB:38152C
+"Light Grayish Purplish Red"	sRGB:AF868E
+"Grayish Purplish Red"		sRGB:915F6D
+"White"				sRGB:F2F3F4
+"Light Gray"			sRGB:B9B8B5
+"Medium Gray"			sRGB:848482
+"Dark Gray"			sRGB:555555
+"Black"				sRGB:222222

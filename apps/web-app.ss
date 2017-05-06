@@ -10,8 +10,7 @@
 (require 'cgi)
 (require 'array)
 
-(define port 8000)
-
+(define port 8080)
 (define socket (make-socket AF_INET SOCK_STREAM port ))
 
 (socket:bind socket)

@@ -30,6 +30,13 @@
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(define scale
+    (case (machine-type)
+      ((arm32le) 1 )
+      ((a6nt i3nt)  1)
+      ((a6osx i3osx)  2 )
+      ((a6le i3le) 1 )))
+
 (initialize-glut)
 
 (window
@@ -37,7 +44,7 @@
 	(title "Box2d Lite - Dominos")
 	(reshape (width height)
 		 (lambda (w h)
-       (glViewport 0 0  (* w 2)  (* 2 h));retina support *2
+       (glViewport 0 0  (* w scale)  (* scale h));retina support *2
 		   (glMatrixMode GL_PROJECTION)
        (glLoadIdentity)
        (glScalef 0.1 0.1 1.0)
@@ -53,7 +60,7 @@
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define time-step 0.008)
+(define time-step 0.0016)
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

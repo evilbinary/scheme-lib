@@ -29,8 +29,8 @@ CXXFLAGS=  -g -std=c++11 	\
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
-	LIBS += 
-	CXXFLAGS += -DGLAD -I../3rdparty/include -I../libglfw  -I../libglut  -L../libglfw/  -L../libglut/ -lglut -lglfw
+	LIBS += -lglut -lglfw
+	CXXFLAGS +=  -D"__builtin_cpu_supports(x)=1" -DGLAD -I../3rdparty/include -I../libglfw  -I../libglut  -L../libglfw/  -L../libglut/ 
 	CXXFLAGS += -fPIC 
 	CFLAGS +=
 endif

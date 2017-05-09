@@ -16,9 +16,9 @@ OTHERS=
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
-	LIBS += 
+	LIBS += -lopenal -lalut 
 	CXXFLAGS += 
-	CFLAGS +=  -fPIC -lalut -lopenal
+	CFLAGS +=  -fPIC 
 endif
 ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"

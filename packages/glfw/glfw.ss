@@ -567,7 +567,9 @@
  glfw-set-window-size-callback
  glfw-set-mouse-button-callback
  glfw-make-mouse-button-callback
-
+ glfw-set-scroll-callback
+ glfw-make-scroll-callback
+  
  glad-load-gl
  glad-load-gl-loader
  glad-load-gles2-loader
@@ -1145,17 +1147,23 @@
    (define $glfw-set-mouse-button-callback
     (foreign-procedure "glfwSetMouseButtonCallback" (void* void*) void*))
 
+   (define $glfw-set-scroll-callback
+     (foreign-procedure "glfwSetScrollCallback" (void* void*) void*))
+
+    (define $glfw-set-joystick-callback
+     (foreign-procedure "glfwSetJoystickCallback" (void* void*) void*))
+   
    (define glfw-wait-events
      (foreign-procedure "glfwWaitEvents" () void))
 
    (define glfw-create-standard-cursor
     (foreign-procedure "glfwCreateStandardCursor" (int) void*))
 
-    (define glfw-create-cursor
-      (foreign-procedure "glfwCreateCursor" (void* int int) void*))
+   (define glfw-create-cursor
+     (foreign-procedure "glfwCreateCursor" (void* int int) void*))
 
-     (define glfw-set-cursor
-       (foreign-procedure "glfwSetCursor" (void* void*) void))
+   (define glfw-set-cursor
+     (foreign-procedure "glfwSetCursor" (void* void*) void))
 
   (define (glfw-set-key-callback win fun)
     ($glfw-set-key-callback win (glfw-make-key-callback fun)))
@@ -1169,6 +1177,26 @@
   (define (glfw-set-mouse-button-callback win fun)
     ($glfw-set-mouse-button-callback win (glfw-make-mouse-button-callback fun) ))
 
+  (define (glfw-set-scroll-callback win fun)
+    ($glfw-set-scroll-callback win (glfw-make-scroll-callback fun)))
+
+   (define (glfw-set-joystick-callback win fun)
+    ($glfw-set-scroll-callback win (glfw-make-joystick-callback fun)))
+
+   (define glfw-make-scroll-callback
+    (lambda (p)
+      (let ([code (foreign-callable p (void* double double) void)])
+	(lock-object code)
+	(foreign-callable-entry-point code))))
+
+
+   (define glfw-make-joystick-callback 
+     (lambda (p)
+       (let ([code (foreign-callable p (void* int int ) void)])
+	 (lock-object code)
+	 (foreign-callable-entry-point code))))
+
+   
   (define glfw-make-key-callback
     (lambda (p)
       (let ([code (foreign-callable p (void* int int   int  int) void)])

@@ -183,7 +183,8 @@
 		  (tt2 '() )
 		  (l '() )
 		  (l2 '() )
-		  (ss '() ))
+		  (ss '() )
+		  (ss2 '() ))
 	    
 	    (set! tt (tab win 440 400 :center))
 	    (tab-titles tt (list "code" "label" "value" "image" "gaga" ))
@@ -197,7 +198,7 @@
 	    
 	    ;;stack view
 	    (set! ss (stack '() 200 600 :center))
-	    (stack-titles ss (list "code" "label" "value" "image" "gaga" "tab" ))
+	    (stack-titles ss (list "code" "label" "value" "image" "gaga" "stack" ))
 	    ;; (label ss "first" 100 100 :center)
 	    ;; (label ss "second" 100 100 :center)
 	    ;; (label ss "third" 100 100 :center)
@@ -205,13 +206,13 @@
 	    (set! l (label ss "first" 200 100 :center  (color-rgba 255 255 255 255 )  (color-rgba 23 134 201 255 ) ) )
 	    (label l "buttom" 80 40 :bottom)
 	    (label l "left" 80 40 :left )
-	    ;; (set! tt2 (tab l 200 80 :top))
+	    ;;(set! tt2 (tab l 200 80 :top))
 	    ;; (tab-titles tt2 (list "aa" "bb" "cc"))
 	    ;; (label tt2 "first" 100 100 :center)
 	    ;; (label tt2 "second" 100 100 :center)
 	    ;;(label tt2 "third" 100 100 :center)
 	    
-	    (label ss "second" 200 100 :center  (color-rgba 255 255 255 255 )  (color-rgba 223 160 59 255 ) )
+	    (label ss "second" 160 100 :left  (color-rgba 255 255 255 255 )  (color-rgba 223 160 59 255 ) )
 	    ;;(label ss "third" 200 100 :center (color-rgba 255 255 255 255 )  (color-rgba 113 158 36 255 ) )
 	    ;;(label ss "4" 200 120 :center (color-rgba 255 255 255 255 )  (color-rgba 61 82 113 255 ) ) 
 	    (edit ss "One may fall in love with many people during the lifetime.When you finally get your own happiness, you will understand the previous sadness is kind of treasure, which makes you better to hold and cherishthe people you love." 200 200 :center  )
@@ -225,9 +226,71 @@
 	    (label tt1 "second" 100 100 :center)
 	    ;;(label tt "third" 100 100 :center)
 	    (label tt1 "gaga" 100 100 :center)
+
+	    ;;stack inner
+	    (set! ss2 (stack ss 180 400 :right ))
+	    (stack-titles ss2 (list "first" "label" "value"  ))
+	    (label ss2 "first" 40 100 :center  (color-rgba 255 255 255 255 )  (color-rgba 23 134 201 255 ) )
+	    (label ss2 "second" 180 100 :center  (color-rgba 255 255 255 255 )  (color-rgba 223 160 59 255 ) )
+	    (label ss2 "third" 180 100 :center (color-rgba 255 255 255 255 )  (color-rgba 113 158 36 255 ) )
+
 	    )
 
 	  ))
+
+(define (test-pop)
+  (window "test-pop" 800 800
+	  (let  ((p '() )
+		 (p1 '())
+		 (p2 '())
+		 (p3 '())
+		 (button1 '())
+		 )
+
+	    (set! button1 (button '()
+				  "click me" 80 40
+				  :left (color-rgba  0 255 0 255)
+				  (color-rgba 255 0 0 255 )))
+       	    (view-onclick-set! button1
+			       (lambda (view action)
+				 (if (= 1 action)
+				     (begin
+				       (if (view-visible p)
+					   (view-visible-set! p #f)
+					   (view-visible-set! p #t))
+				       (view-backgroud-set! button1  (color-rgba 23 134 201 255 )) )
+				     (view-backgroud-set! button1  (color-rgba 255 0 0 255 )))
+				 (display (format "onclick action=~a\n" action))))
+	    
+	    (set! p  (pop '() '() 100 600 :center ))
+	    (label p "item1" 100 30 :center) 
+	    (label p "item2" 100 30 :center)
+	    (label p "item3" 100 30 :center)
+	    (set! p1 (label p "item4" 100 30 :center))
+	    
+	    (view-onclick-set! p1
+			       (lambda (view action)
+				 (if (= 1 action)
+				     (view-visible-set! p #f)
+				     (display "click item4\n"))))
+	    )))
+
+
+
+
+(define (test-scroll)
+  (window "test-scroll" 800 800
+	  (let* ( (win2 (window '() "win" 500 500 :center))
+		 (win (window '() "evilbinary test editor" 300 300 :center))
+		 (btn (button win2 "test" 200 40 :top))
+		)
+	    (edit win "One may fall in love with many people during the lifetime.When you finally get your own happiness, you will understand the previous sadness is kind of treasure, which makes you better to hold and cherishthe people you love." 290 240 :center  )
+	    (view-visible-set! win2 #f)
+	    (view-attrib-set! win2 'is-scroll #t)
+	    ;;(button win3 "win3-4" 80 40 :left (color-rgba  0 255 0 255) )
+	    ;;(edit '() "testafasfa" 80 40 :top-right)
+
+	    ) ))
 
 ;;(test-win-order)
 ;;(test-corner-view)
@@ -237,4 +300,7 @@
 ;;(test-image)
 ;;(test-edit)
 ;;(test-tab)
-(test-stack)
+;;(test-stack)
+;;(test-menu)
+;;(test-pop)
+(test-scroll)

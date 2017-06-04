@@ -394,12 +394,12 @@
     (let ((s (ffi-dlsym handler name )))
       (if (= 0 s)
 	  (let loop ((h handlers))
-	    (let ((sym (ffi-dlsym (car h) name)))
-	      (if (= sym 0)
-		  (if (pair? h)
-		      (loop (cdr h))
-		      0)
-		  sym)))
+	    (if (pair? h)
+		(let ((sym (ffi-dlsym (car h) name)))
+		  (if (= sym 0)
+			  (loop (cdr h))
+			  sym)
+		  sym) 0 ) ) 
 	  s)))
 
   ;; (define-syntax  def-function
@@ -572,12 +572,12 @@
                     (ffi-set-int alloc (car arg) )
                     (ffi-values-set cargs i alloc) ]
                   [(float)
-                    (set! alloc (ffi-alloc 32) ) 
-                    (ffi-set-float alloc (car arg) )
-                    (ffi-values-set cargs i alloc) ]
+		   (set! alloc (ffi-alloc 32) )
+		   (ffi-set-float alloc (+ 0.0 (car arg) ))
+		   (ffi-values-set cargs i alloc) ]
                   [(double)
                     (set! alloc (ffi-alloc 64) ) 
-                    (ffi-set-double alloc  (car arg))
+                    (ffi-set-double alloc  (+ 0.0 (car arg)))
                     (ffi-values-set cargs i alloc) ]
                   [(void)
                     ; (set! alloc (ffi-alloc 32) ) 

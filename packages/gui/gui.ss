@@ -132,7 +132,7 @@
   
   ;;(window-update)
   (define (window-update)
-    (draw-views $root-view))
+    ((view-draw $root-view) $root-view))
 
   ;;title set
   (define (window-set-title title)
@@ -182,6 +182,7 @@
 	    (loop (+ i 1)))))
     
     (set! $root-view (make-view $root-view $window-width $window-height ))
+
     (glfw-set-cursor-pos-callback $window 
 				  (lambda (w x y)
 				    (window-motion-event x y)
@@ -190,7 +191,9 @@
     (glfw-set-key-callback $window
 			   (lambda (w k s a m)
 			     (window-key-event k s a m)
-			    ) )
+			     ) )
+    (glfw-set-scroll-callback $window (lambda (w x y)
+					(window-scroll-event x y)))
     (glfw-set-window-size-callback $window
 				   (lambda (w width height)
 				     (set! $window-width width)
@@ -222,27 +225,58 @@
       (if (and (view-visible view) (>= x px) (<= x (+ px w)) (>= y py) (<= y (+ py h)))
 	  #t #f)))
 
+  ;; (define (find-view view x y)
+  ;;   (let loop  ((len  (- (length (view-childs view)) 1)))
+  ;;     (if (<= len -1)
+  ;; 	  (if (contais view x y) view nil)
+  ;; 	  (begin
+  ;; 	    (display (format "contains=~a\n" (contais (list-ref (view-childs view) len) x y) ))
+  ;; 	    (if (or (contais (list-ref (view-childs view) len) x y)
+  ;; 		    (view-attrib-ref (list-ref (view-childs view) len) 'enable #f)  )
+  ;; 		(begin
+  ;; 		  (draw-rect view)
+  ;; 		  (find-view  (list-ref (view-childs view) len)  x y)
+  ;; 		  )
+  ;; 		(loop (- len 1))) )
+  ;; 	  )))
   (define (find-view view x y)
     (let loop  ((len  (length (view-childs view))))
       (if (zero? len)
-	  (if (contais view x y) view nil)
-	  (begin
-	    (if (contais (list-ref (view-childs view) (- len 1) ) x y)
-		(find-view (list-ref (view-childs view) (- len 1)) x y)
-		(loop (- len 1))))
-	  )))
+  	  (if (contais view x y) view nil)
+  	  (begin
+  	    (if (contais (list-ref (view-childs view) (- len 1) ) x y)
+  		(find-view (list-ref (view-childs view) (- len 1)) x y)
+  		(loop (- len 1))))
+  	  )))
   
   ;;window event
   (define (window-motion-event x y )
     ;;(display (format "window-motion-event ~a,~a\n" x y))
+    (default-motion-event $root-view  x y)
     (if  (not (null? $active-view)) 
 	 ((view-drag-event $active-view) $active-view (- x $cursor-x) (- y $cursor-y))
 	 (let ((view  (find-view $root-view x y)))
 	   (if (not (null? view))
-	       (glfw-set-cursor $window (list-ref $window-cursors (view-attrib-ref view 'cursor 0))))))
+	       (begin 
+		 (glfw-set-cursor $window (list-ref $window-cursors (view-attrib-ref view 'cursor 0)))
+	
+		 ))))
     (set! $cursor-y y)
     (set! $cursor-x x)
+
+ 
+    ;; (let ((v  (find-view $root-view x y)))
+    ;;   ;;(display (format "find-view =~a\n" (not (null? v)) ))
+    ;;   (if (not (null? v))
+    ;; 	  (begin
+    ;; 	    ;;(draw-rect v)
+    ;; 	    ((view-motion-event v) v x y))))
     )
+  (define (window-scroll-event xoffset yoffset)
+    ;;(display (format "scroll x=~a y=~a\n"  xoffset yoffset))
+    (let ((view (find-view $root-view $cursor-x $cursor-y)))
+      (if (not (null? view))
+	 ((view-scroll-event view) view xoffset yoffset) )))
 
   (define (window-key-event keycode scancode action modifier )
     ;;(display (format "key=~a scancode=~a action=~a mods=~a\n"  keycode scancode action modifier))
@@ -308,6 +342,9 @@
      (mutable key-event)
      (mutable focus-event)
      (mutable drag-event)
+     (mutable resize-event)
+     (mutable scroll-event)
+     
      (mutable focus)
      (mutable visible)
      (mutable margin-left)
@@ -326,11 +363,13 @@
 	   (set! v (new p
 			nil 0.0 0.0 
 			w h vg
-			draw-view 
+			default-draw-views
 			(make-eq-hashtable) 
 			0
 			view-calc-layout :view-group
-			default-mouse-event default-motion-event default-key-event default-focus-event default-drag-event
+			default-mouse-event default-motion-event default-key-event
+			default-focus-event default-drag-event
+			default-resize-event default-scroll-event
 			#f #t
 			0.0 0.0 0.0 0.0) )
 	   (if  (null? p)
@@ -346,11 +385,13 @@
 	   (set! v (new p
 			nil 0.0 0.0 
 			w h vg
-			draw-view 
+			default-draw-views
 			(make-eq-hashtable)
 			layout-attrib
 			view-calc-layout :view-group
-			default-mouse-event default-motion-event default-key-event default-focus-event default-drag-event
+			default-mouse-event default-motion-event default-key-event
+			default-focus-event default-drag-event
+			default-resize-event default-scroll-event
 			#f #t
 			0.0 0.0 0.0 0.0 ) )
 	   (if  (null? p)
@@ -387,37 +428,31 @@
 	   (mb (view-margin-bottom view)))
       (cond  
        [(= layout 0 )
-	(display (format "---->default ~a ~a ~a ~a\n" p-x p-y x y))
 	(view-x-set! view (+ p-x x ) )
 	(view-y-set! view (+ p-y y) )]
        [(= :fill (logand layout :fill ) )
-	(display "---->fill\n")
 	(view-x-set! view (+ p-x x ) )
 	(view-y-set! view (+ p-y y ) )
 	(view-width-set! view p-w)
 	(view-height-set! view p-h)]
        
        [(= :fill-left (logand layout :fill-left ) )
-	(display "---->fill-left\n")
 	(view-x-set! view (+ p-x x ) )
 	(view-y-set! view (+ p-y y ) )
 	(view-height-set! view p-h)]
 
        [(= :fill-right (logand layout :fill-right ) )
-	(display "---->fill-right\n")
 	(view-x-set! view (+ p-x x p-w (- w) ))
 	(view-y-set! view (+ p-y y ) )
 	(view-height-set! view p-h)]
 
        [(= :fill-top (logand layout :fill-top ) )
-	(display "---->fill-top\n")
 	(view-x-set! view (+ p-x x ) )
 	(view-y-set! view (+ p-y y ) )
 	(view-width-set! view p-w)
 	]
 
        [(= :fill-bottom (logand layout :fill-bottom ) )
-	(display "---->fill-bottom\n")
 	(view-x-set! view (+ p-x x ) )
 	(view-y-set! view (+ p-y y p-h (- h) ) )
 	(view-width-set! view p-w)
@@ -425,60 +460,78 @@
        
        
        [(= :center (logand layout :center ) )
-	(display "---->center\n")
 	(view-x-set! view (+ p-x x (/ p-w 2) (/ w -2)) )
 	(view-y-set! view (+ p-y y (/ p-h 2) (/ h -2)) )]
 
        [(= :top-left (logand layout :top-left ) )
-	(display "---->:top-left\n")
 	(view-x-set! view (+ p-x x ) )
 	(view-y-set! view (+ p-y y ) )]
        [(= :top-right (logand layout :top-right ) )
-	(display "---->:top-right\n")
 	(view-x-set! view (+ p-x x p-w (- w) ) )
 	(view-y-set! view (+ p-y y ) )]
        [(= :bottom-left (logand layout :bottom-left ) )
-	(display "---->:bottom-left\n")
 	(view-x-set! view (+ p-x x  ) )
 	(view-y-set! view (+ p-y y p-h (- h)  ) )]	
        [(= :bottom-right (logand layout :bottom-right ) )
-	(display "---->:bottom-right\n")
 	(view-x-set! view (+ p-x x  p-w (- w) )  )
 	(view-y-set! view (+ p-y y p-h (- h) ) )]	
 
        [(= :left (logand layout :left ) )
-	(display "---->:left\n")
 	(view-x-set! view (+ p-x x )  )
 	(view-y-set! view (+ p-y y (/ p-h 2) (/ h -2) ) )]
        [(= :right (logand layout :right ) )
-	(display "---->:right\n")
 	(view-x-set! view (+ p-x x  p-h (/ w -1) )  )
 	(view-y-set! view (+ p-y y (/ p-h 2) (/ h -2)  ) )]
        [(= :top (logand layout :top ) )
-	(display "---->:top\n")
 	(view-x-set! view (+ p-x x  (/ p-w 2) (/ w -2 ) ) ) 
 	(view-y-set! view (+ p-y y ) )]
        [(= :bottom (logand layout :bottom ) )
-	(display "---->:bottom\n")
 	(view-x-set! view (+ p-x x (/ p-w 2) (/ w -2 ) )  )
 	(view-y-set! view (+ p-y y p-h (- h) ) )]
        [else
-	(display "---->else")
+	1
 	;; (view-x-set! view (+ ml (view-x view) ))
 	;; (view-x-set! view (+ ml (view-x view) ))
 	])
    
       ))
 
+  (define (default-resize-event view w h)
 
+    nil)
+  (define (default-scroll-event view dx dy)
+    (display (format "  scroll-event ~a ~a\n" dx dy))
+    (let loop ((child (view-childs view)))
+      (if (pair? child)
+	  (begin
+		((view-scroll-event (car child)) (car child) dx dy)
+	    (loop (cdr child))
+	    )))
+    nil)
   
   (define (default-mouse-event view button action mods)
+    ;;(draw-rect view)
     ;;(display (format "  mouse-event ~a ~a\n" button action))
-    (let ((click (view-attrib-ref view 'onclick nil)))
+     (let ((click (view-attrib-ref view 'onclick nil)))
       (if (procedure? click)
-	  (click view action)))
-    nil)
+     	  (click view action)))
+     ;; (let loop ((child (view-childs view)))
+     ;;  (if (pair? child)
+     ;; 	  (begin
+     ;; 		((view-mouse-event (car child)) (car child) button action mods)
+     ;; 	    (loop (cdr child))
+     ;; 	    ))
+     ;;  )
+     )
+     
   (define (default-motion-event view  x y)
+    ;;(display (format "motion-event ~a ~a\n" x y))
+    (let loop ((child (view-childs view)))
+      (if (pair? child)
+	  (begin
+		((view-motion-event (car child)) (car child) x y)
+	    (loop (cdr child))
+	    )))
     nil)
 
   (define (default-focus-event view focused)
@@ -573,7 +626,29 @@
       ;;(nvg-fill vg)
       (if (procedure? click)
 	  (click view action))))
+  
+  ;;window-box scroll-event
+  (define (window-box-scroll-event-process view dx dy)
+    ;;(display (format  "window-box-scroll-event ~a ~a ~a\n" dx dy (record? view) ))
+    (if (and (record? view) (view-attrib-ref view 'is-scroll #f) (view-visible view))
+	(let* ((scroll-track-y (view-attrib-ref view 'scroll-track-y 0.0 ))
+	       (scroll-speed-y (view-attrib-ref view 'scroll-speed-y 4.0))
+	       (scroll-track-height (view-attrib-ref view 'scroll-track-height 0.0))
+	       (sy (* dy scroll-speed-y))
+	       (offset-y (view-attrib-ref view 'offset-y 0))
+	       (h (view-height view))
+	       (w (view-width view)))      
+	  (if (or (< (+ scroll-track-y (- sy)) 0)  (> (+ scroll-track-y scroll-track-height (- sy )) (- h offset-y 8) ))
+	      (set! scroll-track-y 0)
+	      (begin
+		(view-attrib-set! view 'scroll-track-y (+ scroll-track-y (- sy) ))
+		(view-child-move view dx sy)
+		;;(view-y-set! (car (view-childs view)) (+  (view-y (car (view-childs view))) dy ))
+		;;(view-move (car (view-childs view)) dx dy)
+		)))
 
+	
+	))
 
   ;;window-box mouse-event-process
   (define (window-box-mouse-event-process view button action mods)
@@ -582,7 +657,7 @@
   
   ;;window-box motion-process
   (define (window-box-motion-event-process view  x y)
-    (display (format "    motion ~a,~a\n" x y))
+    ;;(display (format "    motion ~a,~a\n" x y))
     (let ((focused (view-focus view))
 	  (vx (view-x view ))
 	  (vy (view-y view)) )
@@ -628,7 +703,12 @@
 	(view-motion-event-set! view window-box-motion-event-process)
 	(view-focus-event-set! view window-box-focus-event-process)
 	(view-drag-event-set! view window-box-drag-process)
-	(view-attrib-set! view 'title text) view) ]
+	(view-scroll-event-set! view window-box-scroll-event-process)
+	(view-attrib-set! view 'title text)
+	(view-attrib-set! view 'offset-x 0)
+	(view-attrib-set! view 'offset-y 32)
+	(view-attrib-set! view 'scroll-track-height (- height 200))
+	view) ]
      [(parent text width height layout)
       (let ((view (make-view parent  width height layout) ))
 	(view-draw-set! view draw-window-box )
@@ -637,7 +717,11 @@
 	(view-motion-event-set! view window-box-motion-event-process)
 	(view-focus-event-set! view window-box-focus-event-process)
 	(view-drag-event-set! view window-box-drag-process)
+	(view-scroll-event-set! view window-box-scroll-event-process)
 	(view-attrib-set! view 'title text)
+	(view-attrib-set! view 'offset-x 0)
+	(view-attrib-set! view 'offset-y 32)
+	(view-attrib-set! view 'scroll-track-height (- height 200))
 	view)]))
 
  (define (view-move view dx dy)
@@ -655,6 +739,7 @@
     (let loop ((childs (view-childs view)))
       (if (pair? childs)
 	  (begin
+	    (view-move (car childs) dx dy)
 	    (view-child-move (car childs) dx dy)
 	    (loop (cdr childs)))
 	  ))
@@ -709,6 +794,8 @@
 	(view-attrib-set! view 'cursor 1)
 	(view-mouse-event-set! view edit-mouse-event)
 	(view-key-event-set! view edit-key-event)
+	(view-scroll-event-set! view edit-scroll-event)
+	(view-attrib-set! view 'scroll-track-height height)
 	view) ]
      [(parent text width height layout)
       (let ((view (make-view parent  width height layout) ))
@@ -717,6 +804,9 @@
 	(view-attrib-set! view 'cursor 1)
 	(view-mouse-event-set! view edit-mouse-event)
 	(view-key-event-set! view edit-key-event)
+	(view-scroll-event-set! view edit-scroll-event)
+	(view-attrib-set! view 'scroll-track-height height)
+
 	view)]
      [(parent text width height layout color bgcolor)
       (let ((view (make-view parent  width height layout) ))
@@ -727,6 +817,9 @@
 	(view-attrib-set! view 'cursor 1)
 	(view-mouse-event-set! view edit-mouse-event)
 	(view-key-event-set! view edit-key-event)
+	(view-scroll-event-set! view edit-scroll-event)
+	(view-attrib-set! view 'scroll-track-height height)
+
 	view)]))
   ;;tab
   (define tab
@@ -828,15 +921,10 @@
 	(if (pair? child)
 	    (begin
 	      ;;(cffi-log #t)
-
-	      
 	      (view-layout-set! (car child) nil)
 	      (view-y-set! (car child) (+ bar-height  (view-y view ) offset) )
-	      (view-x-set! (car child) (+ (view-x view )  ) )
-	      
-	      ;;(layout-views (car child))
-	     
-	      
+	      (view-x-set! (car child) (+ (view-x view )  ) )      
+	      ;;(layout-views (car child))     
 	      (loop (cdr child ) (+ i 1)
 		    (+ offset  bar-height  (if (view-visible (car child ) ) (view-height (car child))  0.0 ) ))
 	      )))
@@ -888,35 +976,44 @@
      [(parent text width height)
       (let ((view (make-view parent  width height ) ))
 	(view-draw-set! view draw-pop )
-	(view-attrib-set! view 'itme-height 20.0)
+	(view-attrib-set! view 'itme-height 30.0)
 	(view-layout-set! view pop-layout)
 	(view-attrib-set! view 'text text)
 	
 	;;(view-attrib-set! view 'cursor 0)
-	;;(view-mouse-event-set! view stack-mouse-event)
+	(view-mouse-event-set! view pop-mouse-event)
+	(view-motion-event-set! view pop-motion-event)
 	;;(view-key-event-set! view edit-key-event)
 	view) ]
      [(parent text width height layout)
       (let ((view (make-view parent  width height layout) ))
 	(view-draw-set! view draw-pop )
-	(view-attrib-set! view 'item-height 20.0)
+	(view-attrib-set! view 'item-height 30.0)
 	(view-layout-set! view pop-layout)
 	(view-attrib-set! view 'text text)
+	(if (null? text )
+	    (begin
+	      (view-attrib-set! view 'active #t)
+	      (view-attrib-set! view 'item-align :center))
+	    (view-attrib-set! view 'active #f))
 
+	;;(view-attrib-set! view 'enable #t )
 	;;(view-attrib-set! view 'cursor 0)
-	;;(view-mouse-event-set! view stack-mouse-event)
+	(view-mouse-event-set! view pop-mouse-event)
+	(view-motion-event-set! view pop-motion-event)
 	;;(view-key-event-set! view edit-key-event)
 	view)]
      [(parent text width height layout color bgcolor)
       (let ((view (make-view parent  width height layout) ))
 	(view-draw-set! view draw-pop )
-	(view-attrib-set! view 'item-height 20.0)
+	(view-attrib-set! view 'item-height 30.0)
 	(view-layout-set! view pop-layout)
 	(view-attrib-set! view 'text text)
 	(view-attrib-set! view 'background-color bgcolor)
 	(view-attrib-set! view 'color color)
 	;;(view-attrib-set! view 'cursor 0)
-	;;(view-mouse-event-set! view stack-mouse-event)
+	(view-mouse-event-set! view pop-mouse-event)
+	(view-motion-event-set! view pop-motion-event)
 	;;(view-key-event-set! view edit-key-event)
 	view)]))
 
@@ -932,38 +1029,110 @@
 	   (h (view-height view))
 	   (p-w (view-width p) )
 	   (p-h (view-height p))
+	   (text (view-attrib-ref view 'text))
+	   (item-align (view-attrib-ref view 'item-align :right ))
 	   (item-height (view-attrib-ref view 'item-height))
+	   (aw (cond
+	   	[(= item-align :right) w]
+	   	[(= item-align :left) (- w )]
+		[(= item-align :center) 0.0 ]
+	   	))
 	   (ml (view-margin-left view))
 	   (mr (view-margin-right view))
 	   (mt (view-margin-top view))
 	   (mb (view-margin-bottom view)))
       (view-calc-layout view)
+      ;;(display (format "aw=~a\n" aw))
       
       (let loop ((child childs)
-		 (i 0)
-		 (offset 0.0))
-	(if (pair? child)
-	    (begin
-
-	      (if (> (view-childs-count (car child)) 0)
-		  (begin
-		    (view-x-set! (car child) (+ (view-x view ) w ) )
-		    (view-y-set! (car child) (+ (view-y view ) offset) )
-		    )
-		  (begin
-		    (view-layout-set! (car child) nil)
-		    (view-x-set! (car child) (+ (view-x view )  ) )
-		    (view-y-set! (car child) (+ (view-y view ) offset) )
-		    ))
-
-
-	     
+      		 (i 0)
+      		 (offset 0.0 ))
+      	(if (pair? child)
+      	    (begin
+	    
+      	      (view-x-set! (car child) (+ (view-x (car child)) aw) )
+      	      (view-y-set! (car child) (+ (view-y (car child)) offset) )
+	      ;;(view-height-set! view offset)
 	      
-	      (loop (cdr child ) (+ i 1)
-		    (+ offset    (if (view-visible (car child ) ) item-height  0.0 ) ))
-	      )))
+      	      (loop (cdr child ) (+ i 1)
+      		    (+ offset (if (view-visible (car child ) ) (view-height (car child))  0.0 ) ))
+      	      )
+      	    ))
+  
       
       ))
+
+
+    (define (view-set-visible view visible)
+      (view-visible-set! view visible)
+      (let loop ((childs (view-childs view)))
+	(if (pair? childs)
+	    (begin
+	      (view-set-visible (car childs) visible)
+	      (loop (cdr childs)))
+	    ))
+      )
+    
+    (define (pop-motion-event view  vx vy)
+      (default-motion-event view vx vy)
+      (if (view-visible view)
+	  (let loop ((childs (view-childs view)))
+	    (if (pair? childs)
+		(begin
+		  (if  (contais (car childs) vx vy)
+		       (let ((x (view-x (car childs)))
+			     (y (view-y (car childs) ))
+			     (w (view-width (car childs) ))
+			     (h (view-height (car childs)))
+			     (text (view-attrib-ref (car childs) 'text))
+			     (radius (view-attrib-ref view 'corner-radius 1.0))
+			     )
+
+			 ((view-motion-event (car childs)) (car childs) vx vy)
+			 (nvg-begin-path vg)
+			 (nvg-stroke-width vg 1.0)
+			 (nvg-rounded-rect vg (+ x 0.5 ) (+ y  0 1.5 )
+					   (+  w -2)  (+ h 1.0)  radius)
+			 (nvg-fill-color vg  (nvg-rgba  10 10 10 160 ) )
+			 (nvg-fill vg)
+			 (nvg-stroke-color vg (nvg-rgba 92 92 92 160))
+			 (nvg-stroke vg)
+			 
+			 )
+		       )
+		  
+		  (loop (cdr childs)))
+		))
+	  
+	  
+	  
+	  ))
+     
+   ;;pop-mouse-event
+   (define (pop-mouse-event view button action mods)
+    (let* ((click (view-attrib-ref view 'onclick nil))
+	   (bg-color (view-attrib-ref view 'background-color nil ))
+	   (x (view-x view))
+	   (y (view-y view))
+	   (w (view-width view))
+	   (h (view-height view))
+	   (text (view-attrib-ref view 'text ""))
+	   (bg (nvg-linear-gradient vg 
+				    x y x (+ y h)
+				    (nvg-rgba 255 255 255 32) 
+				    (nvg-rgba 0 0 0  32))))
+      (display "pop mouse event\n")
+      
+      (if (= action 1)
+	  (begin
+	    (display "pop mouse event\n")
+	    )
+	  )
+     
+      ;;(nvg-fill-paint vg bg)
+      ;;(nvg-fill vg)
+      (if (procedure? click)
+	  (click view action))))
   
   ;;edit-key-event
   (define (edit-key-event view keycode scancode action modifier )
@@ -1010,6 +1179,23 @@
 	      )
 	     )]))
     nil)
+
+
+  (define(edit-scroll-event view dx dy)
+    (let* ((scroll-track-y (view-attrib-ref view 'scroll-track-y 0.0 ))
+	   (scroll-speed-y (view-attrib-ref view 'scroll-speed-y 4.0))
+	   (scroll-track-height (view-attrib-ref view 'scroll-track-height 0.0))
+	   (sy (* dy scroll-speed-y))
+	   (offset-y (view-attrib-ref view 'offset-y 0))
+	   (h (view-height view))
+	   (w (view-width view)))      
+      (if (or (< (+ scroll-track-y (- sy)) 0)  (> (+ scroll-track-y scroll-track-height (- sy )) (- h offset-y 8) ))
+	  (set! scroll-track-y 0)
+	  (begin
+	    (view-attrib-set! view 'scroll-track-y (+ scroll-track-y (- sy) ))
+	    (view-child-move view dx sy)
+	    )))
+	)
   
   (define (edit-mouse-event view button action mods)
     (let* ((click (view-attrib-ref view 'onclick nil))
@@ -1018,6 +1204,7 @@
 	   (y (view-y view))
 	   (w (view-width view))
 	   (h (view-height view))
+	   (scroll-track-y (view-attrib-ref view 'scroll-track-y 0))
 	   (text (view-attrib-ref view 'text ""))
 	   (bg (nvg-linear-gradient vg 
 				    x y x (+ y h)
@@ -1026,7 +1213,7 @@
 
       (if (= action 1)
 	  (begin
-	    (position->cursor view $cursor-x $cursor-y)
+	    (position->cursor view $cursor-x (+ $cursor-y scroll-track-y ))
 	    )
 	  )
      
@@ -1439,6 +1626,7 @@
 	  (y (view-y view))
 	  (width (view-width view))
 	  (height (view-height view))
+	  (scroll-track-y (view-attrib-ref view 'scroll-track-y 0))
 	  (start 0)
 	  (end 0)
 	  (nrows 0)
@@ -1477,13 +1665,13 @@
       	     	  (nvg-begin-path vg)
       	     	  (nvg-fill-color vg (nvg-rgba 255 255 255 255))
 		  ;;(cffi-log #t)
-		  (nvg-text vg (+ x text-padding-left ) y  (nvg-text-row-start rows i)
+		  (nvg-text vg (+ x text-padding-left ) (- y scroll-track-y)  (nvg-text-row-start rows i)
       	     		    (nvg-text-row-end rows i)  )
 		  ;;(cffi-log #f)
 		  
       	     	  ;;(display (format "start[~a]=~a end=~a\n" i (nvg-text-row-start rows i)
 		  ;;(nvg-text-row-end rows i)))
-		  
+		  (set! lnum (+ lnum 1))
       	     	  (set! y (+ y (cffi-get-float lineh)))
       	     	  ;;(print-row (+ rows (* 40 i) ))
 		  
@@ -1494,6 +1682,13 @@
 	     (set! nrows (nvg-text-break-lines vg start NULL width rows 3))
 	     
       	     )
+      
+      (let ((h (* height  (/ (/ height (cffi-get-float lineh) ) lnum))))
+	(if (< h height)
+	    (begin
+	      (if (view-attrib-ref view 'is-scroll #t)
+		  (draw-scroll-bar view))
+	      (view-attrib-set! view 'scroll-track-height h))))
       
       (cffi-free rows)
       (cffi-free glyphs)
@@ -1541,6 +1736,15 @@
         (cffi-get-float (+ glyphs (* 16 i) (* 4 1) ))  ]
       [(a6osx a6le)
        (cffi-get-float (+ glyphs (* 24 i) (* 8 1) ))]))  
+
+  (define (default-draw-views view)
+     (let loop ((childs (view-childs view)))
+      (if (pair? childs)
+	  (begin
+	    (if (view-visible (car childs))
+		((view-draw (car childs)) (car childs)))
+	    (loop (cdr childs)))
+	  )))
   
   (define (draw-views view)
     ((view-draw view ) view)
@@ -1561,18 +1765,72 @@
 	   (w (view-width view))
 	   (h (view-height view)))
       
-      
-      ;;(nvg-stroke-width vg 10.0)
-      ;;(nvg-stroke-color vg  (nvg-rgba 255 0 0 255))
-      ;;(nvg-stroke vg)
-      
       (if (not (null? bg-color))
 	  (begin
 	    (nvg-begin-path vg)
 	    (nvg-fill-color vg bg-color)
 	    (nvg-rounded-rect vg x y  w h 2.0)
 	    (nvg-fill vg )))))
+
+   ;;draw-rect
+  (define (draw-rect view)
+    (let ( (color (view-attrib-ref view 'color (nvg-rgba 255 255 255 160) ))
+	   (bg-color (view-attrib-ref view 'background-color nil ))
+	   (x (view-x view))
+	   (y (view-y view))
+	   (w (view-width view))
+	   (h (view-height view)))
+      (nvg-save vg)
+      (nvg-begin-path vg);
+      (nvg-rounded-rect vg x y  w h 1.0 )
+      
+      (nvg-stroke-width vg 2.0)
+      (nvg-stroke-color vg  (nvg-rgba 0 255 0 255))
+      (nvg-stroke vg)
+      (nvg-restore vg)
+      ))
   
+  (define (draw-scroll-bar view )
+    (let* ( (x (view-x view))
+	    (y (view-y view))
+	    (offset-x (view-attrib-ref view 'offset-x 0))
+	    (offset-y (view-attrib-ref view 'offset-y 0))
+	    (scroll-bar-x (view-attrib-ref view 'scroll-bar-x 0))
+	    (scroll-bar-y (view-attrib-ref view 'scroll-bar-y 0))
+	    (w (view-width view))
+	    (h (view-height view))
+	    (scroll-track-y (view-attrib-ref view  'scroll-track-y 0))
+	    (scrollh (view-attrib-ref view 'scroll-track-height 0.0 ))
+	    (shadow-paint2
+	     (nvg-box-gradient vg
+			       (+ x w 12 1)
+			       (+ y 4 1)
+			       8
+			       (- h 8) 3 4
+			       (nvg-rgba  255 255 255 16)
+			       (nvg-rgba 0 0 0 160)))
+	    (shadow-paint
+	     (nvg-box-gradient vg
+			       (+ x w 12 1)
+			       (+ y 4 1) 8
+			       (- h 8) 3 4
+			       (nvg-rgba 0 0 0 32)
+			       (nvg-rgba 0 0 0 92)))
+	   )
+      (nvg-begin-path vg)
+      (nvg-rounded-rect vg (+ x w -12 offset-x) (+ y offset-y 4) 8 (- h 8 offset-y) 3)
+      (nvg-fill-paint vg shadow-paint)
+      (nvg-fill vg)
+
+      
+      (nvg-begin-path vg)
+      (nvg-rounded-rect vg (+ x w -12 offset-x) (+ y scroll-track-y 4  offset-y) 8  scrollh 3)
+      (nvg-fill-paint vg shadow-paint2)
+      (nvg-fill vg)
+
+      
+      
+    ))
   ;;draw-circle
   (define (draw-circle vg x y r)
     ;;draw circle
@@ -1637,18 +1895,19 @@
 	   (font-size (view-attrib-ref view 'font-size 18.0))
 	   (text-padding-left (view-attrib-ref view 'text-padding-left 5.0))
 	   (text-padding-right (view-attrib-ref view 'text-padding-right 5.0))
-
+	   (scroll-track-y (view-attrib-ref view 'scroll-track-y 0))
 	   (x (view-x view))
 	   (y (view-y view))
 	   (w (view-width view))
 	   (h (view-height view)))
 
+      
       ;;(cffi-log #t)
       (if (and (number? cursor-x) (>= cursor-x  0))
 	  (begin 
 	    (nvg-begin-path vg)
-	    (nvg-move-to vg (+ x text-padding-left cursor-x) (+ y cursor-y) )
-	    (nvg-line-to vg (+ x text-padding-left cursor-x) (+  y cursor-y 20.0) )
+	    (nvg-move-to vg (+ x text-padding-left cursor-x) (+ y (- scroll-track-y) cursor-y) )
+	    (nvg-line-to vg (+ x text-padding-left cursor-x) (+  y (- scroll-track-y) cursor-y 20.0) )
 	    (nvg-stroke-color vg cursor-color)
 	    (nvg-stroke-width vg cursor-width)
 	    (nvg-stroke vg)))
@@ -1661,15 +1920,12 @@
 	    (nvg-rounded-rect vg x y  w h 2.0)
 	    (nvg-fill vg )))
       (draw-edit-box-base vg x y w h)
-      ;;(nvg-intersect-scissor vg x y w h)
+      (nvg-save vg)
+      (nvg-intersect-scissor vg x y w h)
 
       (draw-paragraph view)
-      ;;(draw-paragraph vg x y w h   $cursor-x $cursor-y text)
-      ;; (nvg-font-size vg font-size)
-      ;; (nvg-font-face vg "sans")
-      ;; (nvg-fill-color vg (nvg-rgba 255 255 255 64));
-      ;; (nvg-text-align vg (+ NVG_ALIGN_LEFT NVG_ALIGN_MIDDLE))
-      ;; (nvg-text vg (+ x (* h 0.3)) (+ y (* h 0.5)) text  NULL)
+      (nvg-restore vg)
+      
       ) )
   
   ;;draw label
@@ -1803,6 +2059,8 @@
       (nvg-rounded-rect vg (+ x 0.5) (+ y 0.5) (- w 1.0) (- h 1.0) radius  )
       (nvg-stroke-color vg (nvg-rgba  29 29 29 255 ))
       (nvg-stroke vg)
+      (default-draw-views view)
+
     
       ))
   
@@ -1924,6 +2182,8 @@
 	[(center)
 	 (set! tw (nvg-text-bounds vg 0.0 0.0 text NULL NULL ))
 	 (nvg-text vg (+ x (* w 0.5) (- (* tw 0.5)) (* iw 0.25)) (+ y (* h 0.5)) text NULL  )])
+      (default-draw-views view)
+
       ))
 
 
@@ -1948,55 +2208,46 @@
 	    (child-count (view-childs-count view) )
 	    (text-align (view-attrib-ref view 'text-align 'center))
 	    (bar-text-align  (view-attrib-ref view 'bar-text-align 'left ))
-	    (radius (view-attrib-ref view 'corner-radius 4.0))
+	    (radius (view-attrib-ref view 'corner-radius 1.0))
 	    (font-size (view-attrib-ref view 'font-size 18.0))
 	    (font-face (view-attrib-ref view 'font-face "sans"))
 	    (font-icon (view-attrib-ref view 'font-icon "icons"))
 	    (color (view-attrib-ref view 'color (nvg-rgba 255 255 255 160) ))
 	    (bg-color (view-attrib-ref view 'background-color nil )) )
-      
+
+      (nvg-intersect-scissor vg x y w h)
+
       (nvg-font-size vg font-size)
       (nvg-font-face vg font-face)
-
-      
-      (nvg-fill-color vg color)
-      (nvg-text-align vg (+ NVG_ALIGN_LEFT  NVG_ALIGN_MIDDLE))
-      (case text-align
-	[(left) 
-	 (nvg-text vg  px (+ y  (* item-height 0.5)) text NULL)]
-	[(right)
-	 (set! tw (nvg-text-bounds vg 0.0 0.0 text NULL NULL ))
-	 (nvg-text vg  (+ px w (- tw )) (+ y  (* item-height 0.5))  text NULL)]
-	[(center)
-	 (set! tw (nvg-text-bounds vg 0.0 0.0 text NULL NULL ))
-	 (nvg-text vg (+ px (* w 0.5) (- (* tw 0.5)) (* iw 0.25)) (+ y  (* item-height 0.5)) text NULL  )])
       
       (let loop ((child childs)
 		 (i 0)
 		 (offset 0.0))
 	(if (pair? child)
 	    (begin
-	      
-	      (nvg-begin-path vg)
-	      (nvg-stroke-width vg 1.0)
-	      (nvg-rounded-rect vg (+ x 0.5 ) (+ y  offset 1.5 )
-				(+  w -2)  (+ item-height 1.0)  radius)
-	      (nvg-fill-color vg  (nvg-rgba  29 29 29 160 ) )
-	      (nvg-fill vg)
-	      (nvg-stroke-color vg (nvg-rgba 92 92 92 160))
-	      (nvg-stroke vg)
+	      (if (view-visible (car child))
+		  (let ((cx (view-x (car child)))
+			(cy (view-y (car child))) )
+		    
+		    (nvg-begin-path vg)
+		    (nvg-stroke-width vg 1.0)
+		    (nvg-rounded-rect vg  cx (+ cy  1.5 )
+				      (+  w +1 )  (+ (view-height (car child)) 1.0)  radius)
+
+		    (nvg-fill-color vg  (nvg-rgba  29 29 29 160 ) )
+		    (nvg-fill vg)
+		    (nvg-stroke-color vg (nvg-rgba 92 92 92 160))
+		    (nvg-stroke vg)
+		    ))
 
 	      
 	      (loop (cdr child ) (+ i 1)
-		    (+ offset  (if (view-visible (car child ) )  item-height  0.0 ) ))
+		    (+ offset  (if (view-visible (car child ) )  (view-height (car child))  0.0 ) ))
 	      )))
-
-      (nvg-begin-path vg)
-      (nvg-rounded-rect vg (+ x 0.5) (+ y 0.5) (- w 1.0) (- h 1.0) radius  )
-      (nvg-stroke-color vg (nvg-rgba  29 29 29 255 ))
-      (nvg-stroke vg)
+      (default-draw-views view)
+      )
     
-      ))
+    )
 
   
   (define (is-black col)
@@ -2074,6 +2325,7 @@
 
   ;;draw window-box
   (define (draw-window-box view)
+    ;;(display "draw-window-box\n")
     (let ((cornerRadius 3.0)
 	  (shadowPaint nil)
 	  (headerPaint nil)
@@ -2082,11 +2334,15 @@
 	  (active (view-attrib-ref view 'active #f))
 	  (x (view-x view))
 	  (y (view-y view))
+	  (offset-x (view-attrib-ref view 'offset-x))
+	  (offset-y (view-attrib-ref view 'offset-y))
 	  (w (view-width view))
 	  (h (view-height view)))
+
       (nvg-save vg)
       ;;(drawWindow vg "test" 20.0 10.0 200.0 150.0)
-
+  
+      
       ;;window
       (nvg-begin-path vg)
       (nvg-rounded-rect vg x y w h cornerRadius)
@@ -2134,4 +2390,22 @@
       (nvg-font-blur vg 0.0)
       (nvg-fill-color vg (nvg-rgba 220 220 220 160))
       (nvg-text vg (+ x (/ w 2)) (+ y 16) title NULL )
-      (nvg-restore vg))))
+
+      (nvg-intersect-scissor vg (+ offset-x x) (+ offset-y y)  (- w offset-x)  (- h offset-y ))
+      (default-draw-views view)
+	  
+      (nvg-restore vg)
+    
+      (if (view-attrib-ref view 'is-scroll #f)
+	  (begin
+	    (nvg-save vg)
+	    (nvg-intersect-scissor vg x y  w  h )
+	    (draw-scroll-bar view)
+	  (nvg-restore vg))
+	  ))
+
+
+ 
+    )
+  
+  )

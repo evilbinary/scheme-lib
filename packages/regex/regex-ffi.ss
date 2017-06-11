@@ -30,7 +30,7 @@ REG_BADRPT
  (define lib-name
   (case (machine-type)
    ((arm32le) "libscm.so")
-   ((a6nt i3nt) "libscm.dll")
+   ((a6nt i3nt) "libsystre-0.dll")
    ((a6osx i3osx)  "libscm.so")
    ((a6le i3le) "libscm.so")))
  (define lib (load-librarys  lib-name ))

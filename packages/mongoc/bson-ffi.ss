@@ -203,7 +203,7 @@
   (define lib-name
     (case (machine-type)
       ((arm32le) "libbson.so")
-      ((a6nt i3nt) "libbson.dll")
+      ((a6nt i3nt) "libbson-1.0.dll")
       ((a6osx i3osx)  "libbson.so")
       ((a6le i3le) "libbson.so")))
   (define lib (load-librarys  lib-name ))

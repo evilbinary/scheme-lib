@@ -442,7 +442,7 @@
  (define lib-name
    (case (machine-type)
      ((arm32le) "libmongoc.so")
-     ((a6nt i3nt) "libmongoc.dll")
+     ((a6nt i3nt) "libmongoc-1.0.dll")
      ((a6osx i3osx)  "libmongoc.so")
      ((a6le i3le) "libmongoc.so")))
  (define lib (load-librarys  lib-name ))

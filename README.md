@@ -7,6 +7,9 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 2. 执行`make`命令就可以编译，对应平台的文件在`bin`目录下。
 3. 进入`bin`目录，执行`source env.sh`，然后运行`./scheme --script ../apps/hello.ss`就可以运行例子。
 
+# windows
+1. 下载[scheme-lib-2.0-win32.zip][2]，解压后进入bin，打开cmd运行`run.bat ../apps/gui-test.ss`就可以运行例子了。
+
 ### 截图
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/game-demo.png" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/gui-demo.png" width="400px" />
 
@@ -116,3 +119,4 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 	```
 
 [1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.2.apk   "scheme apk"
+[2]: https://github.com/evilbinary/data/blob/master/pic/scheme-lib-2.0-win32.zip  "scheme-lib-2.0-win32.zip"

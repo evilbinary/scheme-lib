@@ -53,7 +53,7 @@
 	  (loop  (mongoc-cursor-next cursor  doc ) )
 	  )
 	)))
-(cffi-log #t)
+;;(cffi-log #t)
 ;;insert data
 (set! json "{ \"_id\": 123, \"type\": \"misc\", \"item\":\"card\", \"qty\": 15 }")
 (set! insert (bson-new-from-json json (string-length json) error))

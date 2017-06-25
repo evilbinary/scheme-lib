@@ -21,7 +21,7 @@
     (printf "HTTP=>%a\n" request-line)
     (printf "path=%a\n" (cadr request-line))
     
-    (string-append (http:status-line 200 "")
+    (string-append
 		 (http:content
 		  '(("Content-Type" . "text/html"))
 		  (html:head "hello" "")

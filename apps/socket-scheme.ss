@@ -66,7 +66,8 @@
   (let ((ret (eval-string  (cffi-string buff))))
     (cffi-set buff 0 4096)
     (display (format "ret=~a\n" ret))
-    
+    (if (= 0 n)
+	(set! connect-fd (accept socket-fd 0 0)))
     (send connect-fd ret (string-length ret) 0)
     )
   (sleep (make-time 'time-duration 0 1))

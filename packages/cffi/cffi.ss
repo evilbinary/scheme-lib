@@ -30,6 +30,7 @@
    cffi-sym
    print-ptr
    print-string
+   cffi-set
    ;; cffi-load-lib
    ;; cffi-open-lib
    ;; cffi-call
@@ -220,6 +221,8 @@
   
   (define ffi-dl-test (foreign-procedure "ffi_dl_test" ( ) void))
 
+  (define $ffi-set (foreign-procedure "ffi_set" (void* int int) void))
+
 
   (define print-string (foreign-procedure "print_string" (string) int ))
   (define print-ptr (foreign-procedure "print_ptr" (void*) int))
@@ -228,6 +231,7 @@
   ;;cffi define here
   (define cffi-alloc $ffi-alloc)
   (define cffi-free $ffi-free)
+  (define cffi-set $ffi-set)
 
   (define cffi-set-char ffi-set-char)
   (define cffi-set-int ffi-set-int)

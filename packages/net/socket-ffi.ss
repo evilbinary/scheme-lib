@@ -14,6 +14,17 @@
    INADDR_ANY
    SOL_SOCKET
    SO_REUSEADDR
+
+   
+   SO_SNDBUF
+   SO_RCVBUF
+   SO_SNDLOWAT
+   SO_RCVLOWAT
+   SO_SNDTIMEO
+   SO_RCVTIMEO
+   SO_ERROR
+   SO_TYPE
+   
    make-sockaddr-in
 
    cfdopen
@@ -64,6 +75,15 @@
 
  (define SOL_SOCKET 0 )
  (define SO_REUSEADDR   #x0004)
+
+ (define SO_SNDBUF	#x1001)
+ (define SO_RCVBUF	#x1002)
+ (define SO_SNDLOWAT	#x1003)
+ (define SO_RCVLOWAT	#x1004)
+ (define SO_SNDTIMEO	#x1005)
+ (define SO_RCVTIMEO	#x1006)
+ (define SO_ERROR	#x1007)
+ (define SO_TYPE	#x1008)
 
  (def-function make-sockaddr-in
    "make_sockaddr_in" (int int int) void*)

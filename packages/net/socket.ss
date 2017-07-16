@@ -55,11 +55,18 @@
 		      [read-char (p)
 				 (let* ((c (cread fd buf 1))
 					(char (cffi-get-char buf)))
-				   (if (= c -1)
-				       char
-				       char ))
+				   (if (> c -1 )
+				       (if (= 0 c)
+					   (and  (close fd) char)
+					   char)
+				       (eof-object)
+				       ))
 				 ]
-		      [close-port (p) (mark-port-closed! p)]
+		      [close-port (p)
+				  (close fd)
+				  (mark-port-closed! p)
+				  (cffi-free buf)
+				  ]
 		      [else (assertion-violationf 'make-fd-input-port
 						  "operation ~s not handled"
 						  msg)]
@@ -102,7 +109,11 @@
   				  (cffi-set-char buf c)
   				  (cwrite fd buf 1)
   				 ]
-  		      [close-port (p) (mark-port-closed! p)]
+  		      [close-port (p)
+				  (close fd)
+				  (cffi-free buf)
+				  (mark-port-closed! p)
+				  ]
   		      [else (assertion-violationf 'make-fd-output-port
   						  "operation ~s not handled"
   						  msg)]

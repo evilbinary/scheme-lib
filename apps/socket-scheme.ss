@@ -23,24 +23,8 @@
 	   (exit condition)) 
 	 (lambda () body)))))))
 
-(define eval-string
-  (lambda (str)
-    (with-output-to-string
-      (lambda ()
-	(try
-	 (with-input-from-string str
-	   (lambda ()
-	     (let loop ()
-	       (let ((c (read)))
-		 (cond
-		  ((eof-object? c) "" )
-		  ((eq? c (void)) "") 
-		  (else
-		   (eval c)
-		   (loop)))))))
-	 (catch (lambda (x) 
-		  (display-condition x) 
-		  )))))))
+(define (eval-string str)
+  (eval (read (open-input-string str))))
 
 (set! socket-fd (socket AF_INET SOCK_STREAM 0))
 (setsockopt socket-fd SOL_SOCKET SO_RCVTIMEO i 100)

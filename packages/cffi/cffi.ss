@@ -158,6 +158,8 @@
   (define ffi-type-pointer-ptr (foreign-procedure "ffi_type_pointer_ptr" () void*))
   (define ffi-type-sint8-ptr (foreign-procedure "ffi_type_sint8_ptr" () void*))
   (define ffi-type-sint-ptr (foreign-procedure "ffi_type_sint32_ptr" () void*))
+  (define ffi-type-sint64-ptr (foreign-procedure "ffi_type_sint64_ptr" () void*))
+
   (define ffi-type-float-ptr (foreign-procedure "ffi_type_float_ptr" () void*))
   (define ffi-type-double-ptr (foreign-procedure "ffi_type_double_ptr" () void*))
   (define ffi-type-longdouble-ptr (foreign-procedure "ffi_type_longdouble_ptr" () void*))
@@ -166,6 +168,7 @@
   (define ffi-type-pointer (ffi-type-pointer-ptr))
   (define ffi-type-sint8 (ffi-type-sint8-ptr))
   (define ffi-type-sint (ffi-type-sint-ptr))
+  (define ffi-type-sint64 (ffi-type-sint64-ptr))
   (define ffi-type-float (ffi-type-float-ptr))
   (define ffi-type-double (ffi-type-double-ptr))
   (define ffi-type-longdouble (ffi-type-longdouble-ptr))
@@ -178,6 +181,7 @@
 
   (define ffi-set-char (foreign-procedure "ffi_set_char" (void* char) void))
   (define ffi-set-int (foreign-procedure "ffi_set_int" (void* int) void))
+  (define ffi-set-long (foreign-procedure "ffi_set_long" (void* long) void))
   (define ffi-set-float (foreign-procedure "ffi_set_float" (void* float) void))
   (define ffi-set-double (foreign-procedure "ffi_set_double" (void* double) void))
   (define ffi-set-longdouble (foreign-procedure "ffi_set_longdouble" (void* double ) void))
@@ -498,6 +502,7 @@
             (case (car type)
                 [(char )  (ffi-types-set typeelement i ffi-type-sint8 ) ]
                 [(int )  (ffi-types-set typeelement i ffi-type-sint ) ]
+		[(int64 long) (ffi-types-set typeelement i ffi-type-sint64)]
                 [(float )  (ffi-types-set typeelement i ffi-type-float ) ]
                 [(double )  (ffi-types-set typeelement i ffi-type-double ) ]
                 [(void* float*)  (ffi-types-set typeelement i ffi-type-pointer ) ]
@@ -520,16 +525,17 @@
   (define (create-cret-type ret-type)
     (let ((alloc 0) (ret-struct-val 0) (typeelement 0) (typelist '() ) )
       (case ret-type
-          [(int ) ffi-type-sint]
-          [(float ) ffi-type-float]
-          [(double ) ffi-type-double]
-          [(string ) ffi-type-pointer]
-          [(void* float* ) ffi-type-pointer]
-          [(void)  ffi-type-void ]
-          [else
-            ;;(display (format "  $$$else type=~a\n" ret-type) )
-            (process-struct ret-type )
-            ]
+	[(int ) ffi-type-sint]
+	[(int64 long) ffi-type-sint64]
+	[(float ) ffi-type-float]
+	[(double ) ffi-type-double]
+	[(string ) ffi-type-pointer]
+	[(void* float* ) ffi-type-pointer]
+	[(void)  ffi-type-void ]
+	[else
+	 ;;(display (format "  $$$else type=~a\n" ret-type) )
+	 (process-struct ret-type )
+	 ]
         ))
     )
 
@@ -541,6 +547,7 @@
 	   )
       (set! ret-fun (case ret-type
 		      [(int ) ffi-get-int]
+		      [(int64 long) ffi-get-long]
 		      [(float ) ffi-get-float]
 		      [(double ) ffi-get-double]
 		      [(string ) ffi-get-string]
@@ -574,6 +581,10 @@
                   [(int)
                     (set! alloc (ffi-alloc 32) ) 
                     (ffi-set-int alloc (car arg) )
+                    (ffi-values-set cargs i alloc) ]
+		  [(int64 long)
+		    (set! alloc (ffi-alloc 64) ) 
+                    (ffi-set-long alloc   (car arg))
                     (ffi-values-set cargs i alloc) ]
                   [(float)
 		   (set! alloc (ffi-alloc 32) )
@@ -696,6 +707,9 @@
                     ]
                     [(int ) (set! struct-val (ffi-get-int (+ addr offset)))
                         (set! offset (+ offset (/ (car s) 8) ))
+			]
+		     [(int64 long ) (set! struct-val (ffi-get-long (+ addr offset)))
+                        (set! offset (+ offset (/ (car s) 8) ))
                       ]
                     [(float ) (set! struct-val (ffi-get-float (+ addr offset)))
                         (set! offset (+ offset (/ (car s) 8) ))
@@ -749,6 +763,10 @@
                 ]
                 [(int ) 
                   (ffi-set-int (+ offset addr) v)
+                    (set! offset (+ offset (/ ss 8) ))
+		    ]
+		[(int64  long) 
+                  (ffi-set-long (+ offset addr) v)
                     (set! offset (+ offset (/ ss 8) ))
                   ]
                 [(float ) 

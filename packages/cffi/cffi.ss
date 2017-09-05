@@ -37,6 +37,7 @@
    ;; cffi-def
    load-librarys
    def-function
+   def-function-callback
    def-struct
    cffi-alloc
    cffi-free
@@ -294,6 +295,8 @@
 	    ))
       )
     )
+
+
   
   ;;(name1 name2 name3)
   ;;(type1 type2 type3)
@@ -434,7 +437,14 @@
   ;; 	       (cffi-call h sym 'args 'ret values )
   ;; 	       ))))  ) ))
 
-
+  (define-syntax def-function-callback
+    (lambda (x)
+      (syntax-case x ()
+	((_ name args ret )
+	 #'(define name (lambda (p)
+	     (let ([code (foreign-callable p args ret)])
+	       (lock-object code)
+	       (foreign-callable-entry-point code))))))))
   
   (define-syntax def-function
     (lambda (x)

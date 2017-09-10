@@ -6,15 +6,10 @@
 (import (net socket-ffi) (cffi cffi) (net event2-ffi) )
 ;;(cffi-log #t)
 
-(define socket-fd 0)
-(define n 0)
-(define buff (cffi-alloc 4096))
 
 (define base (cffi-alloc 4))
 (define listener (cffi-alloc 4))
-
 (set! base (event-base-new))
-
 (define sockaddr  (make-sockaddr-in AF_INET INADDR_ANY 8080 ))
 
 (def-function-callback
@@ -25,7 +20,6 @@
   make-write-cb
   (void*  void*) void)
 
-
 (def-function-callback
   make-read-cb
   (void*  void*) void)
@@ -34,33 +28,26 @@
   make-conn-cb
   (void* int void*) void)
 
-
 (define read-cb (make-read-cb
 		  (lambda (bev user-data)
 		    (let ((input (bufferevent-get-input bev))
 			  (len 0))
 		      (set! len (evbuffer-get-length input))
 		      (display (format "inputlen ~a\n"  len))
-		      (display (format "~s\n" (cffi-string (evbuffer-pullup input len) )))
-		      ;;(bufferevent-free bev)
-		      ))))
+		      (display (format "~s\n" (cffi-string (evbuffer-pullup input len) ))) ))))
 		    
-
 (define write-cb (make-write-cb
 		  (lambda (bev user-data)
 		    (let ((output (bufferevent-get-output bev)))
 		      (if (= 0 (evbuffer-get-length output))
 			  (display "replay\n")
-			  (bufferevent-free bev)))
-		    )))
-
+			  (bufferevent-free bev))) )))
 
 (define conn-cb (make-write-cb
 		  (lambda (bev event user-data)
 		    (display (format "event=~a\n" event))
 		    (bufferevent-free bev)
-		    )))
-		
+		    )))	
 
 (define listener-cb (make-listener-cb
 		     (lambda (listener-ptr fd sockaddr-ptr socklen ptr)
@@ -69,9 +56,7 @@
 			 (bufferevent-enable bev 4)
 			 (bufferevent-enable bev 2)
 			 (bufferevent-write bev "hello" 5)
-			 (display "listener\n"))
-		       )))
-
+			 (display "listener\n")))))
 
 (set! listener (evconnlistener-new-bind  base listener-cb base 10 -1 sockaddr 16))
 (if (= 0 listener )

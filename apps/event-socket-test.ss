@@ -31,7 +31,7 @@
 			   (event-free arg)
 			   (close fd))
 			 (begin
-			   (display (cffi-string buff))
+			   (display (format "fd=~a msg=~a" fd (cffi-string buff)))
 			   (send fd buff (cstrlen  buff) 0)
 			   (cffi-set buff 0 4096)))))))
 

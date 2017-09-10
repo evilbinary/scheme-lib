@@ -236,8 +236,10 @@
 	(define err 0)
 	(define err-buf (cffi-alloc 1024))
 	(define pattern "([^\\/=&]+)=([^\\/=&]*)")
-	(define nmatch (+ (string-count query #\=) 1))
-	(if (or (string=? query "") (eq? #f (string-index query #\=)) (= 0 (string-index query #\=)))
+	(define nmatch (if (or (not (string? query)) (string=? query "") (eq? #f (string-index query #\=))) 
+						0 
+						(+ (string-count query #\=) 1)))
+	(if (= nmatch 0)
 		keys
 		(begin
 			;;(cffi-log #t)

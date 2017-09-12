@@ -9,6 +9,7 @@
 (get! "/blog/:user/:age" 
 	(lambda (p)
 		(define content (string-append "p是储存所有参数(路由/get请求)的hashtable\n" "User " (hashtable-ref p "user" "") ";Ages " (hashtable-ref p "age" "")))
-		(default-make-response content)))
+		(hashtable-set! p "content" content)
+		(default-make-json p)))
 
 (run 8080)

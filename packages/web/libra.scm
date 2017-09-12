@@ -9,8 +9,9 @@
 				string->list string-copy! string-titlecase 
 				string-upcase string-downcase string-hash)
 		(cffi cffi) 
-		(net socket) (net socket-ffi ) 
-		(regex regex-ffi))
+		(net socket) (net socket-ffi) 
+		(regex regex-ffi)
+		(json json))
 ;; slib feature
 (require 'http)
 (require 'cgi)
@@ -286,21 +287,100 @@
 	(lambda (file-name)
 		(let ((p (open-input-file file-name)))
 			(let loop ((lst '()) (c (read-char p)))
-			(if (eof-object? c)
-				(begin 
-					(close-input-port p)
-					(list->string (reverse lst)))
-				(loop (cons c lst) (read-char p)))))))
+				(if (eof-object? c)
+					(begin 
+						(close-input-port p)
+						(list->string (reverse lst)))
+					(loop (cons c lst) (read-char p)))))))
 
 ;; 返回视图函数
 (define view
 	(lambda (file-name)
+		(if (eq? #f (string-index file-name #\.))
+			(set! file-name (string-append 
+								(hashtable-ref libra-options "web-path" (get-app-path))
+								"/"
+								(hashtable-ref libra-options "view-path" "views")
+								"/"
+								file-name
+								".html")))
 		(default-make-response (read-file file-name))))
 
+;; 默认json返回
 (define (default-make-json data)
 	(http:content
-		'(("Content-Type" . "application/json"))
-			data))
+		'(("Content-Type" . "application/json; charset=utf-8"))
+			(scm->json-string data)))
+
+;; 判断资源文件
+(define (resource? request)
+	(define resource-types '("js" "css" "jpg" "png" "gif"))
+	(if (eq? #f (string-index request #\.))
+		#f
+		(let ((type (string-downcase (substring request (+ 1 (string-index-right request #\.)) (string-length request)))))
+			(exists (lambda (n) (string=? n type)) resource-types))))
+
+;; 返回资源文件
+(define (default-make-resource request)
+	(let ((file-path (get-file-path request)))
+		(if (file-exists? file-path)
+			(http:content 
+				(get-resource-header (string-downcase (substring request (+ 1 (string-index-right request #\.)) (string-length request))))
+					(read-file file-path))
+			(default-make-response "404"))))
+
+;; 返回资源对应http头
+(define (get-resource-header type)
+	(define content-type 
+		(cond
+			((string=? type "js")
+				"application/javascript")
+			((string=? type "css")
+				"text/css")
+			((string=? type "jpg")
+				"image/jpeg")
+			((string=? type "png")
+				"image/png")
+			((string=? type "gif")
+				"image/gif")
+			(else
+				"text/html")))
+	(list (cons "Content-Type" content-type)))
+
+;; 获取执行文件文件夹地址
+(define (get-app-path)
+	(define script (car (command-line)))
+	(define index-\\ (string-index-right script #\\))
+	(define index-// (string-index-right script #\/))
+	(substring script 0 (max (if (number? index-\\) index-\\ 0) (if (number? index-//) index-// 0))))
+
+;; 配置字典
+(define libra-options (make-hashtable string-hash string=?))
+
+;; 展示字典
+(define (show-options)
+	(vector-map (lambda (k) (display (string-append k ": " (hashtable-ref libra-options k ""))) (newline)) (hashtable-keys libra-options))
+)
+
+;; web根目录
+(hashtable-set! libra-options "web-path" (get-app-path))
+;; 视图文件夹名称
+(hashtable-set! libra-options "view-path" "views")
+;; 启动文件目录
+(hashtable-set! libra-options "app-path" (get-app-path))
+
+;; 获取web配置
+(define (get-option key . rest)
+	(define default (if (null? rest) #f (car rest)))
+	(hashtable-ref libra-options key default))
+
+;; 获取文件完整路径
+(define (get-file-path file)
+	(string-append (hashtable-ref libra-options "web-path" (get-app-path)) file))
+
+;; 文件导入
+(define (using file)
+	(load (string-append (hashtable-ref libra-options "app-path" (get-app-path)) "\\" file)))
 
 
 ;; 服务器处理 入口
@@ -310,7 +390,9 @@
 	(lambda (request-line query-string header)
 		;; show msg on server
 		(printf "HTTP=>%a\n" request-line)
-		(let [(keys/handler (request->keys/handler request-line query-string))]
-			(if (procedure? (cdr keys/handler))
-				((cdr keys/handler) (car keys/handler))
-				(default-make-response "404")))))
+		(if (resource? (cadr request-line))
+			(default-make-resource (cadr request-line))
+			(let [(keys/handler (request->keys/handler request-line query-string))]
+				(if (procedure? (cdr keys/handler))
+					((cdr keys/handler) (car keys/handler))
+					(default-make-response "404"))))))

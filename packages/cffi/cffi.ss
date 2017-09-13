@@ -275,7 +275,7 @@
     (let  loop ((libs (map car (library-directories)) ) )
       (if (pair? libs )
 	  (begin
-	    ;;(display (format "   lib##>>>~a ~a\n" (car libs)  (length (cdr libs))))
+	    ;;(display (format "   lib##>>>~a ~a ~a\n" (car libs)  (length (cdr libs)) (string-append (car libs) "/" name) ))
 	    (if (and (file-exists? (string-append (car libs) "/" name)) 
 		     (eq? "" (hashtable-ref loaded-libs (string-append (car libs) "/" name) "") ) )
 		(begin
@@ -289,7 +289,7 @@
   (define (load-librarys . args)
     (let loop ((arg args))
       (if (pair? arg)
-	  (begin
+	  (begin	    
 	    (cffi-load-lib-op (car arg))
 	    (loop (cdr arg))
 	    ))
@@ -395,22 +395,25 @@
   ;;cffi functions begin
   (define (cffi-open-lib path)
     (set! handler (ffi-dlopen path  RTLD_LAZY) )
+    ;;(printf "cffi-open-lib ~a handler=~a\n" path handler)
     (set! handlers (append handlers (list handler)))
     handler
     )
   
   ;;cffi-sym
   (define (cffi-sym name)
-    ;;(display (format "handler=~a name=~a sym=~a\n" handler  name (ffi-dlsym handler name) ))
+    ;;(display (format "cffi-sym handler=~a name=~a sym=~a\n" handler  name (ffi-dlsym handler name) ))
     (let ((s (ffi-dlsym handler name )))
       (if (= 0 s)
 	  (let loop ((h handlers))
 	    (if (pair? h)
 		(let ((sym (ffi-dlsym (car h) name)))
+		  ;;(printf "   sym=~a handler=~a\n" sym (car h ))
 		  (if (= sym 0)
-			  (loop (cdr h))
-			  sym)
-		  sym) 0 ) ) 
+		      (loop (cdr h))
+		      sym))
+		0)
+	    )
 	  s)))
 
   ;; (define-syntax  def-function
@@ -670,7 +673,7 @@
       ;;init cif
       (if (= FFI_OK (ffi-prep-cif cif FFI_DEFAULT_ABI (length arg-type) cret-type carg-type ) )
 	  (begin
-	    ;;(display "ffi-ok\n")
+	    ;;(printf "fptr=~a \n" fptr)
 	    (if (> fptr 0)
 		(begin 
 		  ;;(display (format "ffi-call cret=~x cargs=~x\n" cret cargs ))

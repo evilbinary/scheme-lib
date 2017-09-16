@@ -20,7 +20,7 @@
 (set! curl (curl-easy-init))
 (define my-file (c-fopen "download.jpg" "wb"))
 
-(curl-easy-setopt curl 10002 "https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=3736809153,2744643820&fm=173&s=523279C85971000314006C020300C0D2&w=550&h=231&img.JPEG")
+(curl-easy-setopt curl 10002 "https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/game-demo.png")
 (curl-easy-setopt curl 20011
 		  (make-write-callback
 		   (lambda (ptr size nmemb stream)

@@ -14,7 +14,7 @@
    INADDR_ANY
    SOL_SOCKET
    SO_REUSEADDR
-
+   SO_REUSEPORT
    
    SO_SNDBUF
    SO_RCVBUF
@@ -75,7 +75,8 @@
 
  (define SOL_SOCKET 0 )
  (define SO_REUSEADDR   #x0004)
-
+ (define SO_REUSEPORT   #x0200 )
+ 
  (define SO_SNDBUF	#x1001)
  (define SO_RCVBUF	#x1002)
  (define SO_SNDLOWAT	#x1003)
@@ -105,7 +106,7 @@
     "_write" (int void* int) int)
 
   (def-function cwrite-all
-    "_write_all" (int void*) int)
+    "_write_all" (int void* int) int)
     
 ;;int socket(int  ,int  ,int )
 (def-function socket

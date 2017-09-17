@@ -22,6 +22,7 @@ SOFILES= lib/libscm/libscm$(EXT) \
 		 lib/libgui/libgui$(EXT)  \
 		 lib/libalut/libalut$(EXT)  \
 		 lib/libsocket/libsocket$(EXT)  \
+		 lib/libc/libc$(EXT) \
 		 lib/scheme/scheme	\
 		 lib/boot/scheme.boot	\
 		 lib/boot/petite.boot	\
@@ -36,6 +37,7 @@ BINFILES=bin/libscm$(EXT) \
 		 bin/libgui$(EXT)  \
 		 bin/libsocket$(EXT)  \
 		 bin/libalut$(EXT)  \
+		 bin/libc/libc$(EXT)
 
 all: $(TARGET)
 	@echo "All build finish ^_^ have fun!"

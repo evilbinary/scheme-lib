@@ -99,19 +99,26 @@
   (define (make-fd-output-port fd)
   (let ((buf (cffi-alloc 8)))
     (make-output-port (lambda (msg . args)
+		     ;;(printf "msg=~a args=~a\n" msg args)
   		     (record-case
   		      (cons msg args)
   		      [block-write (p s n)
-  				   (cwrite-all fd s)
-  				   n
+				   (let ((len (bytevector-length (string->utf8 s))))
+				     ;;(printf "size=~a len=~a fd=~a \n" n len fd)
+				     (cwrite-all fd s len)
+				     n
+				   )
   				   ]
   		      [write-char (c p)
-  				  (cffi-set-char buf c)
-  				  (cwrite fd buf 1)
+				  ;;(printf "c=~a p=~a ~x\n" c p (char->integer c))
+				  (cffi-set-char buf c)
+				  (cwrite fd buf 1)
   				 ]
   		      [close-port (p)
+				  ;;(printf "close fd =~a\n" fd )
 				  (close fd)
 				  (cffi-free buf)
+				  (set-port-output-size! p 0)
 				  (mark-port-closed! p)
 				  ]
   		      [else (assertion-violationf 'make-fd-output-port
@@ -127,7 +134,7 @@
 	  (i (cffi-alloc 32))
 	  )
      
-     (setsockopt socket-fd SOL_SOCKET SO_REUSEADDR i 32)
+     (setsockopt socket-fd SOL_SOCKET SO_REUSEPORT i 32)
      (cffi-free i)
      (list socket-fd server-addr)
      ))

@@ -14,7 +14,8 @@ SUB_DIR :=  libscm \
 	scheme	libgl \
 	libffi libglfw \
 	libnanovg libgui \
-	libalut
+	libalut \
+	libc
 
 LIBSCM =./libscm/libscm.so
 LIBGLUT =./libglut/libglut.so
@@ -26,7 +27,7 @@ LIBSOCKET=./libsocket/libsocket.so
 UNAME_S := $(shell uname -s)
 OS_NAME :=$(shell echo $(UNAME_S) | tr '[A-Z]' '[a-z]')
 LIBS_ALL= libscm.so libimgui.so libglfw.so libffi.so libgles.so libnanovg.so \
-	libalut.so libgui.so libsocket.so
+	libalut.so libgui.so libsocket.so libc.so
 
 ifeq ($(UNAME_S), MINGW32_NT-6.1)
   OS_NAME:=windows
@@ -35,6 +36,7 @@ ifeq ($(UNAME_S), MINGW32_NT-6.1)
   LIBFFI = ./libffi/libffi.dll
   LIBGLFW = ./libglfw/libglfw.dll
   LIBGLES= ./libgl/libgles.dll
+  LIBC=./libc/libc.dll
 endif
 
 all: $(TARGET)	
@@ -44,6 +46,8 @@ $(TARGET): $(OS_NAME) $(LIBS_ALL)
 libscm.so: $(LIBSCM) 
 	$(MAKE) -C libscm
 
+libc.so:
+	$(MAKE) -C libc
 libglut.so: $(LIBGLUT)
 	$(MAKE) -C libglut
 

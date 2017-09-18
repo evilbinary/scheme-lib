@@ -172,9 +172,10 @@
   (let* ((request-line (http:read-request-line input-port))
 	 (header (and request-line (http:read-header input-port)))
 	 (query-string (and header (http:read-query-string
-				    request-line header input-port))))
-    (display (http:service serve-proc request-line query-string header)
-	     output-port)))
+				    request-line header input-port)))
+	 (response (http:service serve-proc request-line query-string header)))
+    (if (not (eq? #f response))
+		(display response output-port))))
 
 (define (http:service serve-proc request-line query-string header)
   (cond ((not request-line) (http:error-page 400 "Bad Request."))
@@ -184,13 +185,15 @@
 	 (http:error-page 405 "Method Not Allowed" (html:plain request-line)))
 	((serve-proc request-line query-string header) =>
 	 (lambda (reply)
-	   (cond ((string? reply)
+	   (cond 
+		 ((string? reply)
 		  (string-append (http:status-line 200 "OK")
 				 reply))
 		 ((and (pair? reply) (list? reply))
 		  (if (number? (car reply))
 		      (apply http:error-page reply)
 		      (apply http:error-page (cons 500 reply))))
+	     ((eq? #f reply) #f)
 		 (else (http:error-page 500 "Internal Server Error")))))
 	((not query-string)
 	 (http:error-page 400 "Bad Request" (html:plain request-line)))

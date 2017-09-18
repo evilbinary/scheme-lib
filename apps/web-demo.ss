@@ -1,4 +1,4 @@
-(load "../packages/web/libra.scm")
+(import (web libra))
 
 (get! "/"
 	 (lambda (p) (view "../apps/index.html")))

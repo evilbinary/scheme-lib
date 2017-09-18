@@ -52,8 +52,6 @@
 			(sqlite-exec (string-append "INSERT INTO ImageInfo VALUES (" id "," (number->string max-page) ");"))
 		)
 	)
-	(display max-page)
-	(newline)
     max-page
 )
 

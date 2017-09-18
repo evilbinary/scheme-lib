@@ -23,8 +23,6 @@ $('.summit').click(function(){
     $.ajax({
         url: "/spider?key=" +url,
         success: function(data){
-            console.log(data);
-            dd = data;
             if (data == false || data.length == 0){
                 $('#tip').html('无内容, 请重试');
                 return;

@@ -9,9 +9,11 @@
 				string->list string-copy! string-titlecase 
 				string-upcase string-downcase string-hash)
 		(cffi cffi) 
-		(net socket) (net socket-ffi) 
+		(net socket) 
+		(net socket-ffi) 
 		(regex regex-ffi)
-		(json json))
+		(json json)
+		(c c-ffi))
 ;; slib feature
 (require 'http)
 (require 'cgi)
@@ -37,7 +39,10 @@
 					(let ((iport (make-fd-input-port port)) 
 							(oport (make-fd-output-port port)))
 						;; 指定框架入口 serve-proc
-						(http:serve-query serve-proc iport oport)
+						(http:serve-query 
+							(lambda (request-line query-string header)
+								(serve-proc request-line query-string header iport oport port))
+							iport oport)
 						(close-port iport)
 						(close-port oport)
 						(close port))
@@ -131,6 +136,16 @@
 	keys/handler
 )
 
+;; 32位: 4字节; 64位: 8字节
+(define bytes
+	(case (machine-type)
+		[(i3nt i3osx) 4]
+		[(a6osx a6le) 8]
+		[else 4]))
+
+;; 2 bytes为1组
+(define group (* 2 bytes))
+
 ;; 匹配路由和动态里路，返回参数列表
 (define (libra-regex-router router-reg str)
 	(define reg (cffi-alloc 100))
@@ -154,8 +169,8 @@
 					(let loop ((index 1))
 						;; (+ pmatch (* 结构体大小/8  index) 结构体偏移/4)
 						;; (printf "so1:~d, eo2:~d, str: ~a  \n" (cffi-get-int (+ pmatch (* 8 index))) (cffi-get-int (+ pmatch (* 8 index) 4)) (substring str (cffi-get-int (+ pmatch (* 8 index))) (cffi-get-int (+ pmatch (* 8 index) 4))))
-						(let ((start (cffi-get-int (+ pmatch (* 8 index)))) 
-								(end (cffi-get-int (+ pmatch (* 8 index) 4))))
+						(let ((start (cffi-get-int (+ pmatch (* group index)))) 
+								(end (cffi-get-int (+ pmatch (* group index) bytes))))
 							(set! result (cons (substring str start end) result))
 						)
 						(if (< index (- nmatch 1))
@@ -167,7 +182,9 @@
 		)
 	)
 	(regfree reg)
+	(cffi-free reg)
 	(cffi-free pmatch)
+	(cffi-free err-buf)
 	(reverse result) 
 )
 
@@ -194,12 +211,12 @@
 					(if (not (= 0 err))
 						(begin (display (format "error ~a\n" err)))
 						(begin
-							(if (and (< 1 nmatch) (>= (cffi-get-int (+ pmatch 8)) 0))
+							(if (and (< 1 nmatch) (>= (cffi-get-int (+ pmatch group)) 0))
 								(begin
 									;; (+ pmatch (* 结构体大小/8  index) 结构体偏移/4)
 									;; (printf "so1:~d, eo2:~d, str: ~a  \n" (cffi-get-int (+ pmatch (* 8 index))) (cffi-get-int (+ pmatch (* 8 index) 4)) (substring str (cffi-get-int (+ pmatch (* 8 index))) (cffi-get-int (+ pmatch (* 8 index) 4))))
-									(let ((start (cffi-get-int (+ pmatch 8))) 
-											(end (cffi-get-int (+ pmatch 8 4))))
+									(let ((start (cffi-get-int (+ pmatch group))) 
+											(end (cffi-get-int (+ pmatch group bytes))))
 										; (printf "~a\n" str)
 										(set! result (cons (substring str start end) result))
 										(set! str (string-replace str replace-reg (- start 1) end))
@@ -218,7 +235,9 @@
 		)
 	)
 	(regfree reg)
+	(cffi-free reg)
 	(cffi-free pmatch)
+	(cffi-free err-buf)
 	(cons 
 		(reverse result) 
 		(string-append 
@@ -236,10 +255,10 @@
 	(define pmatch (cffi-alloc 100))
 	(define err 0)
 	(define err-buf (cffi-alloc 1024))
-	(define pattern "([^\\/=&]+)=([^\\/=&]*)")
+	(define pattern "([^\\/=&]+)=([^=&]*)")
 	(define nmatch (if (or (not (string? query)) (string=? query "") (eq? #f (string-index query #\=))) 
 						0 
-						(+ (string-count query #\=) 1)))
+						(+ (* 2 (string-count query #\=)) 1)))
 	(if (= nmatch 0)
 		keys
 		(begin
@@ -255,13 +274,14 @@
 							(if (not (= 0 err))
 								(begin (display (format "error ~a\n" err)))
 								(begin
-									(if (and (< 1 nmatch) (>= (cffi-get-int (+ pmatch 8)) 0))
+									(if (and (< 1 nmatch) (>= (cffi-get-int (+ pmatch group)) 0))
 										(begin
 											;; (+ pmatch (* 结构体大小/8  index) 结构体偏移/4)
 											;; (printf "name: ~a  \n" (substring query (cffi-get-int (+ pmatch (* 8 1))) (cffi-get-int (+ pmatch (* 8 1) 4))))
 											;; (printf "word: ~a  \n" (substring query (cffi-get-int (+ pmatch (* 8 2))) (cffi-get-int (+ pmatch (* 8 2) 4))))
-											(hashtable-set! keys (substring query (cffi-get-int (+ pmatch (* 8 1))) (cffi-get-int (+ pmatch (* 8 1) 4))) (substring query (cffi-get-int (+ pmatch (* 8 2))) (cffi-get-int (+ pmatch (* 8 2) 4))))
-											(set! query (string-replace query "" (cffi-get-int (+ pmatch (* 8 0))) (cffi-get-int (+ pmatch (* 8 0) 4))))
+											(hashtable-set! keys (substring query (cffi-get-int (+ pmatch (* group 1))) (cffi-get-int (+ pmatch (* group 1) bytes)))
+																 (substring query (cffi-get-int (+ pmatch (* group 2))) (cffi-get-int (+ pmatch (* group 2) bytes))))
+											(set! query (string-replace query "" (cffi-get-int (+ pmatch (* group 0))) (cffi-get-int (+ pmatch (* group 0) bytes))))
 										)
 									)
 								)
@@ -276,13 +296,15 @@
 				)
 			)
 			(regfree reg)
+			(cffi-free reg)
 			(cffi-free pmatch)
+			(cffi-free err-buf)
 			keys
 		)
 	)
 )
 
-;; 读取文件
+;; 读取文本文件
 (define read-file
 	(lambda (file-name)
 		(let ((p (open-input-file file-name)))
@@ -314,38 +336,54 @@
 
 ;; 判断资源文件
 (define (resource? request)
-	(define resource-types '("js" "css" "jpg" "png" "gif"))
+	(define resource-types (vector->list (hashtable-keys content-types)))
 	(if (eq? #f (string-index request #\.))
 		#f
 		(let ((type (string-downcase (substring request (+ 1 (string-index-right request #\.)) (string-length request)))))
 			(exists (lambda (n) (string=? n type)) resource-types))))
 
 ;; 返回资源文件
-(define (default-make-resource request)
+(define (default-make-resource request port oport)
 	(let ((file-path (get-file-path request)))
 		(if (file-exists? file-path)
-			(http:content 
-				(get-resource-header (string-downcase (substring request (+ 1 (string-index-right request #\.)) (string-length request))))
-					(read-file file-path))
-			(default-make-response "404"))))
+			(begin
+				(display (string-append
+							(http:status-line 200 "OK")
+							(http:header
+								(list
+									(get-content-type (substring request (+ 1 (string-index-right request #\.)) (string-length request)))
+									(cons "Content-Length" (number->string (get-file-length file-path)))
+								)
+							)
+						 ) 
+					oport
+				)
+				(let ((f (c-fopen file-path "rb"))
+					  (buf (cffi-alloc 1024)))
+					(let loop ((len (c-fread buf 1 1024 f)))
+						(if (> len 0)
+							(begin	   
+								(cwrite-all port buf len)
+								(loop (c-fread buf 1 1024 f)))
+							(c-fclose f)))
+					(cffi-free buf)
+				)
+				#f
+			)
+			'(404 "Bad Request")
+		)
+	)
+)
 
-;; 返回资源对应http头
-(define (get-resource-header type)
-	(define content-type 
-		(cond
-			((string=? type "js")
-				"application/javascript")
-			((string=? type "css")
-				"text/css")
-			((string=? type "jpg")
-				"image/jpeg")
-			((string=? type "png")
-				"image/png")
-			((string=? type "gif")
-				"image/gif")
-			(else
-				"text/html")))
-	(list (cons "Content-Type" content-type)))
+;; 获取文件长度
+(define (get-file-length file-path)
+	(define length 0)
+	(let ([p (open-input-file file-path)])
+ 	 	(set! length (file-length p))
+		(close-port p)
+	)
+	length
+)
 
 ;; 获取执行文件文件夹地址
 (define (get-app-path)
@@ -356,6 +394,7 @@
 
 ;; 配置字典
 (define libra-options (make-hashtable string-hash string=?))
+(define content-types (make-hashtable string-hash string=?))
 
 ;; 展示字典
 (define (show-options)
@@ -368,11 +407,40 @@
 (hashtable-set! libra-options "view-path" "views")
 ;; 启动文件目录
 (hashtable-set! libra-options "app-path" (get-app-path))
+;; Content-Type
+(hashtable-set! libra-options "content-type" content-types)
+
+;; 默认content-type列表
+(define type-pairs
+	(list 
+		 '("js" . "application/javascript")
+		 '("css" . "text/css")
+		 '("jpg" . "image/jpeg")
+		 '("png" . "image/png")
+		 '("gif" . "image/gif")
+		 '("ico" . "image/x-icon")
+	)
+)
+;; 初始化content-types
+(map 
+	(lambda (pair)
+		(hashtable-set! content-types (car pair) (cdr pair)))
+	type-pairs
+)
+
+;; 返回资源对应http头
+(define (get-content-type type)
+	(cons "Content-Type" (hashtable-ref content-types type "text/html"))
+)
 
 ;; 获取web配置
 (define (get-option key . rest)
 	(define default (if (null? rest) #f (car rest)))
 	(hashtable-ref libra-options key default))
+
+;; 设置配置
+(define (set-opiton! key value)
+	(hashtable-set! libra-options key value))
 
 ;; 获取文件完整路径
 (define (get-file-path file)
@@ -387,12 +455,12 @@
 ;; 路由定义
 ;; 一级重要
 (define serve-proc
-	(lambda (request-line query-string header)
+	(lambda (request-line query-string header iport oport port)
 		;; show msg on server
 		(printf "HTTP=>%a\n" request-line)
 		(if (resource? (cadr request-line))
-			(default-make-resource (cadr request-line))
+			(default-make-resource (cadr request-line) port oport)
 			(let [(keys/handler (request->keys/handler request-line query-string))]
 				(if (procedure? (cdr keys/handler))
 					((cdr keys/handler) (car keys/handler))
-					(default-make-response "404"))))))
+					'(404 "Bad Request"))))))

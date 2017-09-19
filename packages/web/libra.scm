@@ -368,7 +368,7 @@
 							(c-fclose f)))
 					(cffi-free buf)
 				)
-				#f
+				'()
 			)
 			'(404 "Bad Request")
 		)
@@ -448,7 +448,7 @@
 
 ;; 文件导入
 (define (using file)
-	(load (string-append (hashtable-ref libra-options "app-path" (get-app-path)) (string (directory-separator))  file)))
+	(load (string-append (hashtable-ref libra-options "app-path" (get-app-path)) "\\" file)))
 
 
 ;; 服务器处理 入口

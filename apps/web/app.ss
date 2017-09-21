@@ -1,7 +1,6 @@
 (import (web libra)
-		(sqlite sqlite))
+	(cffi cffi)	(sqlite sqlite))
 (using "spider.ss")
-
 (sqlite-name! (string-append (get-option "app-path") "/spider.db"))
 (sqlite-exec "create table if not exists ImageInfo (id int primary key not null, page int);")
 

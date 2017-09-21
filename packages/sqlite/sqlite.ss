@@ -16,6 +16,12 @@
     (define (sqlite-name! name)
         (set! db-name name))
 
+    (define bytes 
+        (case (machine-type)
+            ((arm32le i3nt i3osx i3le) 4)
+            ((a6nt a6osx a6le) 8)
+            (else 4)))
+
     ;; select: 返回为row的list
     ;; 其他sql: '()
     (define (sqlite-exec sql)
@@ -34,7 +40,7 @@
                                     (lambda (pro size row col)
                                         (define lst '())
                                         (let loop [(index 0)]
-                                            (set! lst (cons (cffi-get-string (+ row (* 4 index))) lst))
+                                            (set! lst (cons (cffi-get-string (+ row (* bytes index))) lst))
                                             (if (< (+ 1 index) size)
                                                 (loop (+ 1 index))))
                                         (set! result (cons (reverse lst) result))

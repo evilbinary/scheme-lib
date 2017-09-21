@@ -174,7 +174,7 @@
 	 (query-string (and header (http:read-query-string
 				    request-line header input-port)))
 	 (response (http:service serve-proc request-line query-string header)))
-    (if (not (eq? #f response))
+    (if (not (null? response))
 		(display response output-port))))
 
 (define (http:service serve-proc request-line query-string header)
@@ -193,7 +193,7 @@
 		  (if (number? (car reply))
 		      (apply http:error-page reply)
 		      (apply http:error-page (cons 500 reply))))
-	     ((eq? #f reply) #f)
+	     ((null? reply) reply)
 		 (else (http:error-page 500 "Internal Server Error")))))
 	((not query-string)
 	 (http:error-page 400 "Bad Request" (html:plain request-line)))

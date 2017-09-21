@@ -5,7 +5,10 @@
 (sqlite-exec "create table if not exists ImageInfo (id int primary key not null, page int);")
 
 (get! "/"
-	 (lambda (p) (view "index")))
+	 (lambda (p) 
+	 	(if (and (hashtable-contains? p "id") (hashtable-contains? p "page"))
+		 	(id/page->load (hashtable-ref p "id" "0") (hashtable-ref p "page" "-1") (get-option "app-path")))
+	 	(view "index")))
 
 (get! "/spider" 
 	(lambda (p)

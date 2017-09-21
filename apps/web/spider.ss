@@ -34,21 +34,13 @@
 ;; 下载某组图片所有地址
 (define (id->page id path)
 	(define rst (sqlite-exec (string-append "select * from ImageInfo where id=" id)))
-	
 	(define max-page (if (null? rst) 0 (string->number (cadr (car rst)))))
 	(if (= max-page 0)
 		(begin
 			(set! max-page (get-max-page (url->html (string-append "http://www.mm131.com/xinggan/" id ".html"))))
-			(let loop [(index 1)]
-				(if (<= index max-page)
-					(begin
-						(url->file 
-							(string-append "http://img1.mm131.com/pic/" id "/" (number->string index) ".jpg")
-							(string-append path "/content/images/mm/" id "-" (number->string index) ".jpg"))
-						(loop (+ 1 index))
-					)
-				)
-			)
+			(url->file 
+				(string-append "http://img1.mm131.com/pic/" id "/1.jpg")
+				(string-append path "/content/images/mm/" id "-1.jpg"))
 			(sqlite-exec (string-append "INSERT INTO ImageInfo VALUES (" id "," (number->string max-page) ");"))
 		)
 	)
@@ -68,4 +60,21 @@
             infos
         )
     )
+)
+
+;; 下载此id全部图片
+(define (id/page->load id page path)
+	(set! page (string->number page))
+	(let loop [(index 1)
+			   (file-path (string-append path "/content/images/mm/" id "-1.jpg"))]
+		(if (and (<= index page))
+			(begin
+				(if (not (file-exists? file-path))
+					(url->file 
+						(string-append "http://img1.mm131.com/pic/" id "/" (number->string index) ".jpg")
+						file-path))
+				(loop (+ 1 index) (string-append path "/content/images/mm/" id "-" (number->string (+ 1 index)) ".jpg"))
+			)
+		)
+	)
 )

@@ -28,11 +28,11 @@
 
 
 ;; 定义web服务器启动函数
-(define (run lisen-port)
-	(let [(server (make-socket AF_INET SOCK_STREAM lisen-port))]
+(define (run listen-port)
+	(let [(server (make-socket AF_INET SOCK_STREAM listen-port))]
 		(socket:bind server)
 		(socket:listen server)
-		(printf "Start Libra Web App\n")
+		(printf "Listening on %d\n" listen-port)
 		(let loop ((port (socket:accept server)))
 			(if (>= port 0)
 				(begin
@@ -368,7 +368,7 @@
 							(c-fclose f)))
 					(cffi-free buf)
 				)
-				#f
+				'()
 			)
 			'(404 "Bad Request")
 		)
@@ -448,7 +448,7 @@
 
 ;; 文件导入
 (define (using file)
-	(load (string-append (hashtable-ref libra-options "app-path" (get-app-path)) (string (directory-separator))  file)))
+	(load (string-append (hashtable-ref libra-options "app-path" (get-app-path)) (string (directory-separator)) file)))
 
 
 ;; 服务器处理 入口

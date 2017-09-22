@@ -137,11 +137,11 @@
 )
 
 ;; 32位: 4字节; 64位: 8字节
-(define bytes
+(define bytes 
 	(case (machine-type)
-		[(i3nt i3osx) 4]
-		[(a6osx a6le) 8]
-		[else 4]))
+		((arm32le i3nt i3osx i3le a6le) 4)
+		((a6nt a6osx) 8)
+		(else 4)))
 
 ;; 2 bytes为1组
 (define group (* 2 bytes))

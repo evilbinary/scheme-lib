@@ -134,14 +134,14 @@
        (let* ((socket-fd (socket family type 0))
 	      (server-addr (make-sockaddr-in family INADDR_ANY port ))
 	      (i (cffi-alloc 32)))
-	 (setsockopt socket-fd SOL_SOCKET SO_REUSEPORT i 32)
+	 ;;(setsockopt socket-fd SOL_SOCKET SO_REUSEPORT i 32)
 	 (cffi-free i)
 	 (list socket-fd server-addr))]
       [(_ family type port addr)
        (let* ((socket-fd (socket family type 0))
 	      (server-addr (make-sockaddr-in family addr port ))
 	      (i (cffi-alloc 32)))
-	 (setsockopt socket-fd SOL_SOCKET SO_REUSEPORT i 32)
+	 ;;(setsockopt socket-fd SOL_SOCKET SO_REUSEPORT i 32)
 	 (cffi-free i)
 	 (list socket-fd server-addr))]
      ))

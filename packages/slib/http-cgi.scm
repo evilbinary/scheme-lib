@@ -108,10 +108,9 @@
   (define hunk (apply string-append body))
   (string-append (http:header
 		  (cons (cons "Content-Length"
-			      (number->string  (- (bytevector-length (string->utf8 hunk)) 0) )) ;;(string-length hunk)
+			      (number->string  (bytevector-length (string->utf8 hunk)) )) ;;(string-length hunk)
 			alist))
-		 hunk
-		 "\n"))
+		 hunk))
 
 ;;@body String appearing at the bottom of error pages.
 (define *http:byline* #f)
@@ -172,10 +171,9 @@
   (let* ((request-line (http:read-request-line input-port))
 	 (header (and request-line (http:read-header input-port)))
 	 (query-string (and header (http:read-query-string
-				    request-line header input-port)))
-	 (response (http:service serve-proc request-line query-string header)))
-    (if (not (null? response))
-		(display response output-port))))
+				    request-line header input-port))))
+    (display (http:service serve-proc request-line query-string header)
+	     output-port)))
 
 (define (http:service serve-proc request-line query-string header)
   (cond ((not request-line) (http:error-page 400 "Bad Request."))
@@ -185,15 +183,14 @@
 	 (http:error-page 405 "Method Not Allowed" (html:plain request-line)))
 	((serve-proc request-line query-string header) =>
 	 (lambda (reply)
-	   (cond 
-		 ((string? reply)
+	   (cond ((string? reply)
 		  (string-append (http:status-line 200 "OK")
 				 reply))
 		 ((and (pair? reply) (list? reply))
 		  (if (number? (car reply))
 		      (apply http:error-page reply)
 		      (apply http:error-page (cons 500 reply))))
-	     ((null? reply) reply)
+		 ((eqv? '() reply))
 		 (else (http:error-page 500 "Internal Server Error")))))
 	((not query-string)
 	 (http:error-page 400 "Bad Request" (html:plain request-line)))

@@ -479,11 +479,11 @@
 
 ;;event* event_new(struct event_base*  ,int  ,short  ,event_callback_fn  ,void* )
 (def-function event-new
-             "event_new" (void* int short void* void*) void*)
+             "event_new" (void* int int void* void*) void*)
 
 ;;int event_assign(struct event*  ,struct event_base*  ,int  ,short  ,event_callback_fn  ,void* )
 (def-function event-assign
-             "event_assign" (void* void* int short void* void*) int)
+             "event_assign" (void* void* int int void* void*) int)
 
 ;;void event_free(struct event* )
 (def-function event-free

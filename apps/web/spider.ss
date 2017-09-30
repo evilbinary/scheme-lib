@@ -11,9 +11,9 @@
 		(car rst))
 )
 
-;; 获取名称/id
+;; 获取id列表
 (define (html->ids html)
-	(define pattern "<dd><a target.+?xinggan/(\\d+?).html\">[^>]+?>(.+?)</a>")
+	(define pattern "<dd><a target.+?www.mm131.com/\\w+?/(\\d+?).html\">[^>]+?>(.+?)</a>")
 	(define rst (regex-matches pattern html))
 	(define ids '())
 	(map (lambda (lst)
@@ -31,31 +31,34 @@
 		(string->number (cadr rst)))
 )
 
-;; 下载某组图片所有地址
-(define (id->page id path)
+;; 获取某id图片页码
+(define (id->page id type path)
 	(define rst (sqlite-exec (string-append "select * from ImageInfo where id=" id)))
 	(define max-page (if (null? rst) 0 (string->number (cadr (car rst)))))
+	(display id)
 	(if (= max-page 0)
 		(begin
-			(set! max-page (get-max-page (url->html (string-append "http://www.mm131.com/xinggan/" id ".html"))))
-			(url->file 
-				(string-append "http://img1.mm131.com/pic/" id "/1.jpg")
-				(string-append path "/content/images/mm/" id "-1.jpg"))
-			(sqlite-exec (string-append "INSERT INTO ImageInfo VALUES (" id "," (number->string max-page) ");"))
+			(set! max-page (get-max-page (url->html (string-append "http://www.mm131.com/" type "/" id ".html"))))
+			(if (not (file-exists? (string-append path "/content/images/mm/" id "-1.jpg")))
+				(url->file 
+					(string-append "http://img1.mm131.com/pic/" id "/1.jpg")
+					(string-append path "/content/images/mm/" id "-1.jpg")))
+			(if (> max-page 0)
+				(sqlite-exec (string-append "INSERT INTO ImageInfo VALUES (" id "," (number->string max-page) ");")))
 		)
 	)
     max-page
 )
 
-;; 方法组合
-(define (url->id/page url path)
+;; 通过url获取页面图片的id及其页码
+(define (url->id/page url type path)
     (define html (get-images-html (url->html url)))
 	(define infos (make-hashtable string-hash string=?))
     (if (string=? html "")
         #f
         (begin
             (map 
-				(lambda (id) (hashtable-set! infos id (id->page id path))) 
+				(lambda (id) (hashtable-set! infos id (id->page id type path))) 
 				(html->ids html))
             infos
         )

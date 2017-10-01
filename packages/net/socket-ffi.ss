@@ -32,6 +32,8 @@
    cwrite
    cstrlen
    cwrite-all
+   inet-addr
+   ntohl
    
    close
    socket
@@ -86,6 +88,14 @@
  (define SO_ERROR	#x1007)
  (define SO_TYPE	#x1008)
 
+
+  (def-function ntohl
+    "_ntohl" (uint) uint)
+
+  
+  (def-function inet-addr
+    "_inet_addr" (string) int)
+  
  (def-function make-sockaddr-in
    "make_sockaddr_in" (int int int) void*)
 

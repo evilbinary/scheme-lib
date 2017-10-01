@@ -35,7 +35,8 @@
    recv
    sendto
    recvfrom
-
+   inet-addr
+   ntohl
    make-socket
    make-fd-input-port
    make-fd-output-port

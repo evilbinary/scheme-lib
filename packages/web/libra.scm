@@ -53,7 +53,7 @@
 ;; http response maker
 (define (default-make-response html)
 	(http:content
-		'(("Content-Type" . "text/html"))
+		'(("Content-Type" . "text/html") ("Connection" . "close"))
 			html))
 
 ;; 路由哈希表
@@ -331,7 +331,7 @@
 ;; 默认json返回
 (define (default-make-json data)
 	(http:content
-		'(("Content-Type" . "application/json; charset=utf-8"))
+		'(("Content-Type" . "application/json; charset=utf-8") ("Connection" . "close"))
 			(scm->json-string data)))
 
 ;; 判断资源文件
@@ -353,6 +353,7 @@
 								(list
 									(get-content-type (substring request (+ 1 (string-index-right request #\.)) (string-length request)))
 									(cons "Content-Length" (number->string (get-file-length file-path)))
+									(cons "Connection" "close")
 								)
 							)
 						 ) 

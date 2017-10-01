@@ -21,7 +21,7 @@ $('.summit').click(function(){
         url = url + "/list_" + id + "_" + page + ".html";
     $('#tip').html('请求中...');
     $.ajax({
-        url: "/spider?key=" +url,
+        url: "/spider?key=" + url + "&type=" + type,
         success: function(data){
             if (data == false || data.length == 0){
                 $('#tip').html('无内容, 请重试');

@@ -8,7 +8,7 @@
         regex-match-count
         regex-matches
         regex-search
-        regex-spilt
+        regex-split
         regex-replace
         regex-replace-all
         )
@@ -251,7 +251,7 @@
     )
 
     ;; 切割字符串
-    (define (regex-spilt pattern str)
+    (define (regex-split pattern str)
         (define reg (cffi-alloc 100))
         (define pmatch (cffi-alloc 100))
         (define err 0)

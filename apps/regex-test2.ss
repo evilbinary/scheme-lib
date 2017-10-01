@@ -4,13 +4,13 @@
 (define str "a=b&c=d&=e&g=&1=2")
 
 (printf 
-    "match?: ~a \nmatch: ~a \nmatch-count?: ~a \nmatches: ~a \nsearch: ~a \nspilt: ~a \nreplace: ~a \nreplace-all: ~a \n"
+    "match?: ~a \nmatch: ~a \nmatch-count?: ~a \nmatches: ~a \nsearch: ~a \nsplit: ~a \nreplace: ~a \nreplace-all: ~a \n"
     (regex-match? pattern str)
     (regex-match pattern str)
     (regex-match-count pattern str)
     (regex-matches pattern str)
     (regex-search pattern str)
-    (regex-spilt "=" str)
+    (regex-split "=" str)
     (regex-replace "=" str "~")
     (regex-replace-all "=" str "~")
 )

@@ -12,7 +12,13 @@
 
    cffi-set-char
    cffi-set-int
+   cffi-set-float
+   cffi-set-double
    
+   cffi-get-uchar
+   cffi-get-uint
+  cffi-get-ulong
+  
    cffi-get-char
    cffi-get-int
    cffi-get-float
@@ -86,10 +92,10 @@
 
   (define lib-name
     (case (machine-type)
-      ((arm32le) "libffi.so")
-      ((a6nt i3nt)  "libffi.dll")
-      ((a6osx i3osx)  "libffi.so")
-      ((a6le i3le) "libffi.so")))
+      ((arm32le) "libcffi.so")
+      ((a6nt i3nt ta6nt ti3nt)  "libcffi.dll")
+      ((a6osx ta6osx i3osx ti3osx)  "libcffi.so")
+      ((a6le i3le ta6le ti3le) "libcffi.so")))
   (define lib (load-lib lib-name))
   
   (define ffi-prep-cif (foreign-procedure "ffi_prep_cif" (void* int int void* void*) int))
@@ -132,6 +138,7 @@
     )
   (define (ffi-alloc size)
     (let ((m ($ffi-alloc size)))
+        ;;(display (format "$ffi-alloc addr=~x\n" m))
       (set! $ffi-alloc-list(append! $ffi-alloc-list (list m) ))
       m
       )
@@ -142,7 +149,7 @@
     (let loop ((l $ffi-alloc-list))
       (if (pair? l)
 	  (begin
-	    ;;(display (format "addr=~x\n" (car l)))
+	    ;;(display (format "$ffi-free addr=~x\n" (car l)))
 	    ($ffi-free (car l) )
 	    (loop (cdr l))
 	    )
@@ -158,8 +165,14 @@
   (define ffi-type-void-ptr (foreign-procedure "ffi_type_void_ptr" () void*))
   (define ffi-type-pointer-ptr (foreign-procedure "ffi_type_pointer_ptr" () void*))
   (define ffi-type-sint8-ptr (foreign-procedure "ffi_type_sint8_ptr" () void*))
+  (define ffi-type-sint16-ptr (foreign-procedure "ffi_type_sint16_ptr" () void*))
   (define ffi-type-sint-ptr (foreign-procedure "ffi_type_sint32_ptr" () void*))
   (define ffi-type-sint64-ptr (foreign-procedure "ffi_type_sint64_ptr" () void*))
+
+  (define ffi-type-uint8-ptr (foreign-procedure "ffi_type_uint8_ptr" () void*))
+  (define ffi-type-uint16-ptr (foreign-procedure "ffi_type_uint16_ptr" () void*))
+  (define ffi-type-uint-ptr (foreign-procedure "ffi_type_uint32_ptr" () void*))
+  (define ffi-type-uint64-ptr (foreign-procedure "ffi_type_uint64_ptr" () void*))
 
   (define ffi-type-float-ptr (foreign-procedure "ffi_type_float_ptr" () void*))
   (define ffi-type-double-ptr (foreign-procedure "ffi_type_double_ptr" () void*))
@@ -168,21 +181,32 @@
   (define ffi-type-void (ffi-type-void-ptr))
   (define ffi-type-pointer (ffi-type-pointer-ptr))
   (define ffi-type-sint8 (ffi-type-sint8-ptr))
+  (define ffi-type-uint8 (ffi-type-uint8-ptr))
+  (define ffi-type-sint16 (ffi-type-sint16-ptr))
+  (define ffi-type-uint16 (ffi-type-uint16-ptr))
+  
   (define ffi-type-sint (ffi-type-sint-ptr))
+  (define ffi-type-uint (ffi-type-uint-ptr))
   (define ffi-type-sint64 (ffi-type-sint64-ptr))
+  (define ffi-type-uint64 (ffi-type-uint64-ptr))
+
   (define ffi-type-float (ffi-type-float-ptr))
   (define ffi-type-double (ffi-type-double-ptr))
   (define ffi-type-longdouble (ffi-type-longdouble-ptr))
 
 
 
-
-  (define test-float (foreign-procedure "test_float" (void* int void* void* void*) void))
-
-
   (define ffi-set-char (foreign-procedure "ffi_set_char" (void* char) void))
   (define ffi-set-int (foreign-procedure "ffi_set_int" (void* int) void))
-  (define ffi-set-long (foreign-procedure "ffi_set_long" (void* long) void))
+  (define ffi-set-short (foreign-procedure "ffi_set_short" (void* short) void))
+
+  (define ffi-set-long (foreign-procedure "ffi_set_long" (void* integer-64) void))
+
+  (define ffi-set-uchar (foreign-procedure "ffi_set_uchar" (void* char) void))
+  (define ffi-set-uint (foreign-procedure "ffi_set_uint" (void* unsigned-int) void))
+  (define ffi-set-ushort (foreign-procedure "ffi_set_ushort" (void* unsigned-short) void))
+  (define ffi-set-ulong (foreign-procedure "ffi_set_ulong" (void* unsigned-long) void))
+  
   (define ffi-set-float (foreign-procedure "ffi_set_float" (void* float) void))
   (define ffi-set-double (foreign-procedure "ffi_set_double" (void* double) void))
   (define ffi-set-longdouble (foreign-procedure "ffi_set_longdouble" (void* double ) void))
@@ -195,8 +219,15 @@
 
 
   (define ffi-get-char (foreign-procedure "ffi_get_char" (void* ) char))
+  (define ffi-get-short (foreign-procedure "ffi_get_short" (void* ) short))
   (define ffi-get-int (foreign-procedure "ffi_get_int" (void* ) int))
-  (define ffi-get-long (foreign-procedure "ffi_get_long" (void* ) integer-64))
+  (define ffi-get-long (foreign-procedure "ffi_get_long" (void* ) long))
+  
+  (define ffi-get-uchar (foreign-procedure "ffi_get_uchar" (void* ) unsigned-8))
+  (define ffi-get-ushort (foreign-procedure "ffi_get_ushort" (void* ) unsigned-short))
+  (define ffi-get-uint (foreign-procedure "ffi_get_uint" (void* ) unsigned-int))
+  (define ffi-get-ulong (foreign-procedure "ffi_get_ulong" (void* ) unsigned-64))
+  
   (define ffi-get-float (foreign-procedure "ffi_get_float" (void* ) float))
   (define ffi-get-double (foreign-procedure "ffi_get_double" (void* ) double))
   (define ffi-get-string (foreign-procedure "ffi_get_string" (void* ) string ))
@@ -223,8 +254,6 @@
   (define ffi-dlopen (foreign-procedure "ffi_dlopen" (string int ) void*))
   (define ffi-dlerror (foreign-procedure "ffi_dlerror" ( ) string ))
   (define ffi-close (foreign-procedure "ffi_dlclose" (void* ) int))
-  
-  (define ffi-dl-test (foreign-procedure "ffi_dl_test" ( ) void))
 
   (define $ffi-set (foreign-procedure "ffi_set" (void* int int) void))
 
@@ -238,12 +267,20 @@
   (define cffi-free $ffi-free)
   (define cffi-set $ffi-set)
 
+
   (define cffi-set-char ffi-set-char)
   (define cffi-set-int ffi-set-int)
-    
+  (define cffi-set-float ffi-set-float)
+  (define cffi-set-double ffi-set-double)
+
   (define cffi-get-char ffi-get-char)
   (define cffi-get-int ffi-get-int)
   (define cffi-get-long ffi-get-long)
+
+(define cffi-get-uchar ffi-get-uchar)
+  (define cffi-get-uint ffi-get-uint)
+  (define cffi-get-ulong ffi-get-ulong)
+
   (define cffi-get-float ffi-get-float)
   (define cffi-get-double ffi-get-double)
   (define cffi-get-pointer ffi-get-pointer)
@@ -364,9 +401,10 @@
                                      '(t ...)
                                      '#,@(list (map (lambda (ss)
                                           (case (syntax->datum ss)
-                                            [(int float double ) 64 ]
-                                            [(short ) 16 ]
-                                            [(char ) 8 ]
+                                            [(long ulong float double ) 64 ]
+					    [(int uint  ) 32 ]
+                                            [(short ushort) 16 ]
+                                            [(char uchar) 8 ]
                                            ))
                                       #'(t ...) ) )
                                       #,@(map (lambda (vv) 
@@ -378,9 +416,10 @@
                                      '(t ...)
                                      '#,@(list (map (lambda (ss)
                                           (case (syntax->datum ss)
-                                            [(int float double ) 64 ]
-                                            [(short ) 16 ]
-                                            [(char ) 8 ]
+                                            [(long ulong float double ) 64 ]
+                                            [(int uint  ) 32 ]
+                                            [(short ushort) 16 ]
+                                            [(char uchar ) 8 ]
                                            ))
                                       #'(t ...) ) )
                                       v ...
@@ -402,13 +441,14 @@
   
   ;;cffi-sym
   (define (cffi-sym name)
-    ;;(display (format "cffi-sym handler=~a name=~a sym=~a\n" handler  name (ffi-dlsym handler name) ))
+    ;;(display (format "cffi-sym handler=~a name=~a\n" handler  name  ))
+    ;;(display (format "    sym=~a\n" (ffi-dlsym handler name)))
     (let ((s (ffi-dlsym handler name )))
       (if (= 0 s)
 	  (let loop ((h handlers))
 	    (if (pair? h)
 		(let ((sym (ffi-dlsym (car h) name)))
-		  ;;(printf "   sym=~a handler=~a\n" sym (car h ))
+		  (printf "   sym=~a handler=~a name=~a\n" sym (car h ) name)
 		  (if (= sym 0)
 		      (loop (cdr h))
 		      sym))
@@ -465,7 +505,10 @@
       (if (pair? l)
         (apply + l)
         (case l
-          [(int long ) 32]
+	  [(char uchar) 8]
+	  [(short ushort) 16]
+          [(int  uint ) 32]
+	  [(ulong long) 64]
           [(float ) 32]
           [(double  void* string ) 64]
           [(float* ) 32]
@@ -513,17 +556,23 @@
         (if (pair? type)
           (begin 
             (case (car type)
-                [(char )  (ffi-types-set typeelement i ffi-type-sint8 ) ]
-                [(int )  (ffi-types-set typeelement i ffi-type-sint ) ]
-		[(int64 long) (ffi-types-set typeelement i ffi-type-sint64)]
-                [(float )  (ffi-types-set typeelement i ffi-type-float ) ]
-                [(double )  (ffi-types-set typeelement i ffi-type-double ) ]
-                [(void* float*)  (ffi-types-set typeelement i ffi-type-pointer ) ]
-                [(string )  (ffi-types-set typeelement i ffi-type-pointer ) ]
-                [else 
-                    ;(display (format "  ###$$$else type=~a\n" (car type) ) )
-                    (ffi-types-set typeelement i (process-struct  (car type) ) )
-                  ]
+	      [(char )  (ffi-types-set typeelement i ffi-type-sint8 ) ]
+	      [(uchar )  (ffi-types-set typeelement i ffi-type-uint8 ) ]
+	      [(ushort )  (ffi-types-set typeelement i ffi-type-uint16 ) ]
+	      [(short )  (ffi-types-set typeelement i ffi-type-sint16 ) ]
+	      [(uint )  (ffi-types-set typeelement i ffi-type-uint ) ]
+	      [(int )  (ffi-types-set typeelement i ffi-type-sint ) ]
+	      [(ulong )  (ffi-types-set typeelement i ffi-type-uint64 ) ]
+	      [(long )  (ffi-types-set typeelement i ffi-type-sint64 ) ]
+	      [(int64 long) (ffi-types-set typeelement i ffi-type-sint64)]
+	      [(float )  (ffi-types-set typeelement i ffi-type-float ) ]
+	      [(double )  (ffi-types-set typeelement i ffi-type-double ) ]
+	      [(void* float*)  (ffi-types-set typeelement i ffi-type-pointer ) ]
+	      [(string )  (ffi-types-set typeelement i ffi-type-pointer ) ]
+	      [else 
+	       ;;(display (format "  ###$$$else type=~a\n" (car type) ) )
+	       (ffi-types-set typeelement i (process-struct  (car type) ) )
+	       ]
               )
             (loop (cdr type) (+ i 1) )
             )
@@ -538,19 +587,21 @@
   (define (create-cret-type ret-type)
     (let ((alloc 0) (ret-struct-val 0) (typeelement 0) (typelist '() ) )
       (case ret-type
-	[(int ) ffi-type-sint]
-	[(int64 long) ffi-type-sint64]
-	[(float ) ffi-type-float]
-	[(double ) ffi-type-double]
-	[(string ) ffi-type-pointer]
-	[(void* float* ) ffi-type-pointer]
-	[(void)  ffi-type-void ]
-	[else
-	 ;;(display (format "  $$$else type=~a\n" ret-type) )
-	 (process-struct ret-type )
-	 ]
-        ))
-    )
+	 [(short ) ffi-type-sint16]
+	 [(ushort ) ffi-type-uint16]
+	 [(uint ) ffi-type-uint]
+	 [(int ) ffi-type-sint]
+	 [(int64 long) ffi-type-sint64]
+	 [(float ) ffi-type-float]
+	 [(double ) ffi-type-double]
+	 [(string ) ffi-type-pointer]
+	 [(void* float* ) ffi-type-pointer]
+	 [(void)  ffi-type-void ]
+	 [else
+	  ;;(display (format "  $$$else type=~a\n" ret-type) )
+	  (process-struct ret-type )
+	  ]
+	 )))
 
   (define (create-cret ret-type)
     ;;(display (format "ret-type-size=~a\n" (cffi-size ret-type) ))
@@ -559,6 +610,9 @@
 	   (ret-struct-val '() )
 	   )
       (set! ret-fun (case ret-type
+		      [(short ) ffi-get-short]
+		      [(ushort ) ffi-get-ushort]
+		      [(uint ) ffi-get-uint]
 		      [(int ) ffi-get-int]
 		      [(int64 long) ffi-get-long]
 		      [(float ) ffi-get-float]
@@ -582,16 +636,28 @@
     )
 
   (define (create-cargs arg-type args carg-type)
-    ;(display (format "creat-cargs args=~a len=~a carg-type=~a\n" args (length args) carg-type))
+    ;;(display (format "creat-cargs args=~a len=~a carg-type=~a\n" args (length args) carg-type))
     (let ((cargs (ffi-values-alloc (length args)))
           (alloc 0)
           )
         (let loop ((arg args) (type arg-type) (i 0))
           (if (pair? arg)
               (begin 
-                ;(display (format "  type=~a value=~a index=~a \n" (car type) (car arg) i   ))
-                (case (car type) 
-                  [(int)
+                ;;(display (format "  type=~a value=~a index=~a \n" (car type) (car arg) i   ))
+                (case (car type)
+		  [(ushort)
+                    (set! alloc (ffi-alloc 16) ) 
+                    (ffi-set-ushort alloc (car arg) )
+                    (ffi-values-set cargs i alloc) ]
+		  [(short)
+                    (set! alloc (ffi-alloc 16) ) 
+                    (ffi-set-short alloc (car arg) )
+                    (ffi-values-set cargs i alloc) ]
+                  [(uint)
+                    (set! alloc (ffi-alloc 32) ) 
+                    (ffi-set-uint alloc (car arg) )
+                    (ffi-values-set cargs i alloc) ]
+		  [(int)
                     (set! alloc (ffi-alloc 32) ) 
                     (ffi-set-int alloc (car arg) )
                     (ffi-values-set cargs i alloc) ]
@@ -712,12 +778,21 @@
             (if (pair? t)
               (let ((struct-val 0)) 
                   (case (car t)
-                    [(char ) (set! struct-val (ffi-get-int (+ addr offset)) )
+                    [(char ) (set! struct-val (ffi-get-char(+ addr offset)) )
                         (set! offset (+ offset (/ (car s) 8) ))
-                      ]
+			]
+		    [(short ) (set! struct-val (ffi-get-short (+ addr offset)))
+                        (set! offset (+ offset (/ (car s) 8) ))
+			]
+		    [(ushort ) (set! struct-val (ffi-get-ushort (+ addr offset)))
+                        (set! offset (+ offset (/ (car s) 8) ))
+			]
                     [(double ) (set! struct-val (ffi-get-double (+ addr offset)))
                         (set! offset (+ offset (/ (car s) 8) ))
-                    ]
+			]
+		    [(uint ) (set! struct-val (ffi-get-uint (+ addr offset)))
+                        (set! offset (+ offset (/ (car s) 8) ))
+			]
                     [(int ) (set! struct-val (ffi-get-int (+ addr offset)))
                         (set! offset (+ offset (/ (car s) 8) ))
 			]

@@ -12,28 +12,28 @@ TARGET =scheme/scheme
 SUB_DIR :=  libscm \
 	libglut libimgui \
 	scheme	libgl \
-	libffi libglfw \
+	libcffi libglfw \
 	libnanovg libgui \
 	libalut \
 	libc
 
 LIBSCM =./libscm/libscm.so
 LIBGLUT =./libglut/libglut.so
-LIBFFI = ./libffi/libffi.so
+LIBFFI = ./libcffi/libcffi.so
 LIBGLFW = ./libglfw/libglfw.so
 LIBGLES= ./libgl/libgles.so
 LIBSOCKET=./libsocket/libsocket.so
 
 UNAME_S := $(shell uname -s)
 OS_NAME :=$(shell echo $(UNAME_S) | tr '[A-Z]' '[a-z]')
-LIBS_ALL= libscm.so libimgui.so libglfw.so libffi.so libgles.so libnanovg.so \
+LIBS_ALL= libscm.so libimgui.so libglfw.so libcffi.so libgles.so libnanovg.so \
 	libalut.so libgui.so libsocket.so libc.so
 
 ifeq ($(UNAME_S), MINGW32_NT-6.1)
   OS_NAME:=windows
   LIBSCM =./libscm/libscm.dll
   LIBGLUT =./libglut/libglut.dll
-  LIBFFI = ./libffi/libffi.dll
+  LIBFFI = ./libcffi/libcffi.dll
   LIBGLFW = ./libglfw/libglfw.dll
   LIBGLES= ./libgl/libgles.dll
   LIBC=./libc/libc.dll
@@ -60,8 +60,8 @@ libnanovg.so: libgles.so
 libglfw.so: $(LIBGLFW)
 	$(MAKE) -C libglfw
 
-libffi.so: $(LIBFFI)
-	$(MAKE) -C libffi
+libcffi.so: $(LIBFFI)
+	$(MAKE) -C libcffi
 
 libgles.so: $(LIBGLES) 
 	$(MAKE) -C libgl
@@ -81,7 +81,7 @@ ifeq (,$(wildcard boot))
 	@ln -sf platform/$(OS_NAME)/boot/ boot
 	@ln -sf platform/$(OS_NAME)/libscm libscm
 	@ln -sf platform/$(OS_NAME)/libglut libglut
-	@ln -sf platform/$(OS_NAME)/libffi/ libffi
+	@ln -sf platform/$(OS_NAME)/libcffi/ libcffi
 	@ln -sf platform/$(OS_NAME)/libgl/ libgl
 	@ln -sf platform/$(OS_NAME)/libglfw/ libglfw
 	@ln -sf platform/$(OS_NAME)/3rdparty/ 3rdparty

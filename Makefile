@@ -15,7 +15,7 @@ endif
 SOFILES= lib/libscm/libscm$(EXT) \
 		 lib/libglut/libglut$(EXT)  \
 		 lib/libimgui/libimgui$(EXT) \
-		 lib/libffi/libffi$(EXT)  \
+		 lib/libcffi/libcffi$(EXT)  \
 		 lib/libglfw/libglfw$(EXT)  \
 		 lib/libgl/libgles$(EXT)  \
 		 lib/libnanovg/libnanovg$(EXT)  \
@@ -30,7 +30,7 @@ SOFILES= lib/libscm/libscm$(EXT) \
 BINFILES=bin/libscm$(EXT) \
 		 bin/libglut$(EXT)  \
 		 bin/libimgui$(EXT) \
-		 bin/libffi$(EXT)  \
+		 bin/libcffi$(EXT)  \
 		 bin/libglfw$(EXT)  \
 		 bin/libgles$(EXT)  \
 		 bin/libnanovg$(EXT)  \

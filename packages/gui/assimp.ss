@@ -15,7 +15,7 @@
 	((a6le i3le ta6le ti3le) "libassimp.so")))
 
     
-    (define libassimp (load-librarys "libassimp.dylib"))
+    (define libassimp (load-librarys lib-name))
 
     (def-function ai-import-file
       "aiImportFile" (string int) void*)

@@ -11,7 +11,7 @@
 		(cffi cffi) 
 		(net socket) 
 		(net socket-ffi) 
-		(regex regex-ffi)
+		(irregex irregex)
 		(json json)
 		(c c-ffi))
 ;; slib feature
@@ -68,21 +68,6 @@
 	(hashtable-set! router-handler (string-append method " " (cdr keys/reg)) (cons (car keys/reg) handler))
 )
 
-;; 从请求参数字符串中获取参数
-;; 无则返回#f
-(define (query->key query-string key)
-	(if (not (string? query-string))
-		#f
-		(let [(index (string-contains query-string (string-append key "=")))]
-			(if (eq? #f index)
-				#f
-				(let [(str (substring query-string 
-								(+ (string-length key) 1 index) 
-								(string-length query-string)))]
-					(if (eq? #f (string-index str #\&))
-						str
-						(substring str 0 (string-index str #\&))))))))
-
 ;; 从 hashtable 中获取对应keys/handlder
 (define (request->keys/handler request-line query-string)
 	(let  [(method (car request-line)) (router (url->router (cadr request-line)))]
@@ -108,18 +93,18 @@
 	(define router-vector (hashtable-keys router-handler))
 	(define router-length (vector-length router-vector))
 	(define keys/handler (cons #f #f))
-	(define keys (libra-regex-query query))
+	(define keys (if query (libra-regex-query query) '()))
 	(let loop ((index 0))
 		(begin
 			(let [(reg-router (vector-ref router-vector index))]
 				;; (printf (format "~a\n" reg-router))
-				(if (number? (string-index reg-router #\?))
+				(if (string-index reg-router #\?)
 					(begin
 						(let ((values (libra-regex-router reg-router router)))
 							(if (not (null? values))
 								(begin
 									(let ((names/handler (hashtable-ref router-handler reg-router '(#f . #f))))
-										(map (lambda (name value) (hashtable-set! keys name value)) (car names/handler) values)
+										(map (lambda (name value) (set! keys (cons (cons name value) keys))) (car names/handler) values)
 										(set! keys/handler (cons keys (cdr names/handler)))
 									)
 								)
@@ -136,172 +121,54 @@
 	keys/handler
 )
 
-;; 32位: 4字节; 64位: 8字节
-(define bytes 
-	(case (machine-type)
-		((arm32le i3nt i3osx i3le a6le) 4)
-		((a6nt a6osx) 8)
-		(else 4)))
-
-;; 2 bytes为1组
-(define group (* 2 bytes))
-
 ;; 匹配路由和动态里路，返回参数列表
-(define (libra-regex-router router-reg str)
-	(define reg (cffi-alloc 100))
-	(define pmatch (cffi-alloc 100))
-	(define err 0)
-	(define err-buf (cffi-alloc 1024))
-	(define pattern router-reg)
-	(define nmatch (+ (string-count router-reg #\?) 1))
+(define (libra-regex-router reg str)
+	(define match (irregex-search reg str))
 	(define result '())
-	;;(cffi-log #t)
-	(if (< (regcomp reg pattern REG_EXTENDED) 0)
-		(begin
-			(regerror err reg err-buf 1024)
-			(display (format "error ~a\n" (cffi-string err-buf)))
-		)       
-		(begin
-			(set! err (regexec reg str nmatch pmatch 0))
-			(if (not (= REG_NOMATCH err))
-				(if (not (= 0 err))
-					(begin (display (format "error ~a\n" err)))
-					(let loop ((index 1))
-						;; (+ pmatch (* 结构体大小/8  index) 结构体偏移/4)
-						;; (printf "so1:~d, eo2:~d, str: ~a  \n" (cffi-get-int (+ pmatch (* 8 index))) (cffi-get-int (+ pmatch (* 8 index) 4)) (substring str (cffi-get-int (+ pmatch (* 8 index))) (cffi-get-int (+ pmatch (* 8 index) 4))))
-						(let ((start (cffi-get-int (+ pmatch (* group index)))) 
-								(end (cffi-get-int (+ pmatch (* group index) bytes))))
-							(set! result (cons (substring str start end) result))
-						)
-						(if (< index (- nmatch 1))
-							(loop (+ 1 index))
-						)
-					)
-				)
+	(when match
+		(let loop ([idx 8])
+			(when (vector-ref match idx)
+				(set! result (cons (substring str (vector-ref match idx) (vector-ref match (+ idx 2))) result))
+				(loop (+ idx 4))
 			)
 		)
 	)
-	(regfree reg)
-	(cffi-free reg)
-	(cffi-free pmatch)
-	(cffi-free err-buf)
 	(reverse result) 
 )
 
 ;; 获取动态路由的参数列表和正则表示
 (define (libra-regex-path str)
-	(define reg (cffi-alloc 100))
-	(define pmatch (cffi-alloc 100))
-	(define err 0)
-	(define err-buf (cffi-alloc 1024))
 	(define pattern "/:([^\\/]+)")
-	(define nmatch (+ (string-count str #\:) 1))
+	(define replace "/([^/?]+)")
+	(define len (string-length str))
 	(define result '())
-	(define replace-reg "([^/?]+)")
-	;;(cffi-log #t)
-	(if (< (regcomp reg pattern REG_EXTENDED) 0)
-		(begin
-			(regerror err reg err-buf 1024)
-			(display (format "error ~a\n" (cffi-string err-buf))))       
-		(begin
-			(let loop ((max-match 0))
-				(set! err (regexec reg str nmatch pmatch 0))
-				(if (= REG_NOMATCH err)
-					(begin (display "router no match\n"))
-					(if (not (= 0 err))
-						(begin (display (format "error ~a\n" err)))
-						(begin
-							(if (and (< 1 nmatch) (>= (cffi-get-int (+ pmatch group)) 0))
-								(begin
-									;; (+ pmatch (* 结构体大小/8  index) 结构体偏移/4)
-									;; (printf "so1:~d, eo2:~d, str: ~a  \n" (cffi-get-int (+ pmatch (* 8 index))) (cffi-get-int (+ pmatch (* 8 index) 4)) (substring str (cffi-get-int (+ pmatch (* 8 index))) (cffi-get-int (+ pmatch (* 8 index) 4))))
-									(let ((start (cffi-get-int (+ pmatch group))) 
-											(end (cffi-get-int (+ pmatch group bytes))))
-										; (printf "~a\n" str)
-										(set! result (cons (substring str start end) result))
-										(set! str (string-replace str replace-reg (- start 1) end))
-									)
-								)
-							)
-						)
-					)
-				)
-				(if (< max-match (- nmatch 2))
-					(begin 
-						(loop (+ max-match 1))
-					)
-				)
-			)
+	(let loop ([match (irregex-search pattern str 0 len)])
+		(when match
+			(set! result (cons (substring str (vector-ref match 8) (vector-ref match 10)) result))  
+			(loop (irregex-search pattern str (vector-ref match 10) len))
 		)
 	)
-	(regfree reg)
-	(cffi-free reg)
-	(cffi-free pmatch)
-	(cffi-free err-buf)
 	(cons 
 		(reverse result) 
-		(string-append 
-			;"^"
-			str
-			;"(?:$|\\?)"
-			)
+		(irregex-replace/all pattern str replace)
 	)
 )
 
-;; 获取url参数hashtable
+;; 获取url参数关联表
 (define (libra-regex-query query)
-	(define keys (make-hashtable string-hash string=?))
-	(define reg (cffi-alloc 100))
-	(define pmatch (cffi-alloc 100))
-	(define err 0)
-	(define err-buf (cffi-alloc 1024))
 	(define pattern "([^\\/=&]+)=([^=&]*)")
-	(define nmatch (if (or (not (string? query)) (string=? query "") (eq? #f (string-index query #\=))) 
-						0 
-						(+ (* 2 (string-count query #\=)) 1)))
-	(if (= nmatch 0)
-		keys
-		(begin
-			;;(cffi-log #t)
-			(if (< (regcomp reg pattern REG_EXTENDED) 0)
-				(begin
-					(regerror err reg err-buf 1024)
-					(display (format "error ~a\n" (cffi-string err-buf))))       
-				(begin
-					(let loop ((max-match 0))
-						(set! err (regexec reg query nmatch pmatch 0))
-						(if (not (= REG_NOMATCH err))
-							(if (not (= 0 err))
-								(begin (display (format "error ~a\n" err)))
-								(begin
-									(if (and (< 1 nmatch) (>= (cffi-get-int (+ pmatch group)) 0))
-										(begin
-											;; (+ pmatch (* 结构体大小/8  index) 结构体偏移/4)
-											;; (printf "name: ~a  \n" (substring query (cffi-get-int (+ pmatch (* 8 1))) (cffi-get-int (+ pmatch (* 8 1) 4))))
-											;; (printf "word: ~a  \n" (substring query (cffi-get-int (+ pmatch (* 8 2))) (cffi-get-int (+ pmatch (* 8 2) 4))))
-											(hashtable-set! keys (substring query (cffi-get-int (+ pmatch (* group 1))) (cffi-get-int (+ pmatch (* group 1) bytes)))
-																 (substring query (cffi-get-int (+ pmatch (* group 2))) (cffi-get-int (+ pmatch (* group 2) bytes))))
-											(set! query (string-replace query "" (cffi-get-int (+ pmatch (* group 0))) (cffi-get-int (+ pmatch (* group 0) bytes))))
-										)
-									)
-								)
-							)
-						)
-						(if (< max-match (- nmatch 2))
-							(begin 
-								(loop (+ max-match 1))
-							)
-						)
-					)
-				)
-			)
-			(regfree reg)
-			(cffi-free reg)
-			(cffi-free pmatch)
-			(cffi-free err-buf)
-			keys
+	(define len (string-length query))
+	(define keys '())
+	(let loop ([match (irregex-search pattern query 0 len)])
+		(when match
+			(set! keys (cons (cons 
+								(substring query (vector-ref match 8) (vector-ref match 10))
+								(substring query (vector-ref match 12) (vector-ref match 14)))
+							 keys))
+			(loop (irregex-search pattern query (vector-ref match 14) len))
 		)
 	)
+	(reverse keys)
 )
 
 ;; 读取文本文件
@@ -451,6 +318,14 @@
 (define (using file)
 	(load (string-append (hashtable-ref libra-options "app-path" (get-app-path)) (string (directory-separator)) file)))
 
+;; 路由函数参数解析
+(define (params-ref p key . default)
+	(let ((pair (assoc key p)))
+		(if pair
+			(cdr pair)
+			(if (null? default) #f (car default)))
+	)
+)
 
 ;; 服务器处理 入口
 ;; 路由定义

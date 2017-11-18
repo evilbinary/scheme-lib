@@ -7,14 +7,14 @@
 
 (get! "/"
 	 (lambda (p) 
-	 	(if (and (hashtable-contains? p "id") (hashtable-contains? p "page"))
-		 	(id/page->load (hashtable-ref p "id" "0") (hashtable-ref p "page" "-1") (get-option "app-path")))
+	 	(if (and (params-ref p "id") (params-ref p "page"))
+		 	(id/page->load (params-ref p "id") (params-ref p "page") (get-option "app-path")))
 	 	(view "index")))
 
 (get! "/spider" 
 	(lambda (p)
-		(define url (hashtable-ref p "key" "http://www.mm131.com/xinggan"))
-		(define type (hashtable-ref p "type" "xinggan"))
+		(define url (params-ref p "key" "http://www.mm131.com/xinggan"))
+		(define type (params-ref p "type" "xinggan"))
 		(if (eq? #f (string-index url #\_))
 			(set! url (string-append url "/")))
 		(default-make-json (url->id/page url type (get-option "app-path")))))

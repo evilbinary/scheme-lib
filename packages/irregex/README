@@ -1,0 +1,14 @@
+
+                               irregex
+                               -------
+
+               Portable Efficient IrRegular Expressions
+
+                 http://synthcode.com/scheme/irregex/
+
+A fully portable and efficient R[4567]RS implementation of regular
+expressions, supporting both POSIX syntax with various (irregular)
+PCRE extensions, as well as SCSH's SRE syntax.  DFA matching is used
+when possible, otherwise a closure-compiled NFA approach is used.
+
+Documentation is in the file irregex.html.

@@ -34,7 +34,7 @@
             (display (format "curl-easy-perform failed ~s\n"  (curl-easy-strerror res))))
         (curl-easy-cleanup curl)
         (curl-global-cleanup)
-        (cffi-free curl)
+        ;(cffi-free curl) 防止内存二次释放
         content
     )
 
@@ -59,7 +59,7 @@
         (c-fclose my-file)
         (curl-easy-cleanup curl)
         (curl-global-cleanup)
-        (cffi-free curl)
+        ;(cffi-free curl) 防止内存二次释放
         rst
     )
 )

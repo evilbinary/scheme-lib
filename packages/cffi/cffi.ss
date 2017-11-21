@@ -88,7 +88,6 @@
     (set! cffi-enable-log t)
     )
 
-  (define $ffi-alloc-list '() )
 
   (define lib-name
     (case (machine-type)
@@ -118,25 +117,25 @@
   ;;(display (format "addr=~x\n" addr))))
 
   
-  (define (ffi-cif-alloc)
+  (define (ffi-cif-alloc $ffi-alloc-list)
     (let ((m ($ffi-cif-alloc)))
       (set! $ffi-alloc-list(append! $ffi-alloc-list (list m) ))
       m
       )
     )
-  (define (ffi-types-alloc size)
+  (define (ffi-types-alloc $ffi-alloc-list size)
     (let ((m ($ffi-types-alloc size)))
       (set! $ffi-alloc-list(append! $ffi-alloc-list (list m) ))
       m
       )
     )
-  (define (ffi-values-alloc size)
+  (define (ffi-values-alloc $ffi-alloc-list size)
     (let ((m ($ffi-values-alloc size)))
       (set! $ffi-alloc-list(append! $ffi-alloc-list (list m) ))
       m
       )
     )
-  (define (ffi-alloc size)
+  (define (ffi-alloc $ffi-alloc-list size)
     (let ((m ($ffi-alloc size)))
         ;;(display (format "$ffi-alloc addr=~x\n" m))
       (set! $ffi-alloc-list(append! $ffi-alloc-list (list m) ))
@@ -144,7 +143,7 @@
       )
     )
 
-  (define (ffi-free-all)
+  (define (ffi-free-all $ffi-alloc-list)
     ;;(display (format "ffi-free-all=~a\n" (length $ffi-alloc-list)))
     (let loop ((l $ffi-alloc-list))
       (if (pair? l)
@@ -155,6 +154,7 @@
 	    )
 	  )
       )
+    ;;(lock-object $ffi-alloc-list)
     (set! $ffi-alloc-list '() )
     )
 
@@ -448,7 +448,7 @@
 	  (let loop ((h handlers))
 	    (if (pair? h)
 		(let ((sym (ffi-dlsym (car h) name)))
-		  (printf "   sym=~a handler=~a name=~a\n" sym (car h ) name)
+		  ;;(printf "   sym=~a handler=~a name=~a\n" sym (car h ) name)
 		  (if (= sym 0)
 		      (loop (cdr h))
 		      sym))
@@ -522,14 +522,14 @@
     #t
   )
   ;;
-  (define (create-carg-type arg-type)
+  (define (create-carg-type alloc-list arg-type )
     ;;(display (format "creat-carg-type arg-type=~a len=~a \n" arg-type (length arg-type) ))
-    (let ((carg-type (ffi-types-alloc (length arg-type) )))
+    (let ((carg-type (ffi-types-alloc alloc-list (length arg-type) )))
       (let loop ((type arg-type) (i 0))
 	(if (pair? type)
 	    (begin 
 	      ;;(display (format "  type=~a index=~a \n" (car type) i   ))
-	      (ffi-types-set carg-type i (create-cret-type (car type)) )
+	      (ffi-types-set carg-type i (create-cret-type alloc-list (car type)) )
 
 	      (loop (cdr type) (+ i 1) )
 	      )
@@ -539,18 +539,19 @@
       carg-type 
       )
     )
+  
 
-  (define (process-struct  ret-type)
+  (define (process-struct alloc-list ret-type)
     (let ((ret-struct-val '())
           (typelist '() )
           (typeelement '() )
           (alloc 0)
         )
-      (set! alloc (ffi-alloc  (+ 64 16 16 64)))
+      (set! alloc (ffi-alloc alloc-list (+ 64 16 16 64)))
       (set! ret-struct-val ((top-level-value 
                                 (string->symbol (format "make-~a" ret-type ) )) ))
       (set! typelist (struct-ref ret-struct-val 0) )
-      (set! typeelement (ffi-alloc (* 64 (+ (length typelist ) 1) ) ))
+      (set! typeelement (ffi-alloc alloc-list (* 64 (+ (length typelist ) 1) ) ))
       (ffi-init-struct alloc 0 0 FFI_TYPE_STRUCT typeelement)
       (let loop ((type typelist) (i 0))
         (if (pair? type)
@@ -571,7 +572,7 @@
 	      [(string )  (ffi-types-set typeelement i ffi-type-pointer ) ]
 	      [else 
 	       ;;(display (format "  ###$$$else type=~a\n" (car type) ) )
-	       (ffi-types-set typeelement i (process-struct  (car type) ) )
+	       (ffi-types-set typeelement i (process-struct alloc-list  (car type) ) )
 	       ]
               )
             (loop (cdr type) (+ i 1) )
@@ -584,7 +585,7 @@
       
     )
 
-  (define (create-cret-type ret-type)
+  (define (create-cret-type alloc-list ret-type)
     (let ((alloc 0) (ret-struct-val 0) (typeelement 0) (typelist '() ) )
       (case ret-type
 	 [(short ) ffi-type-sint16]
@@ -599,11 +600,11 @@
 	 [(void)  ffi-type-void ]
 	 [else
 	  ;;(display (format "  $$$else type=~a\n" ret-type) )
-	  (process-struct ret-type )
+	  (process-struct alloc-list ret-type )
 	  ]
 	 )))
 
-  (define (create-cret ret-type)
+  (define (create-cret alloc-list ret-type)
     ;;(display (format "ret-type-size=~a\n" (cffi-size ret-type) ))
     (let ( (ret-fun (lambda (x) x)  )
 	   (ret-type-s ret-type )
@@ -630,14 +631,14 @@
 			 )
 		       ]
 		      ) )
-      (list (ffi-alloc (cffi-size ret-type-s) ) ret-fun )
+      (list (ffi-alloc alloc-list (cffi-size ret-type-s) ) ret-fun )
 
       )
     )
 
-  (define (create-cargs arg-type args carg-type)
+  (define (create-cargs alloc-list arg-type args carg-type)
     ;;(display (format "creat-cargs args=~a len=~a carg-type=~a\n" args (length args) carg-type))
-    (let ((cargs (ffi-values-alloc (length args)))
+    (let ((cargs (ffi-values-alloc alloc-list (length args)))
           (alloc 0)
           )
         (let loop ((arg args) (type arg-type) (i 0))
@@ -646,31 +647,31 @@
                 ;;(display (format "  type=~a value=~a index=~a \n" (car type) (car arg) i   ))
                 (case (car type)
 		  [(ushort)
-                    (set! alloc (ffi-alloc 16) ) 
+                    (set! alloc (ffi-alloc alloc-list 16) ) 
                     (ffi-set-ushort alloc (car arg) )
                     (ffi-values-set cargs i alloc) ]
 		  [(short)
-                    (set! alloc (ffi-alloc 16) ) 
+                    (set! alloc (ffi-alloc alloc-list 16) ) 
                     (ffi-set-short alloc (car arg) )
                     (ffi-values-set cargs i alloc) ]
                   [(uint)
-                    (set! alloc (ffi-alloc 32) ) 
+                    (set! alloc (ffi-alloc alloc-list 32) ) 
                     (ffi-set-uint alloc (car arg) )
                     (ffi-values-set cargs i alloc) ]
 		  [(int)
-                    (set! alloc (ffi-alloc 32) ) 
+                    (set! alloc (ffi-alloc alloc-list 32) ) 
                     (ffi-set-int alloc (car arg) )
                     (ffi-values-set cargs i alloc) ]
 		  [(int64 long)
-		    (set! alloc (ffi-alloc 64) ) 
+		    (set! alloc (ffi-alloc alloc-list 64) ) 
                     (ffi-set-long alloc   (car arg))
                     (ffi-values-set cargs i alloc) ]
                   [(float)
-		   (set! alloc (ffi-alloc 32) )
+		   (set! alloc (ffi-alloc alloc-list 32) )
 		   (ffi-set-float alloc (+ 0.0 (car arg) ))
 		   (ffi-values-set cargs i alloc) ]
                   [(double)
-                    (set! alloc (ffi-alloc 64) ) 
+                    (set! alloc (ffi-alloc alloc-list 64) ) 
                     (ffi-set-double alloc  (+ 0.0 (car arg)))
                     (ffi-values-set cargs i alloc) ]
                   [(void)
@@ -680,14 +681,14 @@
                     1
                      ]
                   [(string )
-                    (set! alloc (ffi-alloc 64) )
+                    (set! alloc (ffi-alloc alloc-list 64) )
                     (if (number? (car arg)) 
                       (ffi-set-pointer alloc  (car arg))
                       (ffi-set-string alloc  (car arg))
                     )
                     (ffi-values-set cargs i alloc) ]
                   [(void* )
-		   (set! alloc (ffi-alloc 64) )
+		   (set! alloc (ffi-alloc alloc-list 64) )
 		   (if (string? (car arg))
 		       (ffi-set-string alloc  (car arg))
 		       (ffi-set-pointer alloc  (car arg)))
@@ -696,7 +697,7 @@
 		   (ffi-values-set cargs i alloc) ]
                   [else
                       ;(display (format "  %%%else type=~a size=~a \n" (car type) (cffi-size (struct-ref (car arg) 1) ) ) )
-                      (set! alloc (ffi-alloc (cffi-size (struct-ref (car arg) 1) ))  )
+                      (set! alloc (ffi-alloc alloc-list (cffi-size (struct-ref (car arg) 1) ))  )
                       (lisp2struct (car arg) alloc)
                       (ffi-values-set cargs i alloc)
                      ]
@@ -719,13 +720,14 @@
 	(begin
 	  (display "\n")(display (format "cffi-call ~a arg-type=~a ret-type=~a args=~a \n"  sym  arg-type ret-type args) )  ) )
     (let* (
-          (carg-type (create-carg-type arg-type) )
-          (cret-type (create-cret-type ret-type) )
-          (cargs (create-cargs arg-type args carg-type) )
+	  (alloc-list '())
+          (carg-type (create-carg-type alloc-list arg-type) )
+          (cret-type (create-cret-type alloc-list ret-type) )
+          (cargs (create-cargs alloc-list arg-type args carg-type) )
 
-          (cret-info (create-cret ret-type) )
+          (cret-info (create-cret alloc-list ret-type) )
           (cret '() )
-          (cif (ffi-cif-alloc) )
+          (cif (ffi-cif-alloc alloc-list) )
           (fptr (cffi-sym  sym )) 
           (call-ret '() )
           (ret-val '() )
@@ -753,7 +755,7 @@
       (if (procedure? call-ret)
 	  (set! ret-val (call-ret cret))
 	  )
-      (ffi-free-all)
+      (ffi-free-all alloc-list)
       (if cffi-enable-log
 	  (display (format "ffi-call ret=~x\n" ret-val)))
       ret-val

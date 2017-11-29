@@ -59,9 +59,9 @@
  (define lib-name
   (case (machine-type)
    ((arm32le) "libsocket.so")
-   ((a6nt i3nt) "libsocket.dll")
-   ((a6osx i3osx)  "libsocket.so")
-   ((a6le i3le) "libsocket.so")))
+   ((a6nt i3nt ta6nt ti3nt) "libsocket.dll")
+   ((a6osx i3osx ta6osx ti3osx)  "libsocket.so")
+   ((a6le i3le ta6le ti3le) "libsocket.so")))
  (define lib (load-librarys  lib-name ))
 
 

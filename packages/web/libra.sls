@@ -1,4 +1,4 @@
-(load "../packages/web/libra.scm")
+(load "libra.core.ss")
 
 (library (web libra)
     (export)

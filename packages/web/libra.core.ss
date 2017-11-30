@@ -2,7 +2,7 @@
 ;; web Lib 
 ;; created by : 1481892212@qq.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(load "../packages/slib/slib.ss")
+(load (string-append (getenv "SCHEME_LIBRARY_PATH") "/" "chez.init"))
 (import (scheme)
 		(except (surfage s13 strings)
 				string-for-each string-fill! string-copy 
@@ -10,10 +10,11 @@
 				string-upcase string-downcase string-hash)
 		(cffi cffi) 
 		(net socket) 
-		(net socket-ffi) 
+		(net socket-ffi)
 		(irregex irregex)
 		(json json)
-		(c c-ffi))
+		(c c-ffi)
+		(web mime))
 ;; slib feature
 (require 'http)
 (require 'cgi)
@@ -36,19 +37,51 @@
 		(let loop ((port (socket:accept server)))
 			(if (>= port 0)
 				(begin
-					(let ((iport (make-fd-input-port port)) 
-							(oport (make-fd-output-port port)))
-						;; 指定框架入口 serve-proc
-						(http:serve-query 
-							(lambda (request-line query-string header)
-								(serve-proc request-line query-string header iport oport port))
-							iport oport)
-						(close-port iport)
-						(close-port oport)
-						(close port))
+					(if (and #f (threads?))
+						(make-thread port)
+						(not-make-thread port)
+					)
 					(loop (socket:accept server)))))
 		(socket:close server)))
 
+;; 是否多线程
+(define (threads?)
+    (char=? #\t (string-ref (symbol->string (machine-type)) 0))
+)
+
+;; 多线程
+(define (make-thread port)
+	(fork-thread
+		(lambda ()
+			(let ((iport (make-fd-input-port port)) 
+				  (oport (make-fd-output-port port)))
+			  	;; 指定框架入口 serve-proc
+				(http:serve-query 
+					(lambda (request-line query-string header)
+						(serve-proc request-line query-string header iport oport port))
+					iport oport)
+				;(close-port iport)
+				;(close-port oport)
+				;(close port)
+			)
+		)	
+	)
+)
+
+;; 单线程
+(define (not-make-thread port)
+	(let ((iport (make-fd-input-port port)) 
+		  (oport (make-fd-output-port port)))
+		;; 指定框架入口 serve-proc
+		(http:serve-query 
+			(lambda (request-line query-string header)
+				(serve-proc request-line query-string header iport oport port))
+			iport oport)
+		;(close-port iport)
+		;(close-port oport)
+		;(close port)
+	)
+)
 
 ;; http response maker
 (define (default-make-response html)
@@ -76,7 +109,7 @@
 			(router->keys/handler (string-append (symbol->string method) " " router) query-string)))
 )  
 
-;; 从request中找到纯净的路由
+;;从request中找到纯净的路由
 (define (url->router url)
 	(if (string? url)
 		(if (eq? #f (string-index url #\?))
@@ -203,11 +236,10 @@
 
 ;; 判断资源文件
 (define (resource? request)
-	(define resource-types (vector->list (hashtable-keys content-types)))
-	(if (eq? #f (string-index request #\.))
+	(if (not (string-index request #\.))
 		#f
 		(let ((type (string-downcase (substring request (+ 1 (string-index-right request #\.)) (string-length request)))))
-			(exists (lambda (n) (string=? n type)) resource-types))))
+			(not (not (get-mime-type type))))))
 
 ;; 返回资源文件
 (define (default-make-resource request port oport)
@@ -256,13 +288,18 @@
 ;; 获取执行文件文件夹地址
 (define (get-app-path)
 	(define script (car (command-line)))
-	(define index-\\ (string-index-right script #\\))
-	(define index-// (string-index-right script #\/))
-	(substring script 0 (max (if (number? index-\\) index-\\ 0) (if (number? index-//) index-// 0))))
+	(define index-right (string-index-right script #\\))
+	(define index-left (string-index-right script #\/))
+	(define path (substring script 0 (max (if (number? index-right) index-right 0) (if (number? index-left) index-left 0))))
+	(if (string=? "" path)
+		"."
+		path
+	)
+)
+
 
 ;; 配置字典
 (define libra-options (make-hashtable string-hash string=?))
-(define content-types (make-hashtable string-hash string=?))
 
 ;; 展示字典
 (define (show-options)
@@ -275,30 +312,10 @@
 (hashtable-set! libra-options "view-path" "views")
 ;; 启动文件目录
 (hashtable-set! libra-options "app-path" (get-app-path))
-;; Content-Type
-(hashtable-set! libra-options "content-type" content-types)
-
-;; 默认content-type列表
-(define type-pairs
-	(list 
-		 '("js" . "application/javascript")
-		 '("css" . "text/css")
-		 '("jpg" . "image/jpeg")
-		 '("png" . "image/png")
-		 '("gif" . "image/gif")
-		 '("ico" . "image/x-icon")
-	)
-)
-;; 初始化content-types
-(map 
-	(lambda (pair)
-		(hashtable-set! content-types (car pair) (cdr pair)))
-	type-pairs
-)
 
 ;; 返回资源对应http头
 (define (get-content-type type)
-	(cons "Content-Type" (hashtable-ref content-types type "text/html"))
+	(cons "Content-Type" (symbol->string (get-mime-type type 'text/html)))
 )
 
 ;; 获取web配置
@@ -327,9 +344,8 @@
 	)
 )
 
+
 ;; 服务器处理 入口
-;; 路由定义
-;; 一级重要
 (define serve-proc
 	(lambda (request-line query-string header iport oport port)
 		;; show msg on server
@@ -340,3 +356,4 @@
 				(if (procedure? (cdr keys/handler))
 					((cdr keys/handler) (car keys/handler))
 					'(404 "Bad Request"))))))
+

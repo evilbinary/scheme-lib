@@ -206,9 +206,9 @@
  (define lib-name
   (case (machine-type)
    ((arm32le) "libc.so")
-   ((a6nt i3nt) "libc.dll")
-   ((a6osx i3osx)  "libc.so")
-   ((a6le i3le) "libc.so")))
+   ((a6nt i3nt ta6nt ti3nt) "libc.dll")
+   ((a6osx i3osx ta6osx ti3osx)  "libc.so")
+   ((a6le i3le ta6le ti3le) "libc.so")))
  (define lib (load-librarys  lib-name ))
 
 ;;long c_a64l(char* )

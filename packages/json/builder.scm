@@ -168,9 +168,9 @@
     (build-newline port pretty)
     (format port "~A}" (indent-string pretty level)))
 
-  (define (hashtable->list hashtable)
-      (map (lambda (k) (cons k (hashtable-ref hashtable k #f))) 
-           (vector->list (hashtable-keys hashtable))))
+  (define (hash-table->list hash-table)
+    (hash-table-map hash-table (lambda (k v)
+                                 (cons k v))))
 
   (define (json-build scm port escape pretty level)
     (cond
@@ -181,8 +181,8 @@
      ((string? scm) (json-build-string scm port escape))
      ((json-alist? scm) (json-build-object scm port escape pretty level))
      ((list? scm) (json-build-array scm port escape pretty level))
-     ((hashtable? scm)
-      (json-build-object (hashtable->list scm) port escape pretty level))
+     ((hash-table? scm)
+      (json-build-object (hash-table->list scm) port escape pretty level))
      (else (error 'json-invalid "json invalid"))))
 
   ;;

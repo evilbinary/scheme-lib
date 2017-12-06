@@ -26,8 +26,27 @@
 ;;; Code:
 
 (library (json json)
-  (export scm->json
-          scm->json-string)
-  (import (json builder)))
+  (export json
+          scm->json
+          scm->json-string
+          json->scm
+          json-string->scm
+          json-parser?
+          json-parser-port)
+  (import (json builder)
+          (json parser)
+          (json syntax)))
+
+  ;(define-syntax re-export-modules
+  ;  (syntax-rules ()
+  ;    ((_ (mod ...) ...)
+  ;     (begin
+  ;       (module-use! (module-public-interface (current-module))
+  ;                    (resolve-interface '(mod ...)))
+  ;       ...))))
+  ;
+  ;(re-export-modules (json builder)
+  ;                   (json parser)
+  ;                   (json syntax)))
 
 ;;; (json) ends here

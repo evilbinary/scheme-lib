@@ -2,7 +2,9 @@
 #include <winsock2.h>
 #include <winsock.h>
 #include <ws2tcpip.h>
-
+#include <stdint.h>
+#include <sys/types.h>
+#define in_addr_t uint32_t
 #else
 #include <sys/types.h>
 #include <sys/socket.h>

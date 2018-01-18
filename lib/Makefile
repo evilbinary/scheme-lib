@@ -36,6 +36,7 @@ ifeq ($(UNAME_S), MINGW32_NT-6.1)
   LIBFFI = ./libcffi/libcffi.dll
   LIBGLFW = ./libglfw/libglfw.dll
   LIBGLES= ./libgl/libgles.dll
+  LIBSOCKET=./libsocket/libsocket.dll
   LIBC=./libc/libc.dll
 endif
 
@@ -95,5 +96,5 @@ android:
 	@ndk-build -B V=1 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk	
 clean:
 	@for n in $(SUB_DIR); do $(MAKE) -C $$n clean; done
-	rm -rf libscm libglut boot libffi libgl libglfw 3rdparty 
+	rm -rf libscm libglut boot libcffi libgl libglfw 3rdparty 
 

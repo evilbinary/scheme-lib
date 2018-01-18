@@ -19,13 +19,27 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 
 # android
 ## 新手入门
-### 环境安装
-1. 先安装[scheme-release-1.2.apk][1]
+### 环境安装 手机版
+1. 先安装[scheme-release-1.3.apk][1]
+2. 下载scheme-lib 的packages和apps到 手机/sdcard/org.evilbinary.chez/目录下
+3. 在run界面里面输入代码
+
+```scheme
+(load "/sdcard/org.evilbinary.chez/apps/game-plane/game-plane.ss")
+```
+运行效果如下：
+
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/m-game2.png" width="350px" />
+
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/m-game.png" width="350px" />
+
+### 环境安装 pc版
+1. 先安装[scheme-release-1.3.apk][1]
 2. 将手机连接电脑，开启adb调试模式（需要安装adb命令,不会用goolge）。进入`cd scheme-lib/android/src/packages`，在shell下执行`python sync.py`命令,这样每次修改后，会自动同步packages下的代码到手机`/sdcard/org.evilbinary.chez/lib`目录下面，这样方便运行了。
 3. 在run界面里面输入测试代码。比如:
- 
+
 ```scheme
-(import (test) (gles1) (glut) ) 
+(import (test) (gles1) (glut) )
 (load "/sdcard/org.evilbinary.chez/lib/apps/hello.ss")
 ```
 ### demo例子
@@ -66,7 +80,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 ```
 
 运行效果如下：
-  
+
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld.png" width="350px" />
 
 ### 测试配置
@@ -89,7 +103,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 	 ```c
 	#include <stdio.h>
 	#include <stdarg.h>
-	int add(int a,int b){ 
+	int add(int a,int b){
 		return a+b;
 	}    
 	```
@@ -100,7 +114,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 	include $(LOCAL_PATH)/../Optimizations.mk
 	LOCAL_MODULE    := add
 	LOCAL_SRC_FILES := add.c
-	LOCAL_C_INCLUDES := 
+	LOCAL_C_INCLUDES :=
 	LOCAL_CFLAGS +=  -I. -I./c/
 	LOCAL_CFLAGS += -g -Wall -DANDROID    -DINLINES -DGC_MACROS   -Wno-unused-parameter -pie -fPIE   -fPIC
 	LOCAL_LDLIBS += -ldl -llog -lz
@@ -110,7 +124,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 2. 执行`make android`。
 3. 将编译后生成的库`android/src/libs/libadd.so` 同步到`/sdcard/org.evilbinary.chez/lib`目录下，这样能调用外部库了。
 4. 调用外`libadd.so`库和使用代码如下：
-	
+
 	```scheme
 	(import  (scheme) (utils libutil) )
 	(load-lib "libadd.so")
@@ -118,5 +132,5 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 	(display (add 100 1234))
 	```
 
-[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.2.apk   "scheme apk"
+[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.3.apk   "scheme apk"
 [2]: https://github.com/evilbinary/data/blob/master/pic/scheme-lib-2.0-win32.zip  "scheme-lib-2.0-win32.zip"

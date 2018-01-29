@@ -1,8 +1,8 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 					;Copyright 2016-2080 evilbinary.
-					;作者:evilbinary on 12/24/16.
-					;邮箱:rootdebug@163.com
+					;author:evilbinary on 12/24/16.
+					;email:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (import  (scheme)  (glfw glfw)
 	 (gui imgui)
@@ -64,7 +64,7 @@
 (define window '() )
 (define res-dir 
   (case (machine-type)
-    ((arm32le) "/data/data/org.evilbinary.chez/files/")
+    ((arm32le) "/data/user/0/org.evilbinary.chez/files/apps/res/")
     (else "")
     ))
 

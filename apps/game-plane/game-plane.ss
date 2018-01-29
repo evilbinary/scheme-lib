@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;作者:evilbinary on 11/19/16.
-;邮箱:rootdebug@163.com
+;author:evilbinary on 11/19/16.
+;email:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (import
  (scheme)
@@ -44,7 +44,7 @@
 ;;资源文件目录设置
 (define res-dir
          (case (machine-type)
-           ((arm32le) "/sdcard/org.evilbinary.chez/apps/game-plane/")
+           ((arm32le) "/data/user/0/org.evilbinary.chez/files/apps/game-plane/")
            (else "./")
             ))
 (define scale-w

@@ -20,7 +20,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 # android
 ## 新手入门
 ### 环境安装 手机版
-1. 先安装[scheme-release-1.3.apk][1]
+1. 先安装[scheme-release-1.4.apk][1]
 2. 下载scheme-lib 的packages和apps到 手机/sdcard/org.evilbinary.chez/目录下
 3. 在run界面里面输入代码
 
@@ -34,7 +34,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/m-game.png" width="350px" />
 
 ### 环境安装 pc版
-1. 先安装[scheme-release-1.3.apk][1]
+1. 先安装[scheme-release-1.4.apk][1]
 2. 将手机连接电脑，开启adb调试模式（需要安装adb命令,不会用goolge）。进入`cd scheme-lib/android/src/packages`，在shell下执行`python sync.py`命令,这样每次修改后，会自动同步packages下的代码到手机`/sdcard/org.evilbinary.chez/lib`目录下面，这样方便运行了。
 3. 在run界面里面输入测试代码。比如:
 
@@ -132,5 +132,5 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 	(display (add 100 1234))
 	```
 
-[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.3.apk   "scheme apk"
+[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.4.apk   "scheme apk"
 [2]: https://github.com/evilbinary/data/blob/master/pic/scheme-lib-2.0-win32.zip  "scheme-lib-2.0-win32.zip"

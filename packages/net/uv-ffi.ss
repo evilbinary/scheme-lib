@@ -1,255 +1,8 @@
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['unsigned', 'int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['size_t']
-IdentifierType: ['int']
-IdentifierType: ['int']
-;;<pycparser.c_ast.EllipsisParam object at 0x10a806c10>
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['uint64_t']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['size_t']
-IdentifierType: ['uv_handle_type']
-IdentifierType: ['void']
-IdentifierType: ['size_t']
-IdentifierType: ['void']
-IdentifierType: ['uv_req_type']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['uv_buf_t']
-IdentifierType: ['size_t']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['size_t']
-IdentifierType: ['size_t']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['uv_handle_type']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['uv_handle_type']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['uint64_t']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['uv_pid_t']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['uv_os_fd_t']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['uv_pid_t']
-IdentifierType: ['uv_pid_t']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['uv_fs_type']
-IdentifierType: ['ssize_t']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['uint64_t']
-IdentifierType: ['uint64_t']
-IdentifierType: ['uint64_t']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['void']
-TypeDecl: callback, []
-  IdentifierType: ['void']
-;;ptr argType error <class 'pycparser.c_ast.FuncDecl'> <member 'type' of 'FuncDecl' objects>
-IdentifierType: ['int']
-IdentifierType: ['void']
-IdentifierType: ['void']
-IdentifierType: ['int']
-IdentifierType: ['uv_thread_t']
-IdentifierType: ['int']
-IdentifierType: ['int']
-IdentifierType: ['void']
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;作者:evilbinary on 2018-03-05 22:42:47.
+;;作者:evilbinary on 2018-03-05 22:43:58.
 ;;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(library (net uv ) 
+(library (net uv-ffi) 
   (export pthread-barrier-init
   pthread-barrier-wait
   pthread-barrier-destroy
@@ -515,10 +268,10 @@ IdentifierType: ['void']
 
  (define lib-name
   (case (machine-type)
-   ((arm32le) ".so")
-   ((a6nt i3nt ta6nt ti3nt) ".dll")
-   ((a6osx i3osx ta6osx ti3osx)  ".so")
-   ((a6le i3le ta6le ti3le) ".so")))
+   ((arm32le) "libuv.so")
+   ((a6nt i3nt ta6nt ti3nt) "libuv.dll")
+   ((a6osx i3osx ta6osx ti3osx)  "libuv.dylib")
+   ((a6le i3le ta6le ti3le) "libuv.so")))
  (define lib (load-librarys  lib-name ))
 
 ;;int pthread_barrier_init(pthread_barrier_t* barrier ,void* barrier_attr ,unsigned count)
@@ -583,7 +336,7 @@ IdentifierType: ['void']
 
 ;;int uv_run(uv_loop_t*  ,uv_run_mode mode)
 (def-function uv-run
-             "uv_run" (void* uv_run_mode) int)
+             "uv_run" (void* int) int)
 
 ;;void uv_stop(uv_loop_t* )
 (def-function uv-stop
@@ -695,7 +448,7 @@ IdentifierType: ['void']
 
 ;;void uv_close(uv_handle_t* handle ,uv_close_cb close_cb)
 (def-function uv-close
-             "uv_close" (void* uv_close_cb) void)
+             "uv_close" (void* void*) void)
 
 ;;int uv_send_buffer_size(uv_handle_t* handle ,int* value)
 (def-function uv-send-buffer-size
@@ -719,7 +472,7 @@ IdentifierType: ['void']
 
 ;;int uv_listen(uv_stream_t* stream ,int backlog ,uv_connection_cb cb)
 (def-function uv-listen
-             "uv_listen" (void* int uv_connection_cb) int)
+             "uv_listen" (void* int void*) int)
 
 ;;int uv_accept(uv_stream_t* server ,uv_stream_t* client)
 (def-function uv-accept
@@ -727,7 +480,7 @@ IdentifierType: ['void']
 
 ;;int uv_read_start(uv_stream_t*  ,uv_alloc_cb alloc_cb ,uv_read_cb read_cb)
 (def-function uv-read-start
-             "uv_read_start" (void* uv_alloc_cb uv_read_cb) int)
+             "uv_read_start" (void* void* void*) int)
 
 ;;int uv_read_stop(uv_stream_t* )
 (def-function uv-read-stop
@@ -735,11 +488,11 @@ IdentifierType: ['void']
 
 ;;int uv_write(uv_write_t* req ,uv_stream_t* handle ,uv_buf_t bufs[] ,unsigned int nbufs ,uv_write_cb cb)
 (def-function uv-write
-             "uv_write" (void* void* void* int uv_write_cb) int)
+             "uv_write" (void* void* void* int void*) int)
 
 ;;int uv_write2(uv_write_t* req ,uv_stream_t* handle ,uv_buf_t bufs[] ,unsigned int nbufs ,uv_stream_t* send_handle ,uv_write_cb cb)
 (def-function uv-write2
-             "uv_write2" (void* void* void* int void* uv_write_cb) int)
+             "uv_write2" (void* void* void* int void* void*) int)
 
 ;;int uv_try_write(uv_stream_t* handle ,uv_buf_t bufs[] ,unsigned int nbufs)
 (def-function uv-try-write

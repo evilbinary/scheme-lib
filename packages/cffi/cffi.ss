@@ -48,9 +48,9 @@
    cffi-alloc
    cffi-free
    cffi-log
-
+   cffi-thread
    )
-  (import  (scheme) (utils libutil) (utils macro) )
+  (import  (scheme) (utils libutil) (utils macro) (thread scm-ffi) )
 
   (define FFI_DEFAULT_ABI  2)
 
@@ -84,9 +84,13 @@
 
 
   (define cffi-enable-log #f)
+  (define cffi-enable-thread (threaded?))
   (define (cffi-log t)
-    (set! cffi-enable-log t)
-    )
+    (set! cffi-enable-log t))
+  
+  (define (cffi-thread t)
+    (set! cffi-enable-thread t))
+  
 
 
   (define lib-name
@@ -116,7 +120,7 @@
   ;;(define $ffi-free (lambda (addr)
   ;;(display (format "addr=~x\n" addr))))
 
-  
+
   (define (ffi-cif-alloc $ffi-alloc-list)
     (let ((m ($ffi-cif-alloc)))
       (set! $ffi-alloc-list(append! $ffi-alloc-list (list m) ))
@@ -250,6 +254,7 @@
 
 
   
+  
   (define ffi-dlsym (foreign-procedure "ffi_dlsym" (void*  string) void*))
   (define ffi-dlopen (foreign-procedure "ffi_dlopen" (string int ) void*))
   (define ffi-dlerror (foreign-procedure "ffi_dlerror" ( ) string ))
@@ -332,8 +337,6 @@
 	    ))
       )
     )
-
-
   
   ;;(name1 name2 name3)
   ;;(type1 type2 type3)
@@ -714,6 +717,10 @@
 
     )
 
+
+ 
+  
+
   ;;ffi call
   (define (cffi-call sym arg-type ret-type args )    
     (if cffi-enable-log
@@ -739,23 +746,30 @@
       ;;(display (format "ffi-prep-cif len=~a  cret-type=~a carg-type=~a\n" (length arg-type) cret-type carg-type) )
       ;;(display (test-float cif FFI_DEFAULT_ABI  cret-type carg-type cargs) )
       ;;init cif
+     
       (if (= FFI_OK (ffi-prep-cif cif FFI_DEFAULT_ABI (length arg-type) cret-type carg-type ) )
 	  (begin
 	    ;;(printf "fptr=~a \n" fptr)
 	    (if (> fptr 0)
-		(begin 
+		(begin
+		  (if cffi-enable-thread
+		      (deactivate-thread))
 		  ;;(display (format "ffi-call cret=~x cargs=~x\n" cret cargs ))
-		  (ffi-call cif fptr cret cargs)  
+		  (ffi-call cif fptr cret cargs)
+		  (if cffi-enable-thread
+		      (activate-thread))
 		  )
 		(display (format "cannot find symbol ~a\n" sym ))
                 ))
 	  (error 'cffi (format "ffi-prep-cif return error\n"))
 	  )
+   
       ;;(display (format "cret=~x\n" cret))
       (if (procedure? call-ret)
 	  (set! ret-val (call-ret cret))
 	  )
       (ffi-free-all alloc-list)
+      
       (if cffi-enable-log
 	  (display (format "ffi-call ret=~x\n" ret-val)))
       ret-val

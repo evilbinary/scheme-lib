@@ -4,6 +4,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (library (tensorflow tensorflow-ffi )
   (export tf-data-type-size
+	  tf-version
   tf-delete-status
   tf-set-status
   tf-get-code
@@ -142,6 +143,10 @@
    ((a6le i3le ta6le ti3le) "libtensorflow.so")))
  (define lib (load-librarys  lib-name ))
 
+;;const char* TF_Version();
+ (def-function tf-version
+   "TF_Version" (void) string)
+ 
 ;;size_t TF_DataTypeSize(TF_DataType dt)
 (def-function tf-data-type-size
              "TF_DataTypeSize" (TF_DataType) int)

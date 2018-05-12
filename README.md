@@ -22,9 +22,9 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 # android
 ## 新手入门
 ### 环境安装 手机版
-1. 先安装[scheme-release-1.4.apk][1]
-2. 下载scheme-lib 的packages和apps到 手机/sdcard/org.evilbinary.chez/目录下
-3. 在run界面里面输入代码
+1. 先安装[scheme-release-1.5.apk][1]
+2. 点击下载app库和package库
+3. 下载成功后点击运行计算机demo或者直接打开apps里面的应用demo点击运行
 
 ```scheme
 (load "/sdcard/org.evilbinary.chez/apps/game-plane/game-plane.ss")
@@ -34,54 +34,6 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/m-game2.png" width="350px" />
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/m-game.png" width="350px" />
-
-### 环境安装 pc版
-1. 先安装[scheme-release-1.4.apk][1]
-2. 将手机连接电脑，开启adb调试模式（需要安装adb命令,不会用goolge）。进入`cd scheme-lib/android/src/packages`，在shell下执行`python sync.py`命令,这样每次修改后，会自动同步packages下的代码到手机`/sdcard/org.evilbinary.chez/lib`目录下面，这样方便运行了。
-3. 在run界面里面输入测试代码。比如:
-
-```scheme
-(import (test) (gles1) (glut) )
-(load "/sdcard/org.evilbinary.chez/lib/apps/hello.ss")
-```
-### demo例子
-```scheme
-;imgui例子
-;imgui hello,world
-(define (imgui-test-hello-world)
-       (glut-init)
-       (imgui-init)
-       (imgui-scale 2.5 2.5)
-       (glut-touch-event (lambda (type x y)
-            (imgui-touch-event type x y)
-                  ))
-            (glut-key-event (lambda (event)
-                  (imgui-key-event
-                     (glut-event-get event 'type)
-                     (glut-event-get event 'keycode)
-                     (glut-event-get event 'char)
-                     (glut-event-get event 'chars))
-                   (if (= 4 (glut-event-get event 'keycode ))
-                     (begin (imgui-exit)
-                     (glut-exit)))
-                  ))
-         (glut-display (lambda ()
-                   (imgui-render-start)
-                   ;(imgui-test)
-                   (imgui-set-next-window-size (imgui-make-vec2 200.0 140.0) 0)
-                   (imgui-begin "evilbinary" 0)
-                   (imgui-text "hello,world")
-                   (imgui-end)
-                   (imgui-render-end)
-                  ))
-         (glut-reshape (lambda(w h)
-                            (imgui-resize w h)
-                             ))
-         (glut-main-loop)
-         (imgui-exit))		
-```
-
-运行效果如下：
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld.png" width="350px" />
 
@@ -95,7 +47,7 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 	</map>
 	```
 
-2. `adb push config.xml /sdcard/org.evilbinary.chez/conf/config.xml`
+2. `adb push config.xml /sdcard/org.evilbinary.chez/scm/conf/config.xml`
 3. 打开scheme app就可以直接运行啦。
 
 ## 高级篇
@@ -134,5 +86,5 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 	(display (add 100 1234))
 	```
 
-[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.4.apk   "scheme apk"
+[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.5.apk   "scheme apk"
 [2]: https://github.com/evilbinary/data/blob/master/pic/scheme-lib-2.0-win32.zip  "scheme-lib-2.0-win32.zip"

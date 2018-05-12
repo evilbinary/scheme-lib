@@ -26,9 +26,6 @@ scheme-lib 是一个scheme使用的库。目前支持android mac linux windows�
 2. 点击下载app库和package库
 3. 下载成功后点击运行计算机demo或者直接打开apps里面的应用demo点击运行
 
-```scheme
-(load "/sdcard/org.evilbinary.chez/apps/game-plane/game-plane.ss")
-```
 运行效果如下：
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/m-game2.png" width="350px" />

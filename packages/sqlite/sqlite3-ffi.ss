@@ -2,7 +2,7 @@
 ;作者:evilbinary on 2017-09-02 10:57:19.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(library (sqlite sqlite3-ffi ) 
+(library (sqlite sqlite3-ffi )
   (export sqlite3-libversion
   sqlite3-sourceid
   sqlite3-libversion-number
@@ -241,13 +241,8 @@
 
  (import (scheme) (utils libutil) (cffi cffi) )
 
- (define lib-name
-  (case (machine-type)
-   ((arm32le) "libsqlite3.so")
-   ((a6nt i3nt ta6nt ti3nt) "libsqlite3.dll")
-   ((a6osx i3osx ta6osx ti3osx)  "libsqlite3.dylib")
-   ((a6le i3le ta6le ti3le) "libsqlite3.so")))
- (define lib (load-librarys  lib-name ))
+
+(load-librarys "libsqlite3")
 
 ;;char* sqlite3_libversion(void )
 (def-function sqlite3-libversion

@@ -180,6 +180,7 @@
   c-strcspn
   c-strdup
   c-strerror
+  c-errorno
   c-strlen
   c-strncat
   c-strncmp
@@ -203,13 +204,8 @@
 
  (import (scheme) (utils libutil) (cffi cffi) )
 
- (define lib-name
-  (case (machine-type)
-   ((arm32le) "libc.so")
-   ((a6nt i3nt ta6nt ti3nt) "libc.dll")
-   ((a6osx i3osx ta6osx ti3osx)  "libc.so")
-   ((a6le i3le ta6le ti3le) "libc.so")))
- (define lib (load-librarys  lib-name ))
+ 
+ (load-librarys "libc")
 
 ;;long c_a64l(char* )
 (def-function c-a64l
@@ -919,6 +915,9 @@
 (def-function c-strerror
              "c_strerror" (int) string)
 
+;;int c_errorno( )
+(def-function c-errorno
+             "c_errorno" (void) int)
 ;;size_t c_strlen(char* )
 (def-function c-strlen
              "c_strlen" (string) int)

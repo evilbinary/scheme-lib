@@ -7,9 +7,9 @@
         nvg-create-gles2 
         nvg-delete-gles2
 
-	nvg-create-gles222
-	nvg-create-gles22
-        
+	nvg-create-gl2
+	nvg-delete-gl2
+        main
         nvg-begin-frame
         nvg-cancel-frame
         nvg-end-frame
@@ -165,13 +165,8 @@
     (define NVG_BEVEL 3)
     (define NVG_MITER 4)
 
-    (define lib-name
-     (case (machine-type)
-       ((arm32le) "libnanovg.so")
-       ((a6nt i3nt) "libnanovg.dll")
-       ((a6osx i3osx)  "libnanovg.so")
-       ((a6le i3le) "libnanovg.so")))
-    (define lib (load-librarys  lib-name ))
+    
+    (load-librarys "libnanovg")
 
 
     (def-struct NVGcolor
@@ -202,18 +197,21 @@
         (image int 32)
         )
 
-     (def-function nvg-create-gles22 
-       "nvgCreateGL22" (int) void*)
+     (def-function nvg-create-gl2
+       "nvgCreateGL2" (int) void*)
 
- (def-function nvg-create-gles222 
-       "nvgCreateGLES222" (int) void*)
+       (def-function nvg-delete-gl2
+             "nvgDeleteGL2" (void*) void)
+
      
     (def-function nvg-create-gles2 
-      "nvgCreateGL2" (int) void*)
+      "nvgCreateGLES2" (int) void*)
     
     (def-function nvg-delete-gles2 
-      "nvgDeleteGL2" (void*) void)
+      "nvgDeleteGLES2" (void*) void)
 
+(def-function main
+                 "main" (void) int)
 
 ;; Begin drawing a new frame
 ;; Calls to nanovg drawing API should be wrapped in nvgBeginFrame() & nvgEndFrame()

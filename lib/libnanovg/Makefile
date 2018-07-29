@@ -9,7 +9,7 @@ TARGET = libnanovg.so
 OBJS = nanovg.o nanovg_gl.o
 
 LIBS =-L../libgl/   -lgles
-CFLAGS = -Wall -Wformat   -I../libgl -g -DLOG -DNANOVG_GL2_IMPLEMENTATION -DNANOVG_GL2 
+CFLAGS = -Wall -Wformat   -I../libgl -g -DLOG  -DNANOVG_GLES2_IMPLEMENTATION -DNANOVG_GLES2 
 CXXFLAGS= -Wall -Wformat
 OTHERS=
 

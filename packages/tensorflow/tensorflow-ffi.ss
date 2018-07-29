@@ -135,18 +135,13 @@
 
  (import (scheme) (utils libutil) (cffi cffi) )
 
- (define lib-name
-  (case (machine-type)
-   ((arm32le) "libtensorflow.so")
-   ((a6nt i3nt ta6nt ti3nt) "libtensorflow.dll")
-   ((a6osx i3osx ta6osx ti3osx)  "libtensorflow.so")
-   ((a6le i3le ta6le ti3le) "libtensorflow.so")))
- (define lib (load-librarys  lib-name ))
+
+ (load-librarys "libtensorflow" )
 
 ;;const char* TF_Version();
  (def-function tf-version
    "TF_Version" (void) string)
- 
+
 ;;size_t TF_DataTypeSize(TF_DataType dt)
 (def-function tf-data-type-size
              "TF_DataTypeSize" (TF_DataType) int)

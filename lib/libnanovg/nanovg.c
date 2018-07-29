@@ -27,6 +27,30 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+
+#ifdef ANDROID
+#include <android/log.h>
+#define LOG_TAG "nanovg"
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,LOG_TAG , __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__))
+#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__))
+#define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__))
+
+#else
+
+#ifdef LOG
+#define LOGI(...)  fprintf(stdout,__VA_ARGS__);fprintf(stdout,"\n");fflush(stdout);
+#define LOGW(...)  fprintf(stdout,__VA_ARGS__);fprintf(stdout,"\n");fflush(stdout);
+#define LOGE(...)  fprintf(stdout,__VA_ARGS__);fprintf(stdout,"\n");fflush(stdout);
+#else
+#define LOGI(...)
+#define LOGW(...)
+#define LOGE(...)
+#endif
+
+#endif
+
+
 #ifdef _MSC_VER
 #pragma warning(disable: 4100)  // unreferenced formal parameter
 #pragma warning(disable: 4127)  // conditional expression is constant
@@ -284,6 +308,7 @@ static NVGstate* nvg__getState(NVGcontext* ctx)
 
 NVGcontext* nvgCreateInternal(NVGparams* params)
 {
+    LOGI("nvgCreateInternal");
 	FONSparams fontParams;
 	NVGcontext* ctx = (NVGcontext*)malloc(sizeof(NVGcontext));
 	int i;
@@ -363,6 +388,7 @@ void nvgDeleteInternal(NVGcontext* ctx)
 
 void nvgBeginFrame(NVGcontext* ctx, int windowWidth, int windowHeight, float devicePixelRatio)
 {
+    //LOGI("nvgBeginFrame");
 /*	printf("Tris: draws:%d  fill:%d  stroke:%d  text:%d  TOT:%d\n",
 		ctx->drawCallCount, ctx->fillTriCount, ctx->strokeTriCount, ctx->textTriCount,
 		ctx->fillTriCount+ctx->strokeTriCount+ctx->textTriCount);*/

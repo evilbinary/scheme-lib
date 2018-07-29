@@ -45,14 +45,14 @@
             )
     (import (scheme) (utils libutil) )
     ;;simulator glut c function
-    
+
     ;;begin glut function
     (define lib-name
      (case (machine-type)
        ((arm32le) "libglut.so")
-       ((a6nt i3nt)  (load-lib "glut32.dll") "libglut.dll")
-       ((a6osx i3osx)  "libglut.so")
-       ((a6le i3le) "libglut.so")))
+       ((a6nt i3nt ta6nt ti3nt)  (load-lib "glut32.dll") "libglut.dll")
+       ((a6osx i3osx ta6osx ti3osx )  "libglut.so")
+       ((a6le i3le ta6le ti3le) "libglut.so")))
 
     (define lib (load-lib lib-name))
 
@@ -74,7 +74,7 @@
 
 
 
-    (define glut-init-op  
+    (define glut-init-op
       (foreign-procedure "glut_init" () void))
 
     (define (glut-init . args)
@@ -86,7 +86,7 @@
               (glut-init-op)
               )
             )))
-    
+
 
 
     (define glut-main-loop
@@ -97,7 +97,7 @@
 
     (define glut-test
       (foreign-procedure "glut_test" () void))
-    
+
     (define glut-log
       (foreign-procedure "glut_log" (string) void))
 
@@ -185,7 +185,7 @@
       (if (procedure? glut-idle-proc)
           (glut-idle-proc))
       )
-    
+
     (define (glut-event proc)
       ;(display "glut-event")
       (set! glut-touch-event-proc proc)
@@ -219,11 +219,11 @@
     (define (glut-event-get event name)
         (cond
           ((equal? name 'type) (list-ref event 0))
-          ((equal? name 'keycode) (list-ref event 1)) 
-          ((equal? name 'char) (list-ref event 2)) 
-          ((equal? name 'chars) (list-ref event 3)) 
+          ((equal? name 'keycode) (list-ref event 1))
+          ((equal? name 'char) (list-ref event 2))
+          ((equal? name 'chars) (list-ref event 3))
           (else (void))
-        ))  
+        ))
 
 
     (define (glut-vector type vec )
@@ -233,7 +233,7 @@
              (size (foreign-sizeof type))
             (data (foreign-alloc (*  len size)))
             )
-        (let loop ((i  0)) 
+        (let loop ((i  0))
           (if (< i len)
               (let ((v (vector-ref vec i)))
                 (cond
@@ -246,6 +246,6 @@
     (define (glut-unvector vec)
       (foreign-free vec))
 
-   
-    
+
+
 )

@@ -1370,13 +1370,17 @@ int fonsTextIterNext(FONScontext* stash, FONStextIter* iter, FONSquad* quad)
 	const char* str = iter->next;
 	iter->str = iter->next;
 
+	
 	if (str == iter->end)
 		return 0;
 
-	for (; str != iter->end; str++) {
-		if (fons__decutf8(&iter->utf8state, &iter->codepoint, *(const unsigned char*)str))
+	for (; str !=iter->end; str++) {
+	  
+	  if (fons__decutf8(&iter->utf8state, &iter->codepoint, *(const unsigned char*)str))
 			continue;
 		str++;
+		//printf("str=%s end=%s %p %p\n",str,iter->end,str,iter->end);
+		
 		// Get glyph and quad
 		iter->x = iter->nextx;
 		iter->y = iter->nexty;

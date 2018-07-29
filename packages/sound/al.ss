@@ -23,9 +23,9 @@
     (define lib-name
            (case (machine-type)
              ((arm32le) "libalut.so")
-             ((a6nt i3nt)  (load-lib "libopenal-1.dll")   "libalut.dll" )
-             ((a6osx i3osx)  "libalut.so")
-             ((a6le i3le) "libalut.so")))
+             ((a6nt i3nt ta6nt ti3nt)  (load-lib "libopenal-1.dll")   "libalut.dll" )
+             ((a6osx i3osx ta6osx ti3osx)  "libalut.so")
+             ((a6le i3le ta6le ti3le) "libalut.so")))
     (define lib (load-lib lib-name))
  
     (define test (foreign-procedure "test" (int int) void ))

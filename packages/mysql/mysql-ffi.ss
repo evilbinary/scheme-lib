@@ -2,7 +2,7 @@
 ;作者:evilbinary on 2017-08-31 23:54:31.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(library (mysql mysql-ffi ) 
+(library (mysql mysql-ffi )
   (export my-net-init
   my-net-local-init
   net-end
@@ -166,13 +166,8 @@
 
  (import (scheme) (utils libutil) (cffi cffi) )
 
- (define lib-name
-  (case (machine-type)
-   ((arm32le) "libmysqlclient.so")
-   ((a6nt i3nt) "libmysqlclient.dll")
-   ((a6osx i3osx)  "libmysqlclient.dylib")
-   ((a6le i3le) "libmysqlclient.so")))
- (define lib (load-librarys  lib-name ))
+
+ (load-librarys "libmysqlclient" )
 
 ;;my_bool my_net_init(NET* net ,Vio* vio)
 (def-function my-net-init

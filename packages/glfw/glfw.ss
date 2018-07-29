@@ -569,7 +569,11 @@
  glfw-make-mouse-button-callback
  glfw-set-scroll-callback
  glfw-make-scroll-callback
-  
+ glfw-make-char-callback
+ glfw-set-char-callback 
+ glfw-get-clipboard-string
+ glfw-set-clipboard-string
+ 
  glad-load-gl
  glad-load-gl-loader
  glad-load-gles2-loader
@@ -1112,9 +1116,9 @@
   (define lib-name
     (case (machine-type)
       ((arm32le) "libglfw.so")
-      ((a6nt i3nt)  "libglfw.dll")
-      ((a6osx i3osx)  "libglfw.so")
-      ((a6le i3le) "libglfw.so")))
+      ((a6nt i3nt ta6nt ti3nt)  "libglfw.dll")
+      ((a6osx i3osx ta6osx ti3osx)  "libglfw.so")
+      ((a6le i3le ta6le ti3le) "libglfw.so")))
 
   (define lib (load-lib lib-name))
 
@@ -1152,7 +1156,19 @@
 
     (define $glfw-set-joystick-callback
      (foreign-procedure "glfwSetJoystickCallback" (void* void*) void*))
-   
+
+     (define $glfw-set-char-callback
+     (foreign-procedure "glfwSetCharCallback" (void* void*) void*))
+    
+
+     (define glfw-get-clipboard-string
+       (foreign-procedure "glfwGetClipboardString" (void* ) string))
+     
+
+     (define glfw-set-clipboard-string
+       (foreign-procedure "glfwSetClipboardString" (void* string ) void))
+     
+     
    (define glfw-wait-events
      (foreign-procedure "glfwWaitEvents" () void))
 
@@ -1180,6 +1196,9 @@
   (define (glfw-set-scroll-callback win fun)
     ($glfw-set-scroll-callback win (glfw-make-scroll-callback fun)))
 
+  (define (glfw-set-char-callback win fun)
+    ($glfw-set-char-callback win (glfw-make-char-callback fun)))
+    
    (define (glfw-set-joystick-callback win fun)
     ($glfw-set-scroll-callback win (glfw-make-joystick-callback fun)))
 
@@ -1220,6 +1239,12 @@
       (let ([code (foreign-callable p (void* int int int ) void)])
 	(lock-object code)
 	(foreign-callable-entry-point code))))
+
+   (define glfw-make-char-callback 
+     (lambda (p)
+       (let ([code (foreign-callable p (void*  int ) void)])
+	 (lock-object code)
+	 (foreign-callable-entry-point code))))
   
   ;;gladLoadGLLoader
   (define glfw-window-should-close

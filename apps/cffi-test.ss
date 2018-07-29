@@ -5,17 +5,9 @@
 
 (import  (scheme) (cffi cffi)   )
 
- (define lib-name
-           (case (machine-type)
-             ((arm32le) "foo.so")
-             ((a6nt i3nt)  "foo.dll")
-             ((a6osx i3osx)  "foo.so")
-             ((a6le i3le) "foo.so")))
-
 ;;(load-lib lib-name )
 ; (ffi-dl-test)
-(load-lib "foo.so")
-(load-librarys "foo.so")
+(load-librarys "foo")
 ;;(cffi-log #t)
 
 (display "============test-normal============\n")

@@ -2,7 +2,7 @@
 ;;作者:evilbinary on 2018-03-05 22:43:58.
 ;;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(library (net uv-ffi) 
+(library (net uv-ffi)
   (export pthread-barrier-init
   pthread-barrier-wait
   pthread-barrier-destroy
@@ -266,13 +266,7 @@
 
  (import (scheme) (utils libutil) (cffi cffi) )
 
- (define lib-name
-  (case (machine-type)
-   ((arm32le) "libuv.so")
-   ((a6nt i3nt ta6nt ti3nt) "libuv.dll")
-   ((a6osx i3osx ta6osx ti3osx)  "libuv.dylib")
-   ((a6le i3le ta6le ti3le) "libuv.so")))
- (define lib (load-librarys  lib-name ))
+(load-librarys  "libuv" )
 
 ;;int pthread_barrier_init(pthread_barrier_t* barrier ,void* barrier_attr ,unsigned count)
 (def-function pthread-barrier-init

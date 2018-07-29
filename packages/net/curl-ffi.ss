@@ -502,18 +502,64 @@
 	  CURL_GLOBAL_NOTHING
 	  CURL_GLOBAL_DEFAULT 
 	  CURL_GLOBAL_ACK_EINTR
+
+
+	  CURLINFO_NONE 					
+CURLINFO_EFFECTIVE_URL     		
+CURLINFO_RESPONSE_CODE     		
+CURLINFO_TOTAL_TIME        		
+CURLINFO_NAMELOOKUP_TIME   		
+CURLINFO_CONNECT_TIME      		
+CURLINFO_PRETRANSFER_TIME  		
+CURLINFO_SIZE_UPLOAD       		
+CURLINFO_SIZE_DOWNLOAD     		
+CURLINFO_SPEED_DOWNLOAD    		
+CURLINFO_SPEED_UPLOAD      		
+CURLINFO_HEADER_SIZE       		
+CURLINFO_REQUEST_SIZE      		
+CURLINFO_SSL_VERIFYRESULT  		
+CURLINFO_FILETIME          		
+CURLINFO_CONTENT_LENGTH_DOWNLOAD
+CURLINFO_CONTENT_LENGTH_UPLOAD 
+CURLINFO_STARTTRANSFER_TIME  	
+CURLINFO_CONTENT_TYPE      		
+CURLINFO_REDIRECT_TIME     		
+CURLINFO_REDIRECT_COUNT    		
+CURLINFO_PRIVATE           		
+CURLINFO_HTTP_CONNECTCODE  		
+CURLINFO_HTTPAUTH_AVAIL    		
+CURLINFO_PROXYAUTH_AVAIL   		
+CURLINFO_OS_ERRNO          		
+CURLINFO_NUM_CONNECTS      		
+CURLINFO_SSL_ENGINES       		
+CURLINFO_COOKIELIST        		
+CURLINFO_LASTSOCKET        		
+CURLINFO_FTP_ENTRY_PATH    		
+CURLINFO_REDIRECT_URL      		
+CURLINFO_PRIMARY_IP        		
+CURLINFO_APPCONNECT_TIME   		
+CURLINFO_CERTINFO          		
+CURLINFO_CONDITION_UNMET   		
+CURLINFO_RTSP_SESSION_ID   		
+CURLINFO_RTSP_CLIENT_CSEQ  		
+CURLINFO_RTSP_SERVER_CSEQ  		
+CURLINFO_RTSP_CSEQ_RECV    		
+CURLINFO_PRIMARY_PORT      		
+CURLINFO_LOCAL_IP          		
+CURLINFO_LOCAL_PORT        		
+CURLINFO_TLS_SESSION       		
+CURLINFO_ACTIVESOCKET      		
+CURLINFO_TLS_SSL_PTR       		
+CURLINFO_HTTP_VERSION      		
+CURLINFO_PROXY_SSL_VERIFYRESULT
+CURLINFO_PROTOCOL          		
+CURLINFO_SCHEME            		
 	  )
 
-  (import (scheme) (utils libutil) (cffi cffi) )
+  (import (scheme)  (dffi dffi) (utils libutil) )
 
-  (define lib-name
-    (case (machine-type)
-      ((arm32le) "libcurl.so")
-      ((a6nt i3nt ta6nt ti3nt) "libcurl.dll")
-      ((a6osx i3osx ta6osx ti3osx)  "libcurl.dylib")
-      ((a6le i3le ta6le ti3le) "libcurl.so")))
-  (define lib (load-librarys  lib-name ))
-
+  (load-librarys "libcurl")
+  
   (define OBJECTPOINT 10000)
   (define LONG 0)
   (define STRINGPOINT 10000)
@@ -526,6 +572,14 @@
   (define CURL_GLOBAL_NOTHING 0)
   (define CURL_GLOBAL_DEFAULT CURL_GLOBAL_ALL)
   (define CURL_GLOBAL_ACK_EINTR 2)
+
+  (define CURLINFO_STRING   #x100000)
+  (define CURLINFO_LONG     #x200000)
+  (define CURLINFO_DOUBLE   #x300000)
+  (define CURLINFO_SLIST    #x400000)
+  (define CURLINFO_SOCKET   #x500000)
+  (define CURLINFO_MASK     #x0fffff)
+  (define CURLINFO_TYPEMASK #xf00000)
   
   (define-syntax def-cinit
     (lambda (x)
@@ -539,6 +593,63 @@
 	 (with-syntax ([nname (make-prefix-id "CURLOPT_" #'name)])
 		      #'(define nname
 			  (+ type offset ))))  ) ))
+
+  (define-syntax def-cenum
+    (lambda (x)
+      (syntax-case x ()
+	((_ name type offset)
+	 #'(define name (+ type offset))))))
+  
+(def-cenum CURLINFO_NONE 0 0)
+(def-cenum CURLINFO_EFFECTIVE_URL     CURLINFO_STRING  1)
+(def-cenum CURLINFO_RESPONSE_CODE     CURLINFO_LONG    2)
+(def-cenum CURLINFO_TOTAL_TIME        CURLINFO_DOUBLE  3)
+(def-cenum CURLINFO_NAMELOOKUP_TIME   CURLINFO_DOUBLE  4)
+(def-cenum CURLINFO_CONNECT_TIME      CURLINFO_DOUBLE  5)
+(def-cenum CURLINFO_PRETRANSFER_TIME  CURLINFO_DOUBLE  6)
+(def-cenum CURLINFO_SIZE_UPLOAD       CURLINFO_DOUBLE  7)
+(def-cenum CURLINFO_SIZE_DOWNLOAD     CURLINFO_DOUBLE  8)
+(def-cenum CURLINFO_SPEED_DOWNLOAD    CURLINFO_DOUBLE  9)
+(def-cenum CURLINFO_SPEED_UPLOAD      CURLINFO_DOUBLE  10)
+(def-cenum CURLINFO_HEADER_SIZE       CURLINFO_LONG    11)
+(def-cenum CURLINFO_REQUEST_SIZE      CURLINFO_LONG    12)
+(def-cenum CURLINFO_SSL_VERIFYRESULT  CURLINFO_LONG    13)
+(def-cenum CURLINFO_FILETIME          CURLINFO_LONG    14)
+(def-cenum CURLINFO_CONTENT_LENGTH_DOWNLOAD    CURLINFO_DOUBLE  15)
+(def-cenum CURLINFO_CONTENT_LENGTH_UPLOAD      CURLINFO_DOUBLE  16)
+(def-cenum CURLINFO_STARTTRANSFER_TIME  CURLINFO_DOUBLE  17)
+(def-cenum CURLINFO_CONTENT_TYPE      CURLINFO_STRING  18)
+(def-cenum CURLINFO_REDIRECT_TIME     CURLINFO_DOUBLE  19)
+(def-cenum CURLINFO_REDIRECT_COUNT    CURLINFO_LONG    20)
+(def-cenum CURLINFO_PRIVATE           CURLINFO_STRING  21)
+(def-cenum CURLINFO_HTTP_CONNECTCODE  CURLINFO_LONG    22)
+(def-cenum CURLINFO_HTTPAUTH_AVAIL    CURLINFO_LONG    23)
+(def-cenum CURLINFO_PROXYAUTH_AVAIL   CURLINFO_LONG    24)
+(def-cenum CURLINFO_OS_ERRNO          CURLINFO_LONG    25)
+(def-cenum CURLINFO_NUM_CONNECTS      CURLINFO_LONG    26)
+(def-cenum CURLINFO_SSL_ENGINES       CURLINFO_SLIST   27)
+(def-cenum CURLINFO_COOKIELIST        CURLINFO_SLIST   28)
+(def-cenum CURLINFO_LASTSOCKET        CURLINFO_LONG    29)
+(def-cenum CURLINFO_FTP_ENTRY_PATH    CURLINFO_STRING  30)
+(def-cenum CURLINFO_REDIRECT_URL      CURLINFO_STRING  31)
+(def-cenum CURLINFO_PRIMARY_IP        CURLINFO_STRING  32)
+(def-cenum CURLINFO_APPCONNECT_TIME   CURLINFO_DOUBLE  33)
+(def-cenum CURLINFO_CERTINFO          CURLINFO_SLIST   34)
+(def-cenum CURLINFO_CONDITION_UNMET   CURLINFO_LONG    35)
+(def-cenum CURLINFO_RTSP_SESSION_ID   CURLINFO_STRING  36)
+(def-cenum CURLINFO_RTSP_CLIENT_CSEQ  CURLINFO_LONG    37)
+(def-cenum CURLINFO_RTSP_SERVER_CSEQ  CURLINFO_LONG    38)
+(def-cenum CURLINFO_RTSP_CSEQ_RECV    CURLINFO_LONG    39)
+(def-cenum CURLINFO_PRIMARY_PORT      CURLINFO_LONG    40)
+(def-cenum CURLINFO_LOCAL_IP          CURLINFO_STRING  41)
+(def-cenum CURLINFO_LOCAL_PORT        CURLINFO_LONG    42)
+(def-cenum CURLINFO_TLS_SESSION       CURLINFO_SLIST   43)
+(def-cenum CURLINFO_ACTIVESOCKET      CURLINFO_SOCKET  44)
+(def-cenum CURLINFO_TLS_SSL_PTR       CURLINFO_SLIST   45)
+(def-cenum CURLINFO_HTTP_VERSION      CURLINFO_LONG    46)
+(def-cenum CURLINFO_PROXY_SSL_VERIFYRESULT  CURLINFO_LONG  47)
+(def-cenum CURLINFO_PROTOCOL          CURLINFO_LONG    48)
+(def-cenum CURLINFO_SCHEME            CURLINFO_STRING  49)
 
   ;; This is the FILE ;; or void ;; the regular output should be written to. 
   (def-cinit WRITEDATA OBJECTPOINT 1)
@@ -1439,8 +1550,7 @@
   (def-cinit REQUEST_TARGET STRINGPOINT 266)
 
   ;; bitmask of allowed auth methods for connections to SOCKS5 proxies 
-  (def-cinit SOCKS5_AUTH LONG 267)
-  
+(def-cinit SOCKS5_AUTH LONG 267)
   
   ;;int curl_strequal(char* s1 ,char* s2)
   (def-function curl-strequal

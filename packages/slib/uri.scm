@@ -315,7 +315,7 @@
 ;;routine is useful for showing URI contents on error pages.
 (define (uric:decode uri-component)
   (define len (string-length uri-component))
-  (define (sub uri)
+  (define (sub uri)      
     (cond
      ((string-index uri #\%)
       => (lambda (idx)
@@ -324,10 +324,10 @@
 		    (string->number (substring uri (+ 2 idx) (+ 3 idx)) 16))
 	       (string-append
 		(substring uri 0 idx)
-		(string (integer->char
+		(printf (string  (integer->char
 			 (string->number
 			  (substring uri (+ 1 idx) (+ 3 idx))
-			  16)))
+			  16))))
 		(sub (substring uri (+ 3 idx) (string-length uri)))))))
      (else uri)))
   (sub uri-component))

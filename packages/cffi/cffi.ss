@@ -9,7 +9,8 @@
    ffi-prep-cif
    ffi-prep-cif-var
    ffi-call
-
+   load-lib
+   load-libs
    cffi-set-char
    cffi-set-int
    cffi-set-float
@@ -17,7 +18,7 @@
    
    cffi-get-uchar
    cffi-get-uint
-  cffi-get-ulong
+   cffi-get-ulong
   
    cffi-get-char
    cffi-get-int
@@ -45,12 +46,16 @@
    def-function
    def-function-callback
    def-struct
+   struct-size
+   lisp2struct
+   struct2lisp
+   
    cffi-alloc
    cffi-free
    cffi-log
    cffi-thread
    )
-  (import  (scheme) (utils libutil) (utils macro) (thread scm-ffi) )
+  (import  (scheme) (utils libutil) (utils macro)  )
 
   (define FFI_DEFAULT_ABI  2)
 
@@ -84,7 +89,7 @@
 
 
   (define cffi-enable-log #f)
-  (define cffi-enable-thread (threaded?))
+  (define cffi-enable-thread #f)
   (define (cffi-log t)
     (set! cffi-enable-log t))
   
@@ -99,6 +104,7 @@
       ((a6nt i3nt ta6nt ti3nt)  "libcffi.dll")
       ((a6osx ta6osx i3osx ti3osx)  "libcffi.so")
       ((a6le i3le ta6le ti3le) "libcffi.so")))
+  
   (define lib (load-lib lib-name))
   
   (define ffi-prep-cif (foreign-procedure "ffi_prep_cif" (void* int int void* void*) int))
@@ -123,33 +129,35 @@
 
   (define (ffi-cif-alloc $ffi-alloc-list)
     (let ((m ($ffi-cif-alloc)))
-      (set! $ffi-alloc-list(append! $ffi-alloc-list (list m) ))
+      (set-box! $ffi-alloc-list (append! (unbox $ffi-alloc-list) (list m) ))
       m
-      )
-    )
+      ))
+  
   (define (ffi-types-alloc $ffi-alloc-list size)
     (let ((m ($ffi-types-alloc size)))
-      (set! $ffi-alloc-list(append! $ffi-alloc-list (list m) ))
+      (set-box! $ffi-alloc-list (append! (unbox $ffi-alloc-list) (list m) ))
       m
-      )
-    )
+      ))
+  
   (define (ffi-values-alloc $ffi-alloc-list size)
     (let ((m ($ffi-values-alloc size)))
-      (set! $ffi-alloc-list(append! $ffi-alloc-list (list m) ))
-      m
-      )
-    )
+      (set-box! $ffi-alloc-list
+		(append! (unbox $ffi-alloc-list) (list m) ))
+      m))
+  
   (define (ffi-alloc $ffi-alloc-list size)
+    ;;(display (format "ffi-alloc-list=~a\n" (length (unbox $ffi-alloc-list))))
     (let ((m ($ffi-alloc size)))
-        ;;(display (format "$ffi-alloc addr=~x\n" m))
-      (set! $ffi-alloc-list(append! $ffi-alloc-list (list m) ))
+      ;;(display (format "$ffi-alloc addr=~x\n" m))
+      (set-box! $ffi-alloc-list (append (unbox $ffi-alloc-list) (list m) ))
       m
       )
     )
 
+  
   (define (ffi-free-all $ffi-alloc-list)
-    ;;(display (format "ffi-free-all=~a\n" (length $ffi-alloc-list)))
-    (let loop ((l $ffi-alloc-list))
+    ;;(display (format "ffi-free-all=~a\n" (length (unbox $ffi-alloc-list))))
+    (let loop ((l (unbox $ffi-alloc-list)))
       (if (pair? l)
 	  (begin
 	    ;;(display (format "$ffi-free addr=~x\n" (car l)))
@@ -282,7 +290,7 @@
   (define cffi-get-int ffi-get-int)
   (define cffi-get-long ffi-get-long)
 
-(define cffi-get-uchar ffi-get-uchar)
+  (define cffi-get-uchar ffi-get-uchar)
   (define cffi-get-uint ffi-get-uint)
   (define cffi-get-ulong ffi-get-ulong)
 
@@ -328,15 +336,42 @@
 	    (loop (cdr libs)) ))) )
 
 
-  (define (load-librarys . args)
-    (let loop ((arg args))
-      (if (pair? arg)
-	  (begin	    
-	    (cffi-load-lib-op (car arg))
-	    (loop (cdr arg))
-	    ))
-      )
-    )
+  ;; (define (load-librarys . args)
+  ;;   (let loop ((arg args))
+  ;;     (if (pair? arg)
+  ;; 	  (begin
+  ;; 	    ;;(printf "##load lib=~a\n" (car arg))
+  ;; 	    (let loop2 ((ext (get-dynamic-ext)))
+  ;; 	      (if (pair? ext)
+  ;; 		  (begin
+  ;; 		    (cffi-load-lib-op (string-append (car arg) (car ext)))
+  ;; 		    (loop2 (cdr ext))))
+  ;; 	      (loop (cdr arg)))
+  ;; 	      )
+  ;; 	    ))
+  ;;     )
+
+   (define-syntax load-librarys 
+    (lambda (x)
+      (import (utils libutil))
+      (syntax-case x ()
+  	((_ . args )
+	 #`(define lib
+	     #,(let loop ((arg  (syntax->datum #'args)))
+		 ;;(printf ">>>>load arg=~a\n"  arg)
+		 (if (pair? arg)
+		     (begin
+		       ;;(printf "##load lib=~a\n" (car arg))
+		       (let loop2 ((ext (get-dynamic-ext)))
+			 (if (pair? ext)
+			     (begin
+			       (load-lib  (string-append (car arg) (car ext))  )
+			       (loop2 (cdr ext))))
+			     (loop (cdr arg)))
+		       )
+		     #'1
+		     )))))
+      ))
   
   ;;(name1 name2 name3)
   ;;(type1 type2 type3)
@@ -363,22 +398,17 @@
                                       ;(display (format "  ###=>~a\n" (syntax->datum ss) ) )
                                           (case (syntax->datum ss)
                                               [(number?) (syntax->datum ss)]
-                                              [else (eval (syntax->datum ss) ) ]
-                                            )
-                                          )
-                                      #'(s ...) ) )
-
+                                              [else (eval (syntax->datum ss) ) ]))
+						#'(s ...) ) )
                                  #,@(map (lambda (vv) 
-                                         #`'()  ) #'(v ...)) )]
+					   #`'()  ) #'(v ...)) )]
                               [(v ...)  (new  
                                 '(t ... ) 
                                 '#,@(list (map (lambda (ss)
                                       ;(display (format "  ###=>~a\n" (syntax->datum ss) ) )
                                           (case (syntax->datum ss)
                                               [(number?) (syntax->datum ss)]
-                                              [else (eval (syntax->datum ss) ) ]
-                                            )
-                                          )
+                                              [else (eval (syntax->datum ss) ) ]) )
                                       #'(s ...) ) )
 
                                  v ... ) ])
@@ -393,9 +423,8 @@
                   (fields 
                       (mutable type)
                       (mutable size)
-                      #,@(map (lambda (vv) 
+                      #,@(map (lambda (vv)
                               #`(mutable #,vv) ) #'(v ...)) 
-          
                       )
                   (protocol (lambda (new) 
                     (case-lambda
@@ -404,12 +433,11 @@
                                      '(t ...)
                                      '#,@(list (map (lambda (ss)
                                           (case (syntax->datum ss)
-                                            [(long ulong float double ) 64 ]
-					    [(int uint  ) 32 ]
+                                            [(long ulong float double  void*) 64 ]
+					    [(int uint ) 32 ]
                                             [(short ushort) 16 ]
-                                            [(char uchar) 8 ]
-                                           ))
-                                      #'(t ...) ) )
+                                            [(char uchar) 8 ] ))
+						    #'(t ...) ) )
                                       #,@(map (lambda (vv) 
                                            #`'()  ) #'(v ...))
 
@@ -419,12 +447,12 @@
                                      '(t ...)
                                      '#,@(list (map (lambda (ss)
                                           (case (syntax->datum ss)
-                                            [(long ulong float double ) 64 ]
+                                            [(long ulong float double  void*) 64 ]
                                             [(int uint  ) 32 ]
                                             [(short ushort) 16 ]
-                                            [(char uchar ) 8 ]
-                                           ))
-                                      #'(t ...) ) )
+                                            [(char uchar ) 8 ]))
+						    #'(t ...) ) )
+				     
                                       v ...
                                ) ]
                       )
@@ -494,12 +522,37 @@
   
   (define-syntax def-function
     (lambda (x)
+      (define lib-name
+	(case (machine-type)
+	  ((arm32le) "libcffi.so")
+	  ((a6nt i3nt ta6nt ti3nt)  "libcffi.dll")
+	  ((a6osx ta6osx i3osx ti3osx)  "libcffi.so")
+	  ((a6le i3le ta6le ti3le) "libcffi.so")))
+
+      (define lib (load-lib lib-name))
+      (define ffi-dlsym (foreign-procedure "ffi_dlsym" (void*  string) void*))
+      (define ffi-dlopen (foreign-procedure "ffi_dlopen" (string int ) void*))
+      (define RTLD_LAZY 1)
       (syntax-case x ()
    	((_ name sym args ret)
-   	 #'(define name 
+	 (with-syntax ((libs (get-loaded-libs-list)))
+   	 #`(define name 
    	     (lambda values
-   	       (cffi-call  sym 'args 'ret values )
-   	       ))))  ) )
+   	       (cffi-call
+		sym
+		#,((lambda (libs s)
+		     ;;(printf "get loaded libs=>~a\n" (get-loaded-libs-list))
+		     (let loop ((lib libs))
+		       (if (pair? lib)
+			   (let ((ret (ffi-dlsym (ffi-dlopen (car lib)  RTLD_LAZY)   (syntax->datum s) ) ))
+			     ;;(printf "~a ~a\n" (car lib) ret )
+			     (if (> ret 0)
+				 ret
+				 (loop (cdr lib))))
+			   #'0
+			   ))) #'libs  #'sym)
+		'args 'ret values )
+   	       ))))  ) ))
 
  
   ;;cal-size 
@@ -650,31 +703,31 @@
                 ;;(display (format "  type=~a value=~a index=~a \n" (car type) (car arg) i   ))
                 (case (car type)
 		  [(ushort)
-                    (set! alloc (ffi-alloc alloc-list 16) ) 
+                    (set! alloc (ffi-alloc alloc-list 2) ) 
                     (ffi-set-ushort alloc (car arg) )
                     (ffi-values-set cargs i alloc) ]
 		  [(short)
-                    (set! alloc (ffi-alloc alloc-list 16) ) 
+                    (set! alloc (ffi-alloc alloc-list 2) ) 
                     (ffi-set-short alloc (car arg) )
                     (ffi-values-set cargs i alloc) ]
                   [(uint)
-                    (set! alloc (ffi-alloc alloc-list 32) ) 
+                    (set! alloc (ffi-alloc alloc-list 4) ) 
                     (ffi-set-uint alloc (car arg) )
                     (ffi-values-set cargs i alloc) ]
 		  [(int)
-                    (set! alloc (ffi-alloc alloc-list 32) ) 
+                    (set! alloc (ffi-alloc alloc-list 4) ) 
                     (ffi-set-int alloc (car arg) )
                     (ffi-values-set cargs i alloc) ]
 		  [(int64 long)
-		    (set! alloc (ffi-alloc alloc-list 64) ) 
+		    (set! alloc (ffi-alloc alloc-list 8) ) 
                     (ffi-set-long alloc   (car arg))
                     (ffi-values-set cargs i alloc) ]
                   [(float)
-		   (set! alloc (ffi-alloc alloc-list 32) )
+		   (set! alloc (ffi-alloc alloc-list 4) )
 		   (ffi-set-float alloc (+ 0.0 (car arg) ))
 		   (ffi-values-set cargs i alloc) ]
                   [(double)
-                    (set! alloc (ffi-alloc alloc-list 64) ) 
+                    (set! alloc (ffi-alloc alloc-list 8) ) 
                     (ffi-set-double alloc  (+ 0.0 (car arg)))
                     (ffi-values-set cargs i alloc) ]
                   [(void)
@@ -684,14 +737,13 @@
                     1
                      ]
                   [(string )
-                    (set! alloc (ffi-alloc alloc-list 64) )
-                    (if (number? (car arg)) 
-                      (ffi-set-pointer alloc  (car arg))
-                      (ffi-set-string alloc  (car arg))
-                    )
+		   (set! alloc (ffi-alloc alloc-list 8) )
+		   (if (string? (car arg))
+		       (ffi-set-string alloc  (car arg))
+			   (ffi-set-pointer alloc  (car arg)))
                     (ffi-values-set cargs i alloc) ]
                   [(void* )
-		   (set! alloc (ffi-alloc alloc-list 64) )
+		   (set! alloc (ffi-alloc alloc-list 8) )
 		   (if (string? (car arg))
 		       (ffi-set-string alloc  (car arg))
 		       (ffi-set-pointer alloc  (car arg)))
@@ -719,80 +771,99 @@
 
 
  
-  
+   (define-syntax try 
+    (syntax-rules (catch) 
+      ((_ body (catch catcher)) 
+       (call-with-current-continuation 
+	(lambda (exit) 
+	  (with-exception-handler 
+	   (lambda (condition) 
+	     (catcher condition) 
+	     (exit condition)) 
+	   (lambda () body)))))))
 
   ;;ffi call
-  (define (cffi-call sym arg-type ret-type args )    
-    (if cffi-enable-log
-	(begin
-	  (display "\n")(display (format "cffi-call ~a arg-type=~a ret-type=~a args=~a \n"  sym  arg-type ret-type args) )  ) )
-    (let* (
-	  (alloc-list '())
-          (carg-type (create-carg-type alloc-list arg-type) )
-          (cret-type (create-cret-type alloc-list ret-type) )
-          (cargs (create-cargs alloc-list arg-type args carg-type) )
+   (define (cffi-call sym fptr arg-type ret-type args )
+      (if cffi-enable-log
+	  (begin
+	    (display "\n")(display (format "cffi-call ~a arg-type=~a ret-type=~a args=~a \n"  sym  arg-type ret-type args) )  ) )
+      (try
+      (let* (
+	     (alloc-list (box '()))
+	     (carg-type (create-carg-type alloc-list arg-type) )
+	     (cret-type (create-cret-type alloc-list ret-type) )
+	     (cargs (create-cargs alloc-list arg-type args carg-type) )
 
-          (cret-info (create-cret alloc-list ret-type) )
-          (cret '() )
-          (cif (ffi-cif-alloc alloc-list) )
-          (fptr (cffi-sym  sym )) 
-          (call-ret '() )
-          (ret-val '() )
-          )
-      
-      (set! call-ret (cadr cret-info))
-      (set! cret (car cret-info))
+	     (cret-info (create-cret alloc-list ret-type) )
+	     (cret '() )
+	     (cif (ffi-cif-alloc alloc-list) )
+	     ;;(fptr (cffi-sym  sym )) 
+	     (call-ret '() )
+	     (ret-val '() )
+	     )
+	
+	(set! call-ret (cadr cret-info))
+	(set! cret (car cret-info))
 
       ;;(display (format "ffi-prep-cif len=~a  cret-type=~a carg-type=~a\n" (length arg-type) cret-type carg-type) )
       ;;(display (test-float cif FFI_DEFAULT_ABI  cret-type carg-type cargs) )
       ;;init cif
-     
-      (if (= FFI_OK (ffi-prep-cif cif FFI_DEFAULT_ABI (length arg-type) cret-type carg-type ) )
-	  (begin
-	    ;;(printf "fptr=~a \n" fptr)
-	    (if (> fptr 0)
-		(begin
-		  (if cffi-enable-thread
-		      (deactivate-thread))
-		  ;;(display (format "ffi-call cret=~x cargs=~x\n" cret cargs ))
-		  (ffi-call cif fptr cret cargs)
-		  (if cffi-enable-thread
-		      (activate-thread))
-		  )
-		(display (format "cannot find symbol ~a\n" sym ))
-                ))
-	  (error 'cffi (format "ffi-prep-cif return error\n"))
-	  )
-   
-      ;;(display (format "cret=~x\n" cret))
-      (if (procedure? call-ret)
-	  (set! ret-val (call-ret cret))
-	  )
-      (ffi-free-all alloc-list)
-      
-      (if cffi-enable-log
-	  (display (format "ffi-call ret=~x\n" ret-val)))
-      ret-val
-      )
+	
+	(if (= FFI_OK (ffi-prep-cif cif FFI_DEFAULT_ABI (length arg-type) cret-type carg-type ) )
+	    (begin
+	      ;;(printf "fptr=~a \n" fptr)
+	      (if (> fptr 0)
+		  (begin
+		    ;;(if cffi-enable-thread ;;not need more 
+			;;(deactivate-thread))
+		    ;;(display (format "ffi-call cret=~x cargs=~x\n" cret cargs ))
+		    (ffi-call cif fptr cret cargs)
+		    
+		    ;;(if cffi-enable-thread
+			;;(activate-thread))
+		    )
+		  (display (format "cannot find symbol ~a\n" sym ))
+		  ))
+	    (error 'cffi (format "ffi-prep-cif return error\n"))
+	    )
+	
+	;;(display (format "cret=~x\n" cret))
+	(if (procedure? call-ret)
+	    (set! ret-val (call-ret cret))
+	    )
+	(ffi-free-all alloc-list)
+	
+	(if cffi-enable-log
+	    (display (format "ffi-call ret=~x\n" ret-val)))
+	ret-val
+	)
 
-    )    
+    (catch (lambda (x)
+	     (printf "Call [~a ~a ~a ~a] ~a\n"
+		     sym arg-type ret-type args
+	     	     (with-output-to-string
+	     	       (lambda () (display-condition x)))
+	     	     )
+	     x)))
+    ) 
 
 
 (define (struct-ref s index )
-    ( (record-accessor (record-rtd  s ) index ) s )
-  )
+  ((record-accessor (record-rtd s) index) s))
+
 (define (struct-set! s index  val)
-  ((record-mutator (record-rtd  s ) index )  s val)
-  )
+  ((record-mutator (record-rtd s) index) s val))
  
 ;;struct2lisp
 (define (struct2lisp addr ret-struct-val)
   ;(display (format "  ret-fun conver======>~a ~a\n" addr ret-struct-val ) )
   (let loop ((i 0) (offset 0) 
              (t (struct-ref ret-struct-val 0) ) 
-             (s (struct-ref ret-struct-val 1)) )
+             (s (struct-ref ret-struct-val 1))
+	     (aligned (get-aligned (struct-ref ret-struct-val 1) )))
             (if (pair? t)
-              (let ((struct-val 0)) 
+		(let ((struct-val 0))
+		  (set! offset (/ (car aligned) 8))
                   (case (car t)
                     [(char ) (set! struct-val (ffi-get-char(+ addr offset)) )
                         (set! offset (+ offset (/ (car s) 8) ))
@@ -838,7 +909,7 @@
                   (struct-set! ret-struct-val (+ i 2)  struct-val)
                   ;(display (format "   >>>>ret fun type=~a size=~a struct-val=~a\n" (car t) (car s)  struct-val) )
 
-                  (loop (+ i 1)  offset (cdr t) (cdr s) )
+                  (loop (+ i 1)  offset (cdr t) (cdr s) (cdr aligned) )
               )
               (begin 
                 ;(display (format "      ret-struct-val=~a\n\n" ret-struct-val) )
@@ -847,66 +918,101 @@
       
   )
 
+
+
+(define (% x y)
+  (- x  (*  y (quotient x y))))
+
+(define (get-padding align offset)
+  (% (- align (% offset align)) align))
+
+(define (get-aligned l)
+  (let ((pack 32)
+	(r '()))
+    (let loop ((e l) (offset 0))
+      (if (pair? e)
+	  (let* ((align (car e) )
+		 (padding (get-padding align offset))
+		 (aligned (+ offset padding)))
+	    (set! r (append r (list aligned) ))
+	    ;;(printf "padding=~a offset=~a aligned=~a\n" padding offset aligned)
+	    (set! offset (+ offset align padding ))
+	    (loop (cdr e) offset ))
+	  (append r (list (+ offset (get-padding (apply max l) offset ))) )))))
+    
+
+(define (lastt lst)
+  (if (= (length lst) 1)
+      (car lst)
+      (lastt (cdr lst))))
+
+(define struct-size
+  (lambda (x)
+    (/ (lastt (get-aligned (struct-ref x 1) )) 8) ))
+
 ;;lisp2struct
-  (define (lisp2struct struct-val addr)
-    (let loop ((i 0) (e (struct-ref struct-val 0) ) (offset 0) (s (struct-ref struct-val 1)) )
+(define (lisp2struct struct-val addr)
+  (let loop ((i 0)
+	       (e (struct-ref struct-val 0))
+	       (offset 0)
+	       (s (struct-ref struct-val 1))
+	       (aligned (get-aligned (struct-ref struct-val 1) )))
+      
         (if (pair? e)
           (let ((v ((record-accessor 
                 (record-rtd  struct-val) (+ i 2) ) struct-val ))
                 (ss (car s))
-                ) 
+                )
+	    (set! offset (/ (car aligned) 8))
               ;(display (format "    set ~a value==>~a size=~a offset=~a\n" (car e) v ss offset))
               (case (car e)
                 [(char ) 
                     (ffi-set-char (+ offset addr) v)
-                    (set! offset (+ offset (/ ss 8) ) )
                   ]
                 [(double ) 
                     (ffi-set-double (+ offset addr) v)
-                    (set! offset (+ offset (/ ss 8) ))
                 ]
                 [(int ) 
-                  (ffi-set-int (+ offset addr) v)
-                    (set! offset (+ offset (/ ss 8) ))
-		    ]
+		 (ffi-set-int (+ offset addr) v)
+		 ]
 		[(int64  long) 
-                  (ffi-set-long (+ offset addr) v)
-                    (set! offset (+ offset (/ ss 8) ))
-                  ]
+		 (ffi-set-long (+ offset addr) v)
+		 ]
                 [(float ) 
-                    (ffi-set-float (+ offset addr) v)
-                    (set! offset (+ offset (/ ss 8) ))
-                  ]
+		 (ffi-set-float (+ offset addr) v)
+		 ]
                 [(float* )
-                  ;(print-array v )
-                  ; (let loop ((i  (car s) ) (o 0) )
-                  ;     (if (>= i 0)
-                  ;       (begin 
+		  (ffi-set-pointer (+ offset addr) v)
+					;(print-array v )
+					; (let loop ((i  (car s) ) (o 0) )
+					;     (if (>= i 0)
+					;       (begin 
 
-                  ;         (display (format "    ######====>~a\n" (ffi-get-float (+ v o) ) ))
-                  ;         (ffi-set-float (+ offset addr o) (ffi-get-float (+ v o) ) )
-                  ;         (loop (- i 32) (+ o 32) )
-                  ;         ))
-                  ;   )
-                  (ffi-copy-mem  v (+ offset addr) (/ (car s) 1) )
-                  (set! offset (+ offset (/ (car s) 8) ))
-                ]
+					;         (display (format "    ######====>~a\n" (ffi-get-float (+ v o) ) ))
+					;         (ffi-set-float (+ offset addr o) (ffi-get-float (+ v o) ) )
+					;         (loop (- i 32) (+ o 32) )
+					;         ))
+					;   )
+		 ;;(ffi-copy-mem  v (+ offset addr) (/ (car s) 1) )
+		 ]
                 [(void* ) 
-                  ;(display (format "v=~x addr=~x\n"  v (+ offset addr) ))
-                  ;(ffi-copy-mem  v (+ offset addr) (/ (car s) 8) )
-                  ;(ffi-set-pointer (+ offset addr) v)
-                  (set! offset (+ offset (/ (car s) 8) ))
-                  ]
+					;(display (format "v=~x addr=~x\n"  v (+ offset addr) ))
+		 ;;(ffi-copy-mem  v (+ offset addr) (/ (car s) 1) )
+		 (ffi-set-pointer (+ offset addr) v)
+		 ;;(set! offset (+ offset (/ (car s) 8) ))
+		 ]
                 [else
-                    ;(display (format "    ===else ~a ~a\n" (car e) (car s) ) )
-                    (lisp2struct v (+ offset addr) )
-                    (set! offset (+ offset (/ (car s) 8) ))
-                  ]  
+					;(display (format "    ===else ~a ~a\n" (car e) (car s) ) )
+		 (lisp2struct v (+ offset addr) )
+		 ]  
                 )
-            (loop (+ i 1) (cdr e) offset (cdr s) )
-          ))
+            (loop (+ i 1) (cdr e) offset (cdr s) (cdr aligned) )
+	    ))
+	addr
       )
     )
+
+
 
 
 )

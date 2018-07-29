@@ -2,7 +2,7 @@
 ;作者:evilbinary on 04/22/16.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(library (mongoc bson-ffi ) 
+(library (mongoc bson-ffi )
   (export
    bson-context-new
    bson-context-destroy
@@ -195,18 +195,12 @@
    bson-append-timestamp
    bson-append-undefined
    bson-concat
-   
+
    )
 
   (import (scheme) (utils libutil) (cffi cffi) )
 
-  (define lib-name
-    (case (machine-type)
-      ((arm32le) "libbson.so")
-      ((a6nt i3nt) "libbson-1.0.dll")
-      ((a6osx i3osx)  "libbson.so")
-      ((a6le i3le) "libbson.so")))
-  (define lib (load-librarys  lib-name ))
+  (load-librarys  "libbson"  "libbson-1.0" )
 
 
 

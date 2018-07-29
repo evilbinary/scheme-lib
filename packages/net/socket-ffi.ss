@@ -2,12 +2,12 @@
 ;作者:evilbinary on 2017-04-29 00:03:30.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(library (net socket-ffi ) 
+(library (net socket-ffi )
   (export
-   SOCK_STREAM     
-   SOCK_DGRAM      
-   SOCK_RAW      
-   SOCK_RDM        
+   SOCK_STREAM
+   SOCK_DGRAM
+   SOCK_RAW
+   SOCK_RDM
    SOCK_SEQPACKET
    SOCK_PACKET
    AF_INET
@@ -15,7 +15,7 @@
    SOL_SOCKET
    SO_REUSEADDR
    SO_REUSEPORT
-   
+
    SO_SNDBUF
    SO_RCVBUF
    SO_SNDLOWAT
@@ -24,7 +24,7 @@
    SO_RCVTIMEO
    SO_ERROR
    SO_TYPE
-   
+
    make-sockaddr-in
 
    cfdopen
@@ -34,7 +34,7 @@
    cwrite-all
    inet-addr
    ntohl
-   
+
    close
    socket
    bind
@@ -56,13 +56,9 @@
 
  (import (scheme) (utils libutil) (cffi cffi) )
 
- (define lib-name
-  (case (machine-type)
-   ((arm32le) "libsocket.so")
-   ((a6nt i3nt ta6nt ti3nt) "libsocket.dll")
-   ((a6osx i3osx ta6osx ti3osx)  "libsocket.so")
-   ((a6le i3le ta6le ti3le) "libsocket.so")))
- (define lib (load-librarys  lib-name ))
+
+
+ (load-librarys  "libsocket")
 
 
  (define AF_INET 2 )
@@ -78,7 +74,7 @@
  (define SOL_SOCKET 0 )
  (define SO_REUSEADDR   #x0004)
  (define SO_REUSEPORT   #x0200 )
- 
+
  (define SO_SNDBUF	#x1001)
  (define SO_RCVBUF	#x1002)
  (define SO_SNDLOWAT	#x1003)
@@ -92,10 +88,10 @@
   (def-function ntohl
     "_ntohl" (uint) uint)
 
-  
+
   (def-function inet-addr
     "_inet_addr" (string) int)
-  
+
  (def-function make-sockaddr-in
    "make_sockaddr_in" (int int int) void*)
 
@@ -108,7 +104,7 @@
 
  (def-function cfdopen
     "_fdopen" (int string) int)
-  
+
  (def-function cread
    "_read" (int void* int) int)
 
@@ -117,7 +113,7 @@
 
   (def-function cwrite-all
     "_write_all" (int void* int) int)
-    
+
 ;;int socket(int  ,int  ,int )
 (def-function socket
              "_socket" (int int int) int)
@@ -128,7 +124,7 @@
 
 ;;int connect(int  ,struct sockaddr*  ,socklen_t )
 (def-function connect
-             "_connect" (int void* socklen_t) int)
+             "_connect" (int void* int) int)
 
 ;;int listen(int  ,int )
 (def-function listen

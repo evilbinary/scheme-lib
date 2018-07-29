@@ -2,38 +2,33 @@
 ;作者:evilbinary on 2017-06-10 23:49:57.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(library (regex regex-ffi ) 
+(library (regex regex-ffi )
   (export regcomp
   regexec
   regerror
   regfree
   REG_EXTENDED
-  REG_NOERROR  
+  REG_NOERROR
 REG_NOMATCH
-REG_BADPAT 
-REG_ECOLLATE 
-REG_ECTYPE 
+REG_BADPAT
+REG_ECOLLATE
+REG_ECTYPE
 REG_EESCAPE
 REG_ESUBREG
-REG_EBRACK 
-REG_EPAREN 
-REG_EBRACE 
+REG_EBRACK
+REG_EPAREN
+REG_EBRACE
 REG_BADBR
-REG_ERANGE 
-REG_ESPACE 
+REG_ERANGE
+REG_ESPACE
 REG_BADRPT
 
   )
 
  (import (scheme) (utils libutil) (cffi cffi) )
 
- (define lib-name
-  (case (machine-type)
-   ((arm32le) "libscm.so")
-   ((a6nt i3nt ta6nt ti3nt) "libsystre-0.dll")
-   ((a6osx i3osx ta6osx ti3osx)  "libscm.so")
-   ((a6le i3le ta6le ti3le) "libscm.so")))
- (define lib (load-librarys  lib-name ))
+
+ (load-librarys  "libscm" "libsystre-0" )
 
  (define  REG_EXTENDED 1)
 
@@ -52,7 +47,7 @@ REG_BADRPT
  (define    REG_ESPACE 12);;,		/* Ran out of memory.  */
  (define    REG_BADRPT 13);;,		/* No preceding re for repetition op.  */
 
- 
+
 ;;int regcomp(regex_t* __preg ,char* __pattern ,int __cflags)
 (def-function regcomp
              "regcomp" (void* string int) int)

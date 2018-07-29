@@ -2,7 +2,7 @@
 ;作者:evilbinary on 04/22/16.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(library (mongoc mongoc-ffi ) 
+(library (mongoc mongoc-ffi )
   (export
   mongoc-read-prefs-new
   mongoc-read-prefs-copy
@@ -438,14 +438,8 @@
   mongoc-stream-tls-new)
 
  (import (scheme) (utils libutil) (cffi cffi) (mongoc bson-ffi ))
-
- (define lib-name
-   (case (machine-type)
-     ((arm32le) "libmongoc.so")
-     ((a6nt i3nt) "libmongoc-1.0.dll")
-     ((a6osx i3osx)  "libmongoc.so")
-     ((a6le i3le) "libmongoc.so")))
- (define lib (load-librarys  lib-name ))
+ 
+ (load-librarys  "libmongoc" "libmongoc-1.0")
 
 
 
@@ -2180,7 +2174,5 @@
 
 
 
- 
+
 )
-
-

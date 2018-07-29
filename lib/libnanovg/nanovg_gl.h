@@ -22,6 +22,27 @@
 extern "C" {
 #endif
 
+#ifdef ANDROID
+#include <android/log.h>
+#define LOG_TAG "nanovg"
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,LOG_TAG , __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__))
+#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__))
+#define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__))
+#else
+
+#ifdef LOG
+#define LOGI(...)  fprintf(stdout,__VA_ARGS__);fprintf(stdout,"\n");fflush(stdout);
+#define LOGW(...)  fprintf(stdout,__VA_ARGS__);fprintf(stdout,"\n");fflush(stdout);
+#define LOGE(...)  fprintf(stdout,__VA_ARGS__);fprintf(stdout,"\n");fflush(stdout);
+#else
+#define LOGI(...)
+#define LOGW(...)
+#define LOGE(...)
+#endif
+  
+#endif
+
 // Create flags
 
 enum NVGcreateFlags {
@@ -392,6 +413,7 @@ static void glnvg__dumpProgramError(GLuint prog, const char* name)
 	if (len > 512) len = 512;
 	str[len] = '\0';
 	printf("Program %s error:\n%s\n", name, str);
+	LOGI("Program %s error:\n%s\n", name, str);
 }
 
 static void glnvg__checkError(GLNVGcontext* gl, const char* str)
@@ -401,6 +423,7 @@ static void glnvg__checkError(GLNVGcontext* gl, const char* str)
 	err = glGetError();
 	if (err != GL_NO_ERROR) {
 		printf("Error %08x after %s\n", err, str);
+		LOGI("Error %08x after %s\n", err, str);
 		return;
 	}
 }
@@ -493,7 +516,9 @@ static int glnvg__renderCreate(void* uptr)
 		"#version 150 core\n"
 		"#define NANOVG_GL3 1\n"
 #elif defined NANOVG_GLES2
+	  #ifdef ANDROID
 		"#version 100\n"
+	  #endif
 		"#define NANOVG_GL2 1\n"
 #elif defined NANOVG_GLES3
 		"#version 300 es\n"
@@ -963,7 +988,7 @@ static void glnvg__setUniforms(GLNVGcontext* gl, int uniformOffset, int image)
 	}
 }
 
-static void glnvg__renderViewport(void* uptr, int width, int height, float devicePixelRatio)
+void glnvg__renderViewport(void* uptr, int width, int height, float devicePixelRatio)
 {
 	GLNVGcontext* gl = (GLNVGcontext*)uptr;
 	gl->view[0] = (float)width;
@@ -1547,10 +1572,9 @@ NVGcontext* nvgCreateGLES3(int flags)
 	ctx = nvgCreateInternal(&params);
 	if (ctx == NULL) goto error;
 	return ctx;
-
 error:
 	// 'gl' is freed by nvgDeleteInternal.
-	if (ctx != NULL) nvgDeleteInternal(ctx);
+	if (ctx != NULL) nvgDeleteInternal(ctx);	
 	return NULL;
 }
 

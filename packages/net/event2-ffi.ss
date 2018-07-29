@@ -2,7 +2,7 @@
 ;作者:evilbinary on 2017-09-10 12:06:07.
 ;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(library (net event2-ffi ) 
+(library (net event2-ffi )
   (export evutil-date-rfc1123
   evutil-monotonic-timer-new
   evutil-monotonic-timer-free
@@ -229,13 +229,8 @@
 
  (import (scheme) (utils libutil) (cffi cffi) )
 
- (define lib-name
-  (case (machine-type)
-   ((arm32le) "libevent2.so")
-   ((a6nt i3nt) "libevent2.dll")
-   ((a6osx i3osx)  "libevent2.dylib")
-   ((a6le i3le) "libevent2.so")))
- (define lib (load-librarys  lib-name ))
+
+ (load-librarys  "libevent2" )
 
 ;;int evutil_date_rfc1123(char* date ,size_t datelen ,struct tm* tm)
 (def-function evutil-date-rfc1123

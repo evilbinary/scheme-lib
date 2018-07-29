@@ -1,0 +1,65 @@
+Scheme Requests for Implementation (SRFIs), as R6RS libraries
+-------------------------------------------------------------
+
+The libraries' names conform to SRFI 97: SRFI Libraries.  There is a registry of
+available SRFIs and other platform features which works alongside SRFI 0:
+Feature-Based Conditional Expansion.  The porting done so far is mostly just
+taking the reference implementations from http://srfi.schemers.org and wrapping
+them in libraries and tweaking the few things needed to make them work in R6RS
+libraries and with implementations' functionality.  Supporting any R6RS
+implementation supporting the *.IMPL.sls convention is easy.
+
+These SRFIs are available:
+  (srfi :0 cond-expand)
+  (srfi :1 lists)
+  (srfi :2 and-let*)
+  (srfi :6 basic-string-ports)
+  (srfi :8 receive)
+  (srfi :9 records)
+  (srfi :11 let-values)
+  (srfi :13 strings)
+  (srfi :14 char-sets)
+  (srfi :16 case-lambda)
+  (srfi :19 time)
+  (srfi :23 error)
+  (srfi :25 multi-dimensional-arrays)
+  (srfi :26 cut)
+  (srfi :27 random-bits)
+  (srfi :31 rec)
+  (srfi :37 args-fold)
+  (srfi :38 with-shared-structure)
+  (srfi :39 parameters)
+  (srfi :41 streams)
+  (srfi :42 eager-comprehensions)
+  (srfi :43 vectors)
+  (srfi :45 lazy)
+  (srfi :48 intermediate-format-strings)
+  (srfi :61 cond)
+  (srfi :64 testing)
+  (srfi :67 compare-procedures)
+  (srfi :69 basic-hash-tables)
+  (srfi :78 lightweight-testing)
+  (srfi :98 os-environment-variables)
+  (srfi :99 records)
+
+Other SRFIs are not available because there hasn't been a demand for them or
+they're not possible as an R6RS library.  If you already have ported SRFIs to
+R6RS, we'd love to assimilate them.  You can let us know by "asking a question"
+at the Scheme Libraries project page:
+
+  https://launchpad.net/scheme-libraries
+
+Currently supported systems are Chez Scheme, Ikarus, Larceny, and Ypsilon.
+PLT Scheme is only semi-supported because it has its own "srfi" directory
+which conflicts with having another "srfi" directory; you can symlink/copy
+files from this collection into PLT's "srfi" directory.
+
+For the latest development version, go to:
+
+  https://code.launchpad.net/~scheme-libraries-team/scheme-libraries/srfi
+
+Bug Reporting:
+--------------
+Submit bug reports at:
+
+  https://bugs.launchpad.net/scheme-libraries/+filebug

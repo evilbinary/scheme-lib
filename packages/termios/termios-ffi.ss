@@ -16,13 +16,7 @@
 
  (import (scheme) (utils libutil) (cffi cffi) )
 
- (define lib-name
-  (case (machine-type)
-   ((arm32le) "libtermios.so")
-   ((a6nt i3nt ta6nt ti3nt) "libtermios.dll")
-   ((a6osx i3osx ta6osx ti3osx)  "libtermios.so")
-   ((a6le i3le ta6le ti3le) "libtermios.so")))
- (define lib (load-librarys  lib-name ))
+ (load-librarys  "libtermios" )
 
 ;;speed_t cfgetospeed(struct termios* __termios_p)
 (def-function cfgetospeed

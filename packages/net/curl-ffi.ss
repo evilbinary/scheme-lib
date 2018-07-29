@@ -556,7 +556,7 @@ CURLINFO_PROTOCOL
 CURLINFO_SCHEME            		
 	  )
 
-  (import (scheme)  (dffi dffi) (utils libutil) )
+  (import (scheme)  (cffi cffi) )
 
   (load-librarys "libcurl")
   

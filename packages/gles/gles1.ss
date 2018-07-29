@@ -778,7 +778,7 @@
              ((a6osx i3osx ta6osx ti3osx)  "libgles.so")
              ((a6le i3le ta6le ti3le) "libgles.so")))
          
-         (define lib (load-lib "libgles"))
+         (define lib (load-lib lib-name))
          
          ;; (define-syntax define-function
          ;;   (syntax-rules ()

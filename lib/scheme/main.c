@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include "scm.h"
 
-#define VERSION 1.1
-char *ver="Scheme Version 1.1\n\
+#define VERSION 2.1
+char *ver="Scheme Version 2.1\n\
 Copyright 2016-2020 evilbinary.\n\n";
 
 void repl(){
@@ -257,8 +257,8 @@ void process_arg(int argc,char * argv[]){
     status = Sscheme_program(programfile, new_argc, argv);
   else {
    /* Sscheme_start invokes the value of the scheme-start parameter */
-    //status = Sscheme_start(new_argc, argv);
-    repl();
+    status = Sscheme_start(new_argc, argv);
+    //repl();
   }
 
 

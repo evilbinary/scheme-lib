@@ -33,7 +33,7 @@
 #  endif
 #endif
 
-#ifdef ANDROID
+#if (defined ANDROID) || (defined ARMV6)
     typedef void *ptr;
     typedef int iptr;
     typedef unsigned int uptr;
@@ -124,5 +124,7 @@ SCM_API double scm_flonum_value(ptr x);
 SCM_API ptr scm_integer64 (long long);
 SCM_API void scm_print(ptr p);
 SCM_API ptr scm_get_thread_context();
+
+
 
 #endif //SCM_H_H

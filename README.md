@@ -1,4 +1,7 @@
 # scheme-lib
+
+[![Join the chat at https://gitter.im/evilbinary/scheme-lib](https://badges.gitter.im/evilbinary/scheme-lib.svg)](https://gitter.im/evilbinary/scheme-lib?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 scheme-lib 是一个scheme使用的库。目前支持android mac linux windows，其它平台在规划中。
 
 官方主页：[http://scheme-lib.evilbinary.org/](http://scheme-lib.evilbinary.org/)

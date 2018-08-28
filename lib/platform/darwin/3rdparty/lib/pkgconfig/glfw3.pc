@@ -1,4 +1,4 @@
-prefix=/Users/evil/dev/workspace2/chez/app/src/main/jni/thirdpart
+prefix=/Users/evil/dev/workspace2/chez/app/src/main/jni/3rdparty
 exec_prefix=${prefix}
 includedir=${prefix}/include
 libdir=${exec_prefix}/lib

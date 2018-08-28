@@ -5,15 +5,17 @@
 ##########################################################
 
 
-TARGET = libgui.so
-OBJS = gui.o
+TARGET = libgui.so 
+OBJS = gui.o shader.o mat4.o
 PLATFORM=
 BITS =$(shell getconf LONG_BIT)
 
 
-LIBS =-L../libnanovg -lnanovg
+LIBS = -L../libgl -lgles -L../libfreetype-gl/ -lfreetype-gl 
 CFLAGS = -Wall -Wformat  -DGLAD \
-	-L../libnanovg -I../libnanovg  
+	-I../libgl \
+	-I../libfreetype-gl/ -g \
+	-I/opt/local/include//freetype2/
 
 CXXFLAGS= -Wall -Wformat
 
@@ -33,10 +35,10 @@ endif
 
 ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"
-	LIBS += 
+	LIBS +=  -L/opt/local/lib/ -lfreetype
 	CXXFLAGS += 
 	CXXFLAGS += 
-	CFLAGS +=
+	CFLAGS +=  -I/opt/local/include/ 
 	ifeq ($(BITS), 32)
 		PLATFORM=i3osx
 	else
@@ -52,6 +54,7 @@ ifeq ($(UNAME_S), MINGW32_NT-6.1)
 	CXXFLAGS += 
 	CFLAGS +=
 	PLATFORM=i3nt
+	TARGET = libgui.dll
 endif
 
 .cpp.o:

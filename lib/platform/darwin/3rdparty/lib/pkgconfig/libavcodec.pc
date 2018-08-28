@@ -1,0 +1,14 @@
+prefix=/Users/evil/dev/workspace2/chez/app/src/main/jni/3rdparty/
+exec_prefix=${prefix}
+libdir=/Users/evil/dev/workspace2/chez/app/src/main/jni/3rdparty//lib
+includedir=/Users/evil/dev/workspace2/chez/app/src/main/jni/3rdparty//include
+
+Name: libavcodec
+Description: FFmpeg codec library
+Version: 58.18.100
+Requires: libswresample >= 3.1.100, libavutil >= 56.14.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavcodec -lm -lz -framework AudioToolbox -pthread -framework VideoToolbox -framework CoreFoundation -framework CoreMedia -framework CoreVideo -framework CoreServices
+Libs.private: 
+Cflags: -I${includedir}

@@ -435,9 +435,9 @@
 
 
             ;;function begin
-            /*-------------------------------------------------------------------------
-             * GL core functions.
-             *-----------------------------------------------------------------------*/
+            ;;/*-------------------------------------------------------------------------
+            ;; * GL core functions.
+             ;;*-----------------------------------------------------------------------*/
 
             glActiveTexture
             glAttachShader
@@ -587,13 +587,13 @@
         (import  (scheme) (utils libutil))
 
 
-         (define lib-name
-           (case (machine-type)
-             ((arm32le) "libgl.so")
-             ((a6nt i3nt)  "libgl.dll")
-             ((a6osx i3osx)  "libgl.so")
-             ((a6le i3le) "libgl.so")))
-
+	(define lib-name
+	  (case (machine-type)
+	    ((arm32le) "libgles.so")
+	    ((a6nt i3nt ta6nt ti3nt)  "libgles.dll")
+	    ((a6osx i3osx ta6osx ti3osx)  "libgles.so")
+	    ((a6le i3le ta6le ti3le) "libgles.so")))
+	
          (define lib (load-lib lib-name))
 
          ;; (define-syntax define-function
@@ -1036,9 +1036,9 @@
         (define GL_INVALID_FRAMEBUFFER_OPERATION  #x0506)
 
 
-        /*-------------------------------------------------------------------------
-                 * GL core functions.
-                 *-----------------------------------------------------------------------*/
+        ;;/*-------------------------------------------------------------------------
+        ;;         * GL core functions.
+         ;;        *-----------------------------------------------------------------------*/
 
                 (define-function void         glActiveTexture (int))
                 (define-function void         glAttachShader (int  int))
@@ -1065,7 +1065,7 @@
                 (define-function void         glCompressedTexSubImage2D (int  int  int  int  int  int  int  int   void*))
                 (define-function void         glCopyTexImage2D (int  int  int  int  int  int  int  int))
                 (define-function void         glCopyTexSubImage2D (int  int  int  int  int  int  int  int))
-                (define-function int      glCreateProgram (void))
+                (define-function int      glCreateProgram () )
                 (define-function int      glCreateShader (int))
                 (define-function void         glCullFace (int))
                 (define-function void         glDeleteBuffers (int   void*))
@@ -1084,8 +1084,8 @@
                 (define-function void         glDrawElements (int  int  int   void*))
                 (define-function void         glEnable (int))
                 (define-function void         glEnableVertexAttribArray (int))
-                (define-function void         glFinish (void))
-                (define-function void         glFlush (void))
+                (define-function void         glFinish ())
+                (define-function void         glFlush ())
                 (define-function void         glFramebufferRenderbuffer (int  int  int  int))
                 (define-function void         glFramebufferTexture2D (int  int  int  int  int))
                 (define-function void         glFrontFace (int))
@@ -1100,7 +1100,7 @@
                 (define-function int       glGetAttribLocation (int  string))
                 (define-function void         glGetBooleanv (int   void*))
                 (define-function void         glGetBufferParameteriv (int  int   void*))
-                (define-function int      glGetError (void))
+                (define-function int      glGetError ())
                 (define-function void         glGetFloatv (int   void*))
                 (define-function void         glGetFramebufferAttachmentParameteriv (int  int  int   void*))
                 (define-function void         glGetIntegerv (int   void*))
@@ -1119,7 +1119,7 @@
                 (define-function int       glGetUniformLocation (int  string))
                 (define-function void         glGetVertexAttribfv (int  int   void*))
                 (define-function void         glGetVertexAttribiv (int  int   void*))
-                (define-function void         glGetVertexAttribPointerv (int  int  void** ))
+                (define-function void         glGetVertexAttribPointerv (int  int  void*))
                 (define-function void         glHint (int  int))
                 (define-function int   glIsBuffer (int))
                 (define-function int   glIsEnabled (int))
@@ -1133,12 +1133,12 @@
                 (define-function void         glPixelStorei (int  int))
                 (define-function void         glPolygonOffset (float  float))
                 (define-function void         glReadPixels (int  int  int  int  int  int  void*))
-                (define-function void         glReleaseShaderCompiler (void))
+                (define-function void         glReleaseShaderCompiler ())
                 (define-function void         glRenderbufferStorage (int  int  int  int))
                 (define-function void         glSampleCoverage (float  int))
                 (define-function void         glScissor (int  int  int  int))
                 (define-function void         glShaderBinary (int   void*  int   void*  int))
-                (define-function void         glShaderSource (int  int  void**   void*))
+                (define-function void         glShaderSource (int  int  void*   void*))
                 (define-function void         glStencilFunc (int  int  int))
                 (define-function void         glStencilFuncSeparate (int  int  int  int))
                 (define-function void         glStencilMask (int))

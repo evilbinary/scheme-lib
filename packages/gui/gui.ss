@@ -1653,8 +1653,38 @@
     )
 
   (def-function get "getGlyphPosition" () void*)
-   
+
   (define (draw-paragraph view)
+    (let ((text (view-attrib-ref view 'text ))
+	  (lineh (cffi-alloc 8))
+	  (start 0)
+	  (end 0)
+	  (width (view-width view))
+	  (height (view-height view))
+	  (x (view-x view))
+	  (y (view-y view))
+	  (bg-color (view-attrib-ref view 'background-color nil ))
+	  (radius (view-attrib-ref view 'corner-radius 0.0))
+	  (font-size (view-attrib-ref view 'font-size 20.0))
+	  (font-face (view-attrib-ref view 'font-face "sans")))
+      (set! start (cffi-string-pointer text))
+      (set! end (+ start (string-length text ) ))
+      
+      (nvg-save vg)
+      (nvg-font-size vg font-size)
+      (nvg-font-face vg font-face)
+      (nvg-text-align vg  (+ NVG_ALIGN_LEFT NVG_ALIGN_TOP))
+      (nvg-text-metrics vg NULL NULL lineh)
+      
+      
+      (nvg-begin-path vg)
+      (nvg-fill-color vg (nvg-rgba 255 255 255 255))
+      (nvg-text-box vg x y width (view-attrib-ref view 'text "") NULL)
+      (nvg-restore vg)
+      
+      ))
+  
+  (define (draw-paragraph2 view)
     (let ((rows (cffi-alloc (* 40  3 )))
 	  (glyphs (cffi-alloc (string-length  (view-attrib-ref view 'text ) )))
 	  (text (view-attrib-ref view 'text ))
@@ -1750,6 +1780,7 @@
       [(i3nt i3osx)
        (cffi-get-pointer (+ rows (* 24  i) (* 4 0 )))  ]
       [(a6osx a6le)
+       (cffi-get-string rows)
        (cffi-get-pointer (+ rows (* 40  i) (* 8 0 )))]))
 
   (define (nvg-text-row-end rows i)
@@ -1960,6 +1991,7 @@
       (nvg-intersect-scissor vg x y w h)
 
       (draw-paragraph view)
+    
       (nvg-restore vg)
       
       ) )

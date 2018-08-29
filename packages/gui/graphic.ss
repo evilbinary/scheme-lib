@@ -19,7 +19,7 @@
      graphic-draw-edit
      graphic-edit-add-text
      graphic-new-markup
-     
+     graphic-get-fps
      gl-edit-key-event
      )
     (import (scheme) (utils libutil) (cffi cffi) (gles gles2) )
@@ -29,8 +29,8 @@
     
     (def-function glShaderSource2 "glShaderSource2" (int int string void*) void)
     
-    (def-function gl-render-text "gl_render_text" (void*) void)
-    (def-function gl-add-text "gl_add_text" (void* string float float) void)
+    (def-function gl-render-text "gl_render_text" (void* float float) void)
+    (def-function gl-update-text "gl_update_text" (void* string) void)
     (def-function gl-new-text "gl_new_text" (int float float) void*)
 
     (def-function shader-load-from-string "shader_load_from_string" (string string) int)
@@ -45,7 +45,8 @@
     (def-function gl-render-edit "gl_render_edit" ( void* float float) void)
     (def-function gl-edit-key-event "gl_edit_key_event" ( void* int int int int) void)
 
-    
+    (def-function graphic-get-fps "get_fps" (void) int)
+
     
     (define texture-vert-shader 0)
     (define texture-frag-shader 0)
@@ -107,6 +108,7 @@
     (define my-width 0)
     (define my-height 0)
 
+    (define font-string-cache (make-hashtable equal-hash equal?) )
 
     (define font-program 0)
 
@@ -218,7 +220,7 @@
       (set! uniform-font-projection (glGetUniformLocation font-program "projection"))
 
       
-      (set! ptext (gl-new-text font-program my-width my-height))
+      ;;(set! ptext (gl-new-text font-program my-width my-height))
 
       )
 
@@ -235,11 +237,26 @@
     (define (graphic-new-markup name size)
       (gl-new-markup name size))
     
+
+    (define (graphic-new-text text)
+      (let ((t (gl-new-text font-program my-width my-height)))
+      t))
     
-    (define (graphic-draw-text x1 y1 text)
-        (gl-add-text ptext text x1 (-  my-height y1))
-        (gl-render-text ptext)
-      )
+    (define graphic-draw-text
+      (case-lambda
+       [(t x1 y1 t2)
+        (gl-render-text t x1 y1)]
+       [(x1 y1 text)
+	(let ((p (hashtable-ref font-string-cache text '())))
+	  (if (null? p)
+	      (begin
+		(set! p (graphic-new-text text))
+		(gl-update-text p text)
+		(hashtable-set! font-string-cache text  p)
+		))
+	  (gl-render-text p x1 (- my-height y1)))
+	]
+      ))
 
     (define (graphic-draw-line x1 y1 x2 y2 r g b a)
       (let ((vertices (v 'float (list x1 y1 x2 y2))))

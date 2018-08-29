@@ -137,7 +137,7 @@
 
   (printf "~a ,~a\n" (cffi-get-int w) (cffi-get-int h))
   
-  (glfw-swap-interval 1)
+  (glfw-swap-interval 10)
 
   (widget-init width height)
   
@@ -208,13 +208,28 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
     
     )
 
-
+  ;; (fork-thread
+  ;;  (lambda ()
+  ;;    (let loop ()
+       
+  ;;      (dialog 120.0 40.0 300.0 400.0 "测试scroll~")
+  ;;      (sleep (make-time 'time-duration 100000 0))
+  ;;      (glfw-post-empty-event)
+  ;;      (loop))
+  ;;    ))
+  
   ;;test scroll
   (let ((d (dialog 20.0 80.0 300.0 400.0 "测试scroll~"))
-	(p (scroll 280.0 360.0)))
+	(p (scroll 280.0 360.0))
+	(v (video 280.0 250.0  "/Users/evil/Downloads/WeChatSight513.mp4"))
+	)
+    ;; (widget-add-draw
+    ;;  v
+    ;;  (lambda (w p)
+    ;;    (glfw-post-empty-event)
+    ;;    ))
 
-
-    ;;(widget-add p (video 280.0 250.0  "/Users/evil/Downloads/WeChatSight513.mp4"))
+    (widget-add p v)
     (widget-add p (image 180.0 180.0 "test1.jpg"))
     (widget-add p (image 180.0 180.0 "gaga.jpg"))
     (widget-add p (image 180.0 180.0 "duck.png"))
@@ -287,6 +302,10 @@ QQ群：Lisp兴趣小组239401374 啊哈哈" markup)
 	   ;;(graphic-draw-edit  my-edit mouse-x mouse-y)
 	   ;; (graphic-draw-solid-quad 20.0 20.0  300.0 300.0 255.0 0.0 0.0 0.5)
 
+	   (graphic-draw-text 0.0 20.0 (format "fps=~a\n" (graphic-get-fps)))
+
+	   ;;(if (> (graphic-get-fps) 30)
+	   
 	   
 	   ;;(video-render v)
 	  		 
@@ -303,15 +322,14 @@ QQ群：Lisp兴趣小组239401374 啊哈哈" markup)
 	   ;; 	 (set! count 0)
 	   ;; 	 ))
 	   ;; (set! count (+ count 1))
-
-	   (widget-render)   
-	  
 	   
-	   (graphic-render)
-	   ;;(glEnable GL_CULL_FACE)
-	   ;;(glDisable GL_DEPTH_TEST)
-	   (glfw-poll-events)
+	   (widget-render)
 	   (glfw-swap-buffers window)
+	   ;;(glfw-poll-events)
+	   (glfw-wait-events)
+	   
+	   ;; (if(>  (graphic-get-fps) 120)
+	   ;;(sleep (make-time 'time-duration (* (graphic-get-fps) 1000 1000) (flonum->fixnum (/   (graphic-get-fps) 120.0))))
 	   
 	   ))
   (graphic-destroy)

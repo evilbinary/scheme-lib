@@ -26,6 +26,8 @@
 #include "vertex-buffer.h"
 #include "text-buffer.h"
 #include "markup.h"
+#include <stdio.h>
+#include <time.h>
 
 
 typedef struct{
@@ -44,9 +46,34 @@ typedef struct{
   int shader;
 }text_t;
 
+long get_time(){
+  struct timeval tv;  
+  gettimeofday(&tv,NULL);  
+  return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
+
+long get_fps(){
+    static long fps = 0;
+    static long lastTime = 0; // ms
+    static long frameCount = 0;
+    ++frameCount;
+    if(lastTime==0){
+      lastTime = get_time();
+    }
+    
+    long curTime = get_time();
+    //printf("cur time %ld ==%ld\n",curTime,lastTime);
+    if (curTime - lastTime > 1000){ // 取固定时间间隔为1秒
+        fps = frameCount;
+        frameCount = 0;
+        lastTime = curTime;
+    }
+    return fps;
+}
 
 text_t * gl_new_text(int shader,float width,float height){
   text_t *text=malloc(sizeof(text_t));
+  text->text=NULL;
   text->shader=shader;
   text->font_manager = font_manager_new( 512, 512, LCD_FILTERING_ON);
   text->buffer = text_buffer_new( );
@@ -71,7 +98,12 @@ text_t * gl_new_text(int shader,float width,float height){
   text->normal=normal;
   text->pen=pen;
     
-  
+
+  if(text->font_manager->atlas->id==0){
+    glGenTextures( 1, &text->font_manager->atlas->id );
+  }
+
+
 
     vec4 bounds = text_buffer_get_bounds( text->buffer, &text->pen );
     float left = bounds.left;
@@ -94,34 +126,49 @@ void gl_destroy_text(text_t *text){
   }
 }
 
-void gl_add_text(text_t *text,char* str,float x1,float y1){
-  vec2 pen = {{x1*2,y1*2}};
-  vertex_buffer_clear(text->buffer->buffer );
-  
-   text_buffer_printf( text->buffer, &pen,
-		      &text->normal,str,
-		      NULL );
-
-   if(text->font_manager->atlas->id==0){
-     glGenTextures( 1, &text->font_manager->atlas->id );
-   }
-  
-   glBindTexture( GL_TEXTURE_2D, text->font_manager->atlas->id );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-   
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, text->font_manager->atlas->width,
-		 text->font_manager->atlas->height, 0, GL_RGB, GL_UNSIGNED_BYTE,
-		 text->font_manager->atlas->data );
+void gl_update_text(text_t *text,char* str){
+ 
    //text_buffer_align( text->buffer, &text->pen, ALIGN_CENTER );
+
+  if(text->text==NULL){
+    text->text=malloc(strlen(str));
+  }else if(strlen(str)>strlen(text->text)){
+    free(text->text);
+    text->text=malloc(strlen(str));
+  }
+  strcpy(text->text,str);
+  
+  vec2 pen = {{0.0,0.0}};
+  vertex_buffer_clear(text->buffer->buffer );  
+  text_buffer_printf( text->buffer, &pen,
+		      &text->normal,text->text,
+		      NULL );
     
+  glBindTexture( GL_TEXTURE_2D, text->font_manager->atlas->id );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+   
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+  glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, text->font_manager->atlas->width,
+		text->font_manager->atlas->height, 0, GL_RGB, GL_UNSIGNED_BYTE,
+		text->font_manager->atlas->data );
+
+
 }
 
-void gl_render_text(text_t* text){
+void gl_render_text(text_t* text,float x1,float y1){
   int text_shader=text->shader;
+
+  if(text->text==NULL)
+    return;
   
+  vec2 pen = {{x1*2,y1*2}};
+  vertex_buffer_clear(text->buffer->buffer );  
+  text_buffer_printf( text->buffer, &pen,
+		      &text->normal,text->text,
+		      NULL );
+
   glUseProgram(text_shader );
   {
     glUniformMatrix4fv( glGetUniformLocation(text_shader, "model" ),
@@ -136,11 +183,8 @@ void gl_render_text(text_t* text){
 		 1.0f/text->font_manager->atlas->height,
 		 (float)text->font_manager->atlas->depth );
 
-    glActiveTexture( GL_TEXTURE0 );
+    glActiveTexture( GL_TEXTURE0 );    
     glBindTexture( GL_TEXTURE_2D, text->font_manager->atlas->id );
-
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glBlendColor( 1, 1, 1, 1 );
     
     vertex_buffer_render(text->buffer->buffer, GL_TRIANGLES );
     

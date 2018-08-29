@@ -23,6 +23,9 @@
    widget-set-xy
    draw-widget-child-rect
    draw-widget-rect
+   widget-add-draw
+   widget-get-event
+   widget-add-event
    )
   (import (scheme) (utils libutil) (gui graphic ) (gui video) (gui stb))
 
@@ -102,9 +105,8 @@
       0.0 0.0 1.0 1.0 src))
 
   (define (draw-text x y  text)
-    (graphic-draw-text
-     x y
-      text))
+    (graphic-draw-text x y text )
+    )
 
   (define (draw-video v x y w h )
     (let l ((i 3))
@@ -857,19 +859,35 @@
 	       )
        )))
 
-  (define (widget-active widget)
-    '())
+(define (widget-active widget)
+  '())
+
+(define (widget-get-event widget)
+  (vector-ref widget %event))
+
+(define (widget-add-event widget event)
+  (vector-set! widget %event
+	       (lambda (w p)
+		 ((vector-ref w %event) w p)
+		 (event w p))))
+
+(define (widget-add-draw widget event)
+  (let ((draw (vector-ref widget %draw)))
+    (vector-set! widget %draw
+		 (lambda (widget parent)
+		   (draw widget parent)
+		   (event widget  parent )))))
  
-  (define (widget-event type data )
-    (let loop ((len (- (length $widgets) 1) ))
-      (if (>= len 0)
-	  (let ((w (list-ref $widgets  len)))
-	    ;;(printf "~a  ~a\n" len (list-ref $widgets len))
-	    (let ((event (vector-ref w %event)))
-	      (event w '() type data)
-	      )
-	    (loop  (- len 1)))
-	  )))
+   (define (widget-event type data )
+     (let loop ((len (- (length $widgets) 1) ))
+       (if (>= len 0)
+	   (let ((w (list-ref $widgets  len)))
+	     ;;(printf "~a  ~a\n" len (list-ref $widgets len))
+	     (let ((event (vector-ref w %event)))
+	       (event w '() type data)
+	       )
+	     (loop  (- len 1)))
+	   )))
 
 
   (define (draw-widget-rect widget)
@@ -942,7 +960,9 @@
 	    (let ((draw (vector-ref (car w) %draw)))	   
 	      (draw (car w) '() ))
 	    (loop (cdr w)
-		  )))))
+		  ))))
+    (graphic-render)
+    )
 
 (define (widget-init w h)
   (set! window-width w)

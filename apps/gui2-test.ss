@@ -109,9 +109,60 @@
   ;;(draw-large  mouse-x mouse-y  text-id)
   )
 
+(define (test-mobile-ui)
+  (let ((mobile-pic (load-texture "mobile.png"))
+	(button1 (button 120.0 30.0 "按钮1"))
+	(p (scroll 244.0 420.0))
+	(img (image 180.0 180.0 "./duck.png"))
+	(icon (load-texture "face.png"))
+	(e (edit 260.0 120.0 "scheme-lib 是一个scheme使用的库。目前支持android mac linux windows，其它平台在规划中。官方主页啦啦啦啦gagaga：http://scheme-lib.evilbinary.org/ 
+QQ群：Lisp兴趣小组239401374 啊哈哈"))
+	(d (dialog 40.0 40.0 300.0 600.0 "窗体啦啦~")))
+    (widget-set-draw
+     d
+     (lambda (widget p)
+       (let ((x  (vector-ref  widget %x))
+	     (y  (vector-ref widget %y))
+	     (w  (vector-ref  widget %w))
+	     (h  (vector-ref  widget %h))
+	     (draw (widget-get-draw widget))
+	     )
+       ;;(draw-image (+ 6.0 x) (+ y 6.0) w h mobile-pic)
+       (graphic-draw-solid-quad (+ x 20.0) (+ y 40.0 ) (+ x w -20.0) (+ y h -40.0) 255.0 255.0 255.0 1.0)
+       (graphic-draw-texture-quad
+	x y
+	(+ x w) (+ y h)
+	0.0 0.0 (/ 787 2370.0) 1.0 mobile-pic)
+
+       ;;(draw-widget-rect widget)
+       (vector-set! widget %gx x)
+       (vector-set! widget %gy y)
+       
+       (let loop ((child (widget-get-child widget)))
+	 (if (pair? child)
+	     (begin
+	       ((widget-get-draw (car child)) (car child)  widget)
+	       (loop (cdr child)))
+	     ))
+	 
+       )))
+    (widget-set-padding d 30.0 30.0 90.0 40.0)
+
+    (widget-add d p)
+    (widget-add p img)
+    (widget-add p button1)
+
+    (widget-add p (image 180.0 180.0 "test1.jpg"))
+    (widget-add p (image 180.0 180.0 "gaga.jpg"))
+    (widget-add p (image 180.0 180.0 "duck.png"))
+    (widget-add p (image 180.0 180.0 "face.png"))
+    (widget-add p (button 120.0 30.0 "按钮"))
+    (widget-add p e)
+  ))
+
   
 (define width 800)
-(define height 600)
+(define height 700)
 
 (define w  (cffi-alloc 8) )
 (define h (cffi-alloc 8))
@@ -188,13 +239,25 @@
   	(button3 (button 120.0 30.0 "按钮3"))
   	(button4 (button 120.0 30.0 "按钮"))
   	(img (image 80.0 80.0 "./duck.png"))
+	(icon (load-texture "face.png"))
   	)
     (widget-set-margin button1 10.0 20.0 0.0 20.0)
     (widget-set-margin button2 10.0 20.0 0.0 20.0)
     (widget-set-margin button3 10.0 20.0 0.0 20.0)
     (widget-set-margin img 10.0 10.0 10.0 20.0)
 
+     (widget-add-event
+      button1
+      (lambda (w p t d)
+	(printf "button1 event type ~a ~a\n" t d)))
 
+     (widget-add-draw
+      button1
+      (lambda (w p)
+	(let ((x (vector-ref w %gx))
+	      (y (vector-ref w %gy)))
+	  (draw-image (+ 6.0 x) (+ y 6.0) 20.0 20.0 icon))))
+     
     (widget-add p button1)
     (widget-add p button2)
     (widget-add p button3)
@@ -221,15 +284,19 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
   ;;test scroll
   (let ((d (dialog 20.0 80.0 300.0 400.0 "测试scroll~"))
 	(p (scroll 280.0 360.0))
-	(v (video 280.0 250.0  "/Users/evil/Downloads/WeChatSight513.mp4"))
+	;;(v (video 280.0 250.0  "/Users/evil/Downloads/WeChatSight513.mp4"))
 	)
     ;; (widget-add-draw
     ;;  v
     ;;  (lambda (w p)
     ;;    (glfw-post-empty-event)
     ;;    ))
-
-    (widget-add p v)
+    (widget-add-event
+     p
+     (lambda (w p t d)
+       (printf "scroll event type ~a ~a\n" t d)))
+    
+    ;;(widget-add p v)
     (widget-add p (image 180.0 180.0 "test1.jpg"))
     (widget-add p (image 180.0 180.0 "gaga.jpg"))
     (widget-add p (image 180.0 180.0 "duck.png"))
@@ -266,13 +333,14 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
   
   ;;(test-multi-dialog)
   ;;(widget-layout)
+  (test-mobile-ui)
   
   (let (
 	(text-id (load-texture  "./duck.png"))
 	(aw (load-texture  "./aw.png"))
 	(rotation 2.0)
 	(markup  (graphic-new-markup "Roboto-Regular.ttf" 25.0))
-	(v (video-new "/Users/evil/Downloads/WeChatSight513.mp4" width height))
+	;;(v (video-new "/Users/evil/Downloads/WeChatSight513.mp4" width height))
 	)
 
     (glEnable GL_BLEND)
@@ -300,7 +368,7 @@ QQ群：Lisp兴趣小组239401374 啊哈哈" markup)
      
 	   ;;(graphic-draw-text mouse-x mouse-y para)
 	   ;;(graphic-draw-edit  my-edit mouse-x mouse-y)
-	   ;; (graphic-draw-solid-quad 20.0 20.0  300.0 300.0 255.0 0.0 0.0 0.5)
+	   ;;(graphic-draw-solid-quad 20.0 20.0  300.0 300.0 255.0 0.0 0.0 0.5)
 
 	   (graphic-draw-text 0.0 20.0 (format "fps=~a\n" (graphic-get-fps)))
 
@@ -322,12 +390,11 @@ QQ群：Lisp兴趣小组239401374 啊哈哈" markup)
 	   ;; 	 (set! count 0)
 	   ;; 	 ))
 	   ;; (set! count (+ count 1))
-	   
-	   (widget-render)
-	   (glfw-swap-buffers window)
-	   ;;(glfw-poll-events)
 	   (glfw-wait-events)
-	   
+	   (widget-render)
+	   ;;(glfw-poll-events)
+	   (glfw-swap-buffers window)
+
 	   ;; (if(>  (graphic-get-fps) 120)
 	   ;;(sleep (make-time 'time-duration (* (graphic-get-fps) 1000 1000) (flonum->fixnum (/   (graphic-get-fps) 120.0))))
 	   

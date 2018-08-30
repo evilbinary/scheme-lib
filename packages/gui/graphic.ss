@@ -19,6 +19,11 @@
      graphic-draw-edit
      graphic-edit-add-text
      graphic-new-markup
+     gl-markup-set-foreground
+     gl-markup-set-background
+     gl-markup-set-font-size
+     gl-edit-set-markup
+     
      graphic-get-fps
      gl-edit-key-event
      )
@@ -40,6 +45,12 @@
     (def-function gl-destroy-text "gl_destroy_text" (void*) void)
 
     (def-function gl-new-markup "gl_new_markup" (string float) void*)
+    (def-function gl-markup-set-foreground "gl_markup_set_foreground" (void* float float float float) void)
+    (def-function gl-markup-set-background "gl_markup_set_background" (void* float float float float) void)
+    (def-function gl-markup-set-font-size "gl_markup_set_font_size" (void* float) void)
+
+    (def-function gl-edit-set-markup "gl_edit_set_markup" (void* void* int) void)
+
     (def-function gl-new-edit "gl_new_edit" (int float float float float) void*)
     (def-function gl-edit-add-text "gl_add_edit_text" (void*  string ) void)
     (def-function gl-render-edit "gl_render_edit" ( void* float float) void)

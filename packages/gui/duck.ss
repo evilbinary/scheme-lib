@@ -4,6 +4,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (library (gui duck)
   (export
+   draw-image
+   draw-dialog
    dialog
    button
    image
@@ -24,8 +26,19 @@
    draw-widget-child-rect
    draw-widget-rect
    widget-add-draw
+   widget-set-draw
+   widget-get-draw
+   widget-set-event
    widget-get-event
    widget-add-event
+   widget-get-child
+   widget-set-padding
+   %gx
+   %gy
+   %w
+   %h
+   %x
+   %y
    )
   (import (scheme) (utils libutil) (gui graphic ) (gui video) (gui stb))
 
@@ -141,6 +154,12 @@
     (vector-set! widget %margin-right right)
     (vector-set! widget %margin-top top)
     (vector-set! widget %margin-bottom bottom)
+    )
+  (define (widget-set-padding widget left right top bottom)
+    (vector-set! widget %left left)
+    (vector-set! widget %right right)
+    (vector-set! widget %top top)
+    (vector-set! widget %bottom bottom)
     )
   
   (define (widget-set-xy widget x y)
@@ -377,7 +396,7 @@
 		      ;;(printf "~a,~a  ~a ~a\n" gx gy w h)
 		      ;;(graphic-draw-solid-quad 0.0 0.0 800.0 600.0 255.0 0.0 0.0 0.5)
 
-		      (draw-scroll-bar (+ gx w -20.0 ) gy 20.0 h
+		      (draw-scroll-bar (+ gx w -10.0 ) gy 10.0 h
 				       (vector-ref widget %scroll-y)
 				       (vector-ref widget %scroll-height)
 				       )
@@ -487,6 +506,8 @@
     (let ((ed (graphic-new-edit w h))
 	  (markup  (graphic-new-markup "Roboto-Regular.ttf" 25.0))
 	  )
+      ;;(gl-markup-set-foreground markup 32.0 32.0 32.0 0.5)
+      ;;(gl-edit-set-markup ed markup 0)
       (graphic-edit-add-text ed text markup)
     (vector 0.0 0.0 w h
 	    (lambda (x)
@@ -719,7 +740,7 @@
 			     w h text)
 		)
 	      )
-	    (lambda (widget parent type data);;event
+	    (lambda (widget parent type data);;event	      	      		     
 	      (if (null? parent)
 		  (begin
 		    (if (= type 3)
@@ -729,7 +750,7 @@
 		(if (= type 3)
 		    (begin
 		      ;;(printf "button click event ~a ~a ~a\n" type text data)
-		     (draw-widget-child-rect parent widget )
+		      (draw-widget-child-rect parent widget )
 		     )))
 	      )
 	    (list);;child
@@ -780,6 +801,7 @@
 			 ))
 		   ))
 	       (lambda (widget parent type data)
+		 ;;(printf "type ~a ~a\n" type data)
 		 (if (= type %event-mouse-button)
 		     (begin
 		       ;;(printf "dialog status ~a\n" (vector-ref widget %status))
@@ -862,32 +884,47 @@
 (define (widget-active widget)
   '())
 
+(define (widget-get-child widget)
+  (vector-ref widget %child))
+
+(define (widget-set-draw widget event)
+  (vector-set! widget %draw event))
+
+(define (widget-get-draw widget)
+  (vector-ref widget %draw))
+
+(define (widget-set-event widget event)
+  (vector-set! widget %event event))
+
 (define (widget-get-event widget)
   (vector-ref widget %event))
 
 (define (widget-add-event widget event)
-  (vector-set! widget %event
-	       (lambda (w p)
-		 ((vector-ref w %event) w p)
-		 (event w p))))
+  (let ((e (vector-ref widget %event)))
+    (vector-set! widget %event
+		 (lambda (w p t d)
+		   (e w p t d)
+		   (event w p t d)))))
 
 (define (widget-add-draw widget event)
   (let ((draw (vector-ref widget %draw)))
     (vector-set! widget %draw
 		 (lambda (widget parent)
+		   (event widget  parent )
 		   (draw widget parent)
-		   (event widget  parent )))))
+		   (event widget  parent )
+		   ))))
  
-   (define (widget-event type data )
-     (let loop ((len (- (length $widgets) 1) ))
-       (if (>= len 0)
-	   (let ((w (list-ref $widgets  len)))
-	     ;;(printf "~a  ~a\n" len (list-ref $widgets len))
-	     (let ((event (vector-ref w %event)))
-	       (event w '() type data)
-	       )
-	     (loop  (- len 1)))
-	   )))
+(define (widget-event type data )
+  (let loop ((len (- (length $widgets) 1) ))
+    (if (>= len 0)
+	(let ((w (list-ref $widgets  len)))
+	  ;;(printf "~a  ~a\n" len (list-ref $widgets len))
+	  (let ((event (vector-ref w %event)))
+	    (event w '() type data)
+	    )
+	  (loop  (- len 1)))
+	)))
 
 
   (define (draw-widget-rect widget)
@@ -910,9 +947,12 @@
 	      (cw  (vector-ref  child %w))
 	      (ch  (vector-ref  child %h))
 	      )
-	  '()
+	  
 	  ;;(graphic-draw-solid-quad (+ x cx) (+ y cy) (+ x cx cw) (+ y cy  ch)  128.0 30.0 34.0 0.5)
+		  
+		  ;;(printf "draw child rect\n")
 	  (graphic-draw-solid-quad cx cy (+ cx cw) (+ cy ch)  128.0 30.0 34.0 0.5)
+
 	  )))
   
   (define (widget-mouse-button-event data )

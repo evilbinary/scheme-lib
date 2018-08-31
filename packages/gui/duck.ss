@@ -33,6 +33,9 @@
    widget-add-event
    widget-get-child
    widget-set-padding
+   widget-resize
+   widget-disable-cursor
+   widget-set-cursor
    %gx
    %gy
    %w
@@ -84,6 +87,10 @@
   (define %event-key 2)
   (define %event-mouse-button 3)
   (define %event-motion 1)
+
+  (define cursor-x 0)
+  (define cursor-y 0)
+  (define cursor-arrow 0)
   
   (define (draw-dialog x y w h title)
 
@@ -769,8 +776,10 @@
 	    ))
 
   (define (dialog x y w h title)
-    (let ((offset vector)
+    (let ((offset (vector 0 0))
 	  (active 0)
+	  (resize-status 0)
+	  (resize-pos (vector 0 0))
 	  )
       (widget-add
        (vector x y
@@ -785,7 +794,8 @@
 		   ;;(draw-widget-rect widget)
 		   (vector-set! widget %gx x)
 		   (vector-set! widget %gy y)
-		   
+
+		   (graphic-sissor-begin x y w h)
 		   (draw-dialog x y w h title)
 		   ;;(draw-text x y  (format "status =>~a" (vector-ref widget %status)))
 		   
@@ -799,48 +809,78 @@
 			   ((vector-ref (car child) %draw) (car child)  widget)
 			   (loop (cdr child)))
 			 ))
+		   (graphic-sissor-end)
 		   ))
-	       (lambda (widget parent type data)
-		 ;;(printf "type ~a ~a\n" type data)
+	       (lambda (widget parent type data);;event
 		 (if (= type %event-mouse-button)
-		     (begin
+		     (let ((xx (vector-ref widget %x))
+			   (yy (vector-ref widget %y))
+			   (ww (vector-ref widget %w))
+			   (hh (vector-ref widget %h)))
+		       (printf "type ~a ~a\n" type data)
 		       ;;(printf "dialog status ~a\n" (vector-ref widget %status))
+		       (if (in-rect (+ xx ww -20.0) (+ yy hh -20.0)
+				    (+ xx ww) (+ yy hh)
+				    (vector-ref data 3)
+				    (vector-ref data 4))
+			   (begin
+			     (printf "==> ~a ~a\n" type data)
+			     (set! resize-status (vector-ref data 1) )))
+		       (if (and (= (vector-ref data 1) 0) (= resize-status 1)) ;;rlease mouse
+			   (set! resize-status 0))
+		       
 		       (set! active (vector-ref data 1))))
 		 
 		 (if (and (= type %event-mouse-button) (= (vector-ref data 1) 1) )
-		     (let ((mx (vector-ref data 3))
-			   (my (vector-ref data 4)))
-		       (set! offset
-			     (vector
-			      (- (vector-ref widget 0) mx)
-			      (- (vector-ref widget 1) my)))
+			 (let ((mx (vector-ref data 3))
+			       (my (vector-ref data 4)))
 
-		       ;;child event
-		       (let loop ((child (vector-ref widget %child)))
-			 (if (pair? child)
-			     (begin
-			       ;; (printf "~a ~a\n" (car child) (vector
-			       ;; 			       (- mx (vector-ref widget 0))
-			       ;; 			       (- my (vector-ref widget 1) )  ) )
-			       
-			       (if (is-in (car child) (vector
-						       (- mx (vector-ref widget 0))
-						       (- my (vector-ref widget 1) )  ))
-				   (begin
-				     ;;(printf "in here\n")
-				   ((vector-ref (car child) %event) (car child) widget  type data)))
-			       
-			       (loop (cdr child)))
-			     ))
-		       ))
+			   (set! resize-pos (vector mx my))
+			   (set! offset
+				 (vector
+				  (- (vector-ref widget %x) mx)
+				  (- (vector-ref widget %y) my)))
+
+			   ;;child event
+			   (let loop ((child (vector-ref widget %child)))
+			     (if (pair? child)
+				 (begin
+				   ;; (printf "~a ~a\n" (car child) (vector
+				   ;; 			       (- mx (vector-ref widget 0))
+				   ;; 			       (- my (vector-ref widget 1) )  ) )
+				   
+				   (if (is-in (car child) (vector
+							   (- mx (vector-ref widget 0))
+							   (- my (vector-ref widget 1) )  ))
+				       (begin
+					 ;;(printf "in here\n")
+					 ((vector-ref (car child) %event) (car child) widget  type data)))
+				   
+				   (loop (cdr child)))
+				 ))
+			   ))
 		 (if (= type %event-motion)
 		     (begin
 		       (if (= active %status-active)
 			   (let ()
 			     ;;(printf "sel ~a ~a ==  ~a ~a \n" (vector-ref data 0) (vector-ref data 1)  xx yy)
-			     (vector-set! widget  %x  (+ (vector-ref data 0) (vector-ref offset 0)  ) )
-			     (vector-set! widget  %y  (+ (vector-ref data 1) (vector-ref offset 1)  ) )
-			     '()
+			      (if (= 1 resize-status)
+				  (let ((mx (vector-ref data 0))
+					(my (vector-ref data 1))
+					(w (vector-ref widget %w))
+					(h (vector-ref widget %h))
+					(x (vector-ref widget %x))
+					(y (vector-ref widget %y))
+					)
+				    ;;(printf "resize mouse offset ~a ~a\n" (vector-ref offset 0) (vector-ref offset 1)  )
+				    (widget-resize widget
+						   (+ w (- mx (vector-ref resize-pos 0)))
+						   (+ h (- my (vector-ref resize-pos 1))))
+				    (set! resize-pos (vector mx my))
+				    )
+				  (begin
+				    (vector-set! widget  %x  (+ (vector-ref data 0) (vector-ref offset 0)  ) )
+				    (vector-set! widget  %y  (+ (vector-ref data 1) (vector-ref offset 1)  ) )))
 			     ))
 		       )
 		     )
@@ -881,6 +921,13 @@
 	       )
        )))
 
+(define (widget-resize widget w h)
+  (vector-set! widget %w w)
+  (vector-set! widget %h h)
+  ((vector-ref widget %layout) widget)
+  )
+  
+
 (define (widget-active widget)
   '())
 
@@ -914,8 +961,13 @@
 		   (draw widget parent)
 		   (event widget  parent )
 		   ))))
- 
+
 (define (widget-event type data )
+  (if (= type %event-motion)
+      (begin
+	(set! cursor-x (vector-ref data 0))
+	(set! cursor-y (vector-ref data 1))
+	))
   (let loop ((len (- (length $widgets) 1) ))
     (if (>= len 0)
 	(let ((w (list-ref $widgets  len)))
@@ -992,32 +1044,47 @@
 	  )))
 
 
-  (define (widget-render)
-    ;;(printf "dialog=====>~a\n" $widgets)
-    (let loop ((w $widgets))
-      (if (pair? w)
-	  (begin
-	    (let ((draw (vector-ref (car w) %draw)))	   
-	      (draw (car w) '() ))
-	    (loop (cdr w)
-		  ))))
-    (graphic-render)
-    )
+(define (widget-render)
+  ;;(printf "dialog=====>~a\n" $widgets)
+  (let loop ((w $widgets))
+    (if (pair? w)
+	(begin
+	  (let ((draw (vector-ref (car w) %draw)))	   
+	    (draw (car w) '() ))
+	  (loop (cdr w)
+		))))
+  ;;(graphic-draw-solid-quad cursor-x cursor-y (+ cursor-x 10.0) (+ cursor-y 10.0) 255.0 0.0 0.0 0.5)
+  (if (> cursor-arrow 0)
+      (draw-image cursor-x cursor-y 22.0 24.0 cursor-arrow))
+  (graphic-render)
+  )
+
+(define (widget-set-cursor cursor)
+  (set! cursor-arrow cursor))
+
+(define (widget-show-cursor)
+   (if (>= cursor-arrow 0)
+       (set! cursor-arrow (load-texture "cursor.png"))))
+
+(define (widget-disable-cursor)
+  (set! cursor-arrow -1))
 
 (define (widget-init w h)
   (set! window-width w)
   (set! window-height h)
   (graphic-init w h)
+ 
+  
   )
   
-  (define (widget-layout)
-    (let loop ((w $widgets))
-      (if (pair? w)
-	  (begin
-	    (let ((layout (vector-ref (car w) %layout)))
-	      (layout (car w) ))
-	    (loop (cdr w)
-		  )))))
+(define (widget-layout)
+  (let loop ((w $widgets))
+    (if (pair? w)
+	(begin
+	  (let ((layout (vector-ref (car w) %layout)))
+	    (layout (car w) ))
+	  (loop (cdr w)
+		)))))
 
   
   )

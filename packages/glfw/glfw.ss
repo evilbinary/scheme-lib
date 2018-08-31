@@ -573,12 +573,13 @@
  glfw-set-char-callback 
  glfw-get-clipboard-string
  glfw-set-clipboard-string
- 
+ glfw-post-empty-event
+ glfw-set-input-mode
+ glfw-get-cursor-pos
  glad-load-gl
  glad-load-gl-loader
  glad-load-gles2-loader
  glad-load-gles1-loader
- 
 
  )	
 
@@ -1167,7 +1168,11 @@
 
      (define glfw-set-clipboard-string
        (foreign-procedure "glfwSetClipboardString" (void* string ) void))
-     
+
+     ;; (define $glfw-set-framebuffer-size-callback
+     ;;   (foreign-procedure "glfwSetFrameBufferSizeCallback" (void* int int) void))
+     (define glfw-post-empty-event
+        (foreign-procedure "glfwPostEmptyEvent" () void))
      
    (define glfw-wait-events
      (foreign-procedure "glfwWaitEvents" () void))
@@ -1181,6 +1186,15 @@
    (define glfw-set-cursor
      (foreign-procedure "glfwSetCursor" (void* void*) void))
 
+   
+   (define glfw-set-input-mode
+     (foreign-procedure "glfwSetInputMode" (void* int int) void))
+
+   (define glfw-get-cursor-pos
+     (foreign-procedure "glfwGetCursorPos" (void* void* void*) void))
+
+
+   
   (define (glfw-set-key-callback win fun)
     ($glfw-set-key-callback win (glfw-make-key-callback fun)))
 
@@ -1190,6 +1204,12 @@
   (define (glfw-set-window-size-callback win fun)
     ($glfw-set-window-size-callback win (glfw-make-window-size-callback fun)  ))
 
+ 
+  ;; (define (glfw-set-framebuffer-size-callback win fun)
+  ;;   ($glfw-set-framebuffer-size-callback win (glfw-make-framebuffer-size-callback fun)  ))
+
+  
+  
   (define (glfw-set-mouse-button-callback win fun)
     ($glfw-set-mouse-button-callback win (glfw-make-mouse-button-callback fun) ))
 
@@ -1234,6 +1254,12 @@
 	(lock-object code)
 	(foreign-callable-entry-point code))))
 
+   (define glfw-make-framebuffer-size-callback 
+    (lambda (p)
+      (let ([code (foreign-callable p (void* int int ) void)])
+	(lock-object code)
+	(foreign-callable-entry-point code))))
+   
   (define glfw-make-mouse-button-callback 
     (lambda (p)
       (let ([code (foreign-callable p (void* int int int ) void)])

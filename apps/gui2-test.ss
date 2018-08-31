@@ -167,6 +167,9 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
 (define w  (cffi-alloc 8) )
 (define h (cffi-alloc 8))
 
+(define cursorx (cffi-alloc 8))
+(define cursory (cffi-alloc 8))
+
 (define  my-edit 0)
 (define count 0)
 
@@ -188,19 +191,21 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
 
   (printf "~a ,~a\n" (cffi-get-int w) (cffi-get-int h))
   
-  (glfw-swap-interval 10)
+  (glfw-swap-interval 1)
+  ;;(glfw-set-input-mode window GLFW_CURSOR GLFW_CURSOR_HIDDEN)
 
+  
   (widget-init width height)
   
   (glfw-set-cursor-pos-callback
    window 
    (lambda (w x y)
      ;;(display (format "w=~x ~x ~a,~a\n" w window x y ))
-     ;;(glfw-swap-buffers w)
+     (glfw-post-empty-event)
      (set! mouse-x x)
      (set! mouse-y y)
      (widget-event 1 (vector x y))
-     '()
+     
      ))
   
   (glfw-set-key-callback
@@ -234,8 +239,8 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
   (set! my-edit (graphic-new-edit 300.0 300.0))
   
   (let ((p (dialog 400.0 0.0 300.0 400.0 "窗体啦啦~"))
-  	(button1 (button 120.0 30.0 "按钮1"))
-  	(button2 (button 120.0 30.0 "按钮2"))
+  	(button1 (button 120.0 30.0 "窗体调大"))
+  	(button2 (button 120.0 30.0 "窗体调小"))
   	(button3 (button 120.0 30.0 "按钮3"))
   	(button4 (button 120.0 30.0 "按钮"))
   	(img (image 80.0 80.0 "./duck.png"))
@@ -245,12 +250,19 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
     (widget-set-margin button2 10.0 20.0 0.0 20.0)
     (widget-set-margin button3 10.0 20.0 0.0 20.0)
     (widget-set-margin img 10.0 10.0 10.0 20.0)
+    (widget-add-event
+     button1
+     (lambda (w p t d)
+       (widget-resize p (+ (vector-ref p %w) 10) (+ (vector-ref p %h) 10))
+       (printf "button1 event type ~a ~a\n" t d)))
 
      (widget-add-event
-      button1
+      button2
       (lambda (w p t d)
-	(printf "button1 event type ~a ~a\n" t d)))
+	(widget-resize p (- (vector-ref p %w) 10) (- (vector-ref p %h) 10))
+	(printf "button2 event type ~a ~a\n" t d)))
 
+    
      (widget-add-draw
       button1
       (lambda (w p)
@@ -370,7 +382,9 @@ QQ群：Lisp兴趣小组239401374 啊哈哈" markup)
 	   ;;(graphic-draw-edit  my-edit mouse-x mouse-y)
 	   ;;(graphic-draw-solid-quad 20.0 20.0  300.0 300.0 255.0 0.0 0.0 0.5)
 
-	   (graphic-draw-text 0.0 20.0 (format "fps=~a\n" (graphic-get-fps)))
+	   ;;(glfw-get-cursor-pos window cursorx cursory)
+	   ;;(widget-event 1 (vector (cffi-get-double cursorx ) (cffi-get-double cursory )))
+	   (graphic-draw-text 0.0 20.0 (format "fps=~a\n" (graphic-get-fps) ))
 
 	   ;;(if (> (graphic-get-fps) 30)
 	   

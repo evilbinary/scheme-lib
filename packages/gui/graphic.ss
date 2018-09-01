@@ -23,6 +23,7 @@
      gl-markup-set-background
      gl-markup-set-font-size
      gl-edit-set-markup
+     gl-edit-char-event
      
      graphic-get-fps
      gl-edit-key-event
@@ -55,6 +56,7 @@
     (def-function gl-edit-add-text "gl_add_edit_text" (void*  string ) void)
     (def-function gl-render-edit "gl_render_edit" ( void* float float) void)
     (def-function gl-edit-key-event "gl_edit_key_event" ( void* int int int int) void)
+    (def-function gl-edit-char-event "gl_edit_char_event" ( void* int int) void)
 
     (def-function graphic-get-fps "get_fps" (void) int)
 

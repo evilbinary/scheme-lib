@@ -93,6 +93,16 @@
        (widget-scroll-event (vector x y mouse-x mouse-y))
        ))
     )
+
+  (define (collect-thread)
+    (if (threaded?)
+	(fork-thread
+	 (lambda ()
+	   (let loop ()
+	     (collect)
+	     (printf "tid=~a\n" (get-thread-id))
+	     (sleep (make-time 'time-duration 0 1))
+	     (loop))))))
   
   (define (window-create width height title)
     (let ((window '()))
@@ -107,7 +117,8 @@
       
       (widget-init width height)
       (window-event-init window)
-
+      ;;(collect-thread)
+      
       window
       ))
 
@@ -125,6 +136,7 @@
 	   (widget-render)
 	   ;;(glfw-poll-events)
 	   (glfw-swap-buffers window)
+	   (collect)
 	   ))
   
   (define (window-destroy window)

@@ -63,7 +63,7 @@
 	)))
 
 (define (test-video)
- (let ((d (dialog 20.0 80.0 300.0 400.0 "测试scroll~"))
+ (let ((d (dialog 20.0 80.0 300.0 400.0 "测试视频"))
 	(p (scroll 280.0 360.0))
 	(v (video 280.0 250.0  "/Users/evil/Downloads/WeChatSight513.mp4"))
 	)
@@ -252,20 +252,56 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
     (widget-add p t)
     ))
 
+(define (test-calc)
+  (let ((d (dialog 40.0 20.0 250.0 360.0 "计算器"))
+	(result (button 224.0 60.0 ""))
+	(num7  (button 50.0 50.0 "7"))
+	(num8  (button 50.0 50.0 "8"))
+	(num9  (button 50.0 50.0 "9"))
+	(num6  (button 50.0 50.0 "6"))
+	(num5  (button 50.0 50.0 "5"))
+	(num4  (button 50.0 50.0 "4"))
+	(num3  (button 50.0 50.0 "3"))
+	(num2  (button 50.0 50.0 "2"))
+	(num1  (button 50.0 50.0 "1"))
+	(num0  (button 110.0 50.0 "0"))
+	(mul  (button 50.0 50.0 "x"))
+	(sub  (button 50.0 50.0 "-"))
+	(add  (button 50.0 50.0 "+"))
+	(ret  (button 50.0 50.0 "="))
+	(dot  (button 50.0 50.0 "."))
+	)
+    (let loop ((btn (list result num7 num8 num9 mul
+			  num4  num5 num6 sub
+			  num1 num2  num3 add
+			  num0  dot ret)))
+      (if (pair? btn)
+	  (begin
+	    (widget-set-margin (car btn) 4.0 4.0 4.0 4.0)
+	    (widget-set-text-font-size (car btn) 40.0)
+	    (widget-set-text-font-color (car btn) 200.0 0.0 0.0 0.8)
+	    (widget-add d (car btn))
+	    (loop (cdr btn))
+	    )))
+
+    )
+  )
+
 (define (duck-test)
   (set! window (window-create width height "鸭子gui"))
   (window-set-fps-pos 750.0 0.0)
   ;;(window-set-fps-pos  20.0  20.0)
-  (window-show-fps #t)
+  ;;(window-show-fps #t)
   
   ;;widget add here
-  ;;(test-mobile-ui)
+  (test-mobile-ui)
   ;;(test-scroll)
   ;;(test-multi-dialog)
   ;;(test-multi-widget)
   ;;(test-video)
   ;;(test-editor)
   (test-tab)
+  (test-calc)
   
   ;;run
   (window-loop window)

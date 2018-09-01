@@ -12,6 +12,8 @@
      graphic-draw-text
      graphic-render
      graphic-destroy
+     graphic-set-text-font-size
+     graphic-set-text-font-color
      graphic-sissor-begin
      graphic-sissor-end
 
@@ -34,16 +36,16 @@
     (load-librarys "libgui")
     
     (def-function glShaderSource2 "glShaderSource2" (int int string void*) void)
-    
-    (def-function gl-render-text "gl_render_text" (void* float float) void)
-    (def-function gl-update-text "gl_update_text" (void* string) void)
-    (def-function gl-new-text "gl_new_text" (int float float) void*)
-
     (def-function shader-load-from-string "shader_load_from_string" (string string) int)
     (def-function shader-load "shader_load" (string string) int)
    
-
+    (def-function gl-render-text "gl_render_text" (void* float float) void)
+    (def-function gl-update-text "gl_update_text" (void* string) void)
+    (def-function gl-new-text "gl_new_text" (int float float) void*)
     (def-function gl-destroy-text "gl_destroy_text" (void*) void)
+    (def-function gl-set-text-font-size "gl_set_text_font_size" (void* float) void)
+    (def-function gl-set-text-font-color "gl_set_text_font_color" (void* float float float float) void)
+
 
     (def-function gl-new-markup "gl_new_markup" (string float) void*)
     (def-function gl-markup-set-foreground "gl_markup_set_foreground" (void* float float float float) void)
@@ -51,7 +53,6 @@
     (def-function gl-markup-set-font-size "gl_markup_set_font_size" (void* float) void)
 
     (def-function gl-edit-set-markup "gl_edit_set_markup" (void* void* int) void)
-
     (def-function gl-new-edit "gl_new_edit" (int float float float float) void*)
     (def-function gl-edit-add-text "gl_add_edit_text" (void*  string ) void)
     (def-function gl-render-edit "gl_render_edit" ( void* float float) void)
@@ -121,7 +122,7 @@
     (define my-width 0)
     (define my-height 0)
 
-    (define font-string-cache (make-hashtable equal-hash equal?) )
+    (define font-string-cache (make-hashtable equal-hash eqv?) )
 
     (define font-program 0)
 
@@ -269,7 +270,29 @@
 		))
 	  (gl-render-text p x1 (- my-height y1)))
 	]
-      ))
+       ))
+
+    (define (graphic-set-text-font-size text size)
+      (let ((p (hashtable-ref font-string-cache text '())))
+	(if (null? p)
+	    (begin
+	      (set! p (graphic-new-text text))
+	      (gl-update-text p text)
+	      (hashtable-set! font-string-cache text  p)
+	      ))
+	(gl-set-text-font-size p size)
+	))
+
+    (define (graphic-set-text-font-color text r g b a)
+      (let ((p (hashtable-ref font-string-cache text '())))
+	(if (null? p)
+	    (begin
+	      (set! p (graphic-new-text text))
+	      (gl-update-text p text)
+	      (hashtable-set! font-string-cache text  p)
+	      ))
+	(gl-set-text-font-color p r g b a)
+	))
 
     (define (graphic-draw-line x1 y1 x2 y2 r g b a)
       (let ((vertices (v 'float (list x1 y1 x2 y2))))

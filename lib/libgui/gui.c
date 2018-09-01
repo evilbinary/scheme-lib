@@ -46,6 +46,8 @@ typedef struct{
   int shader;
 }text_t;
 
+font_manager_t * gfont_manager=NULL;
+
 long get_time(){
   struct timeval tv;  
   gettimeofday(&tv,NULL);  
@@ -73,9 +75,12 @@ long get_fps(){
 
 text_t * gl_new_text(int shader,float width,float height){
   text_t *text=malloc(sizeof(text_t));
+  if(gfont_manager==NULL){
+    gfont_manager=font_manager_new( 512, 512, LCD_FILTERING_ON);
+  }
   text->text=NULL;
   text->shader=shader;
-  text->font_manager = font_manager_new( 512, 512, LCD_FILTERING_ON);
+  text->font_manager = gfont_manager;
   text->buffer = text_buffer_new( );
 
   vec4 white = {{1,1,1,1}};
@@ -120,9 +125,54 @@ text_t * gl_new_text(int shader,float width,float height){
     
   return text;
 }
+
+float gl_get_text_font_size(text_t * text){
+  return text->normal.size;
+}
+
+void gl_update_font(text_t* text){
+   vec2 pen = {{0.0,0.0}};
+  vertex_buffer_clear(text->buffer->buffer );  
+  text_buffer_printf( text->buffer, &pen,
+		      &text->normal,text->text,
+		      NULL );
+    
+  glBindTexture( GL_TEXTURE_2D, text->font_manager->atlas->id );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+   
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+  glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, text->font_manager->atlas->width,
+		text->font_manager->atlas->height, 0, GL_RGB, GL_UNSIGNED_BYTE,
+		text->font_manager->atlas->data );
+}
+void gl_set_text_font_size(text_t* text,float size){
+  text->normal.size=size;
+  text->normal.font = font_manager_get_from_markup(text->font_manager, &text->normal);
+  gl_update_font(text);
+ 
+}
+void gl_set_text_font_color(text_t* text,float r,float g,float b,float a){
+  vec4 color = {{r/255.0,g/255.0,b/255.0,a}};
+  text->normal.foreground_color=color;
+  text->normal.font = font_manager_get_from_markup(text->font_manager, &text->normal);
+  gl_update_font(text);
+
+}
+
+
+void gl_get_text_bound(text_t *text,float *left,float *right,float *top,float *bottom){
+   vec4 bounds=text_buffer_get_bounds( text->buffer, &text->pen);
+   *left=bounds.left;
+   *right = bounds.left + bounds.width;
+   *top = bounds.top;
+   *bottom = bounds.top - bounds.height;
+}
+
 void gl_destroy_text(text_t *text){
   if(text!=NULL){
-    
+    free(text);
   }
 }
 
@@ -138,22 +188,7 @@ void gl_update_text(text_t *text,char* str){
   }
   strcpy(text->text,str);
   
-  vec2 pen = {{0.0,0.0}};
-  vertex_buffer_clear(text->buffer->buffer );  
-  text_buffer_printf( text->buffer, &pen,
-		      &text->normal,text->text,
-		      NULL );
-    
-  glBindTexture( GL_TEXTURE_2D, text->font_manager->atlas->id );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-   
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-  glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, text->font_manager->atlas->width,
-		text->font_manager->atlas->height, 0, GL_RGB, GL_UNSIGNED_BYTE,
-		text->font_manager->atlas->data );
-
+  gl_update_font(text);
 
 }
 

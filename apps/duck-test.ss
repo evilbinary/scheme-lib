@@ -16,7 +16,9 @@
 
 
 (define window '() )
-
+(define width 800)
+(define height 700)
+;;(cffi-log #t)
 
 (define para "如果我们将我们所有的物体导入到程序当中，
 它们有可能会全挤在世界的原点(0, 0, 0)上，这并不是我们想要的结果
@@ -56,7 +58,7 @@
  (let loop ((i 0))
     (if (< i 20)
 	(begin
-	  (draw-dialog (+ i  mouse-x) (+ i mouse-y) 200.0 200.0)
+	  (dialog  (+ i  100.0) (+ i 100.0) 300.0 200.0 (format "dialog~a" i) )
 	  (loop (+ i 1)))
 	)))
 
@@ -142,15 +144,64 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
     (widget-add p e)
   ))
 
+(define (test-multi-widget)
 
-(define width 800)
-(define height 700)
-;;(cffi-log #t)
+    (let ((p (dialog 400.0 0.0 300.0 400.0 "窗体啦啦~"))
+  	(button1 (button 120.0 30.0 "窗体调大"))
+  	(button2 (button 120.0 30.0 "窗体调小"))
+  	(button3 (button 120.0 30.0 "按钮3"))
+  	(button4 (button 120.0 30.0 "按钮"))
+  	(img (image 80.0 80.0 "./duck.png"))
+	(icon (load-texture "face.png"))
+  	)
+    (widget-set-margin button1 10.0 20.0 0.0 20.0)
+    (widget-set-margin button2 10.0 20.0 0.0 20.0)
+    (widget-set-margin button3 10.0 20.0 0.0 20.0)
+    (widget-set-margin img 10.0 10.0 10.0 20.0)
+    (widget-add-event
+     button1
+     (lambda (w p t d)
+       (widget-resize p (+ (vector-ref p %w) 10) (+ (vector-ref p %h) 10))
+       ;;(printf "button1 event type ~a ~a\n" t d)
+       ))
+
+     (widget-add-event
+      button2
+      (lambda (w p t d)
+	(widget-resize p (- (vector-ref p %w) 10) (- (vector-ref p %h) 10))
+	;;(printf "button2 event type ~a ~a\n" t d)
+	))
+
+    
+     (widget-add-draw
+      button1
+      (lambda (w p)
+	(let ((x (vector-ref w %gx))
+	      (y (vector-ref w %gy)))
+	  (draw-image (+ 6.0 x) (+ y 6.0) 20.0 20.0 icon))))
+     
+    (widget-add p button1)
+    (widget-add p button2)
+    (widget-add p button3)
+    (widget-add p button4)
+    (widget-add p img)
+   
+    (widget-add p (button 120.0 30.0 "button5"))
+    (widget-add p (text 120.0 30.0 "总结:喜欢很大很大的"))
+    (widget-add p (edit 280.0 120.0 "scheme-lib 是一个scheme使用的库。目前支持android mac linux windows，其它平台在规划中。官方主页啦啦啦啦gagaga：http://scheme-lib.evilbinary.org/ 
+QQ群：Lisp兴趣小组239401374 啊哈哈"))
+    
+    ))
 
 (define (duck-test)
   (set! window (window-create width height "鸭子gui"))
+  (window-show-fps #t)
   ;;widget add here
   (test-mobile-ui)
+  ;;(test-mutil-widget)
+  (test-scroll)
+  ;;(test-multi-dialog)
+  (test-multi-widget)
   
   ;;run
   (window-loop window)

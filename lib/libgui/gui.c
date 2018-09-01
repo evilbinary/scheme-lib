@@ -234,6 +234,35 @@ typedef struct _edit_t{
 }edit_t;
 
 
+void gl_edit_set_markup(edit_t *self,markup_t * m,int index){
+  self->markup[index]=*m;
+}
+
+void gl_markup_set_foreground(markup_t *m,float r,float g,float b,float a){
+  
+  if(m!=NULL){
+    vec4 color = {{r,g,b,a}};
+    m->foreground_color=color;
+    /* printf("here\n"); */
+    /* font_manager_t * font_manager=font_manager_new( 512, 512, LCD_FILTERING_ON); */
+    /* m->font = font_manager_get_from_markup(font_manager,m ); */
+    /* font_manager_delete( font_manager ); */
+
+  }
+}
+void gl_markup_set_background(markup_t *m,float r,float g,float b,float a){
+  if(m!=NULL){
+    vec4 color = {{r,g,b,a}};
+    m->background_color=color;
+  }
+}
+
+void gl_markup_set_font_size(markup_t *m,float font_size){
+  if(m!=NULL){
+    m->size=font_size;
+  }
+}
+
 
 markup_t * gl_new_markup(char* name,float font_size){
 
@@ -257,9 +286,9 @@ markup_t * gl_new_markup(char* name,float font_size){
   };
 
   font_manager_t * font_manager=font_manager_new( 512, 512, LCD_FILTERING_ON);
-   
+  
   normal.font = font_manager_get_from_markup(font_manager,&normal );
-
+  font_manager_delete( font_manager );
   markup_t* markup=(markup_t *) malloc(sizeof(markup_t));
   *markup=normal;
 
@@ -366,11 +395,86 @@ edit_t * gl_new_edit(int shader,float w,float h,float width,float height){
 }
 
 
+void insert_string(char* destination, int pos, char* seed){
+    char * strC;
+    strC = (char*)malloc(strlen(destination)+strlen(seed)+1);
+    strncpy(strC,destination,pos);
+    strC[pos] = '\0';
+    strcat(strC,seed);
+    strcat(strC,destination+pos);
+    strcpy(destination,strC);
+    free(strC);
+}
+void remove_string(char* str,int pos,int len){
+  
+}
+void replace_string(char* str,int pos,char* seed){
+  
+}
+
+
+int get_text_index(edit_t *self,int index){
+  int i;
+  int count=0;
+  for(i=0;i<strlen(self->input);i+=utf8_surrogate_len(self->input+i)){
+    //printf(" count=%d index=%d\n",count,index);
+    if(count==index){
+      return i;
+    }
+    count++;
+  }
+  return -1;
+}
+
+//encode a Unicode code point as UTF-8 byte array
+int utf8_encode(char *out, uint32_t utf)
+{
+  if (utf <= 0x7F) {
+    // Plain ASCII
+    out[0] = (char) utf;
+    out[1] = 0;
+    return 1;
+  }
+  else if (utf <= 0x07FF) {
+    // 2-byte unicode
+    out[0] = (char) (((utf >> 6) & 0x1F) | 0xC0);
+    out[1] = (char) (((utf >> 0) & 0x3F) | 0x80);
+    out[2] = 0;
+    return 2;
+  }
+  else if (utf <= 0xFFFF) {
+    // 3-byte unicode
+    out[0] = (char) (((utf >> 12) & 0x0F) | 0xE0);
+    out[1] = (char) (((utf >>  6) & 0x3F) | 0x80);
+    out[2] = (char) (((utf >>  0) & 0x3F) | 0x80);
+    out[3] = 0;
+    return 3;
+  }
+  else if (utf <= 0x10FFFF) {
+    // 4-byte unicode
+    out[0] = (char) (((utf >> 18) & 0x07) | 0xF0);
+    out[1] = (char) (((utf >> 12) & 0x3F) | 0x80);
+    out[2] = (char) (((utf >>  6) & 0x3F) | 0x80);
+    out[3] = (char) (((utf >>  0) & 0x3F) | 0x80);
+    out[4] = 0;
+    return 4;
+  }
+  else { 
+    // error - use replacement character
+    out[0] = (char) 0xEF;  
+    out[1] = (char) 0xBF;
+    out[2] = (char) 0xBD;
+    out[3] = 0;
+    return 0;
+  }
+}
+
+
 void gl_add_edit_text(edit_t * self,char* text){
   size_t len = strlen(self->input);
   //printf("len=%d max_input=%d text=%d str=>%s\n",len,self->max_input,strlen(text),text);
   
-  if(len > self->max_input ){
+  if((len+self->cursor) >= self->max_input ){
     size_t alloc_size=self->max_input*2;
     char* new_input=malloc(alloc_size);    
     memcpy(new_input,self->input,self->max_input);
@@ -379,20 +483,41 @@ void gl_add_edit_text(edit_t * self,char* text){
     free(self->input);
     self->max_input=alloc_size;
    }
-  strcpy(self->input,text);
+
+
+  if(strlen(self->input)==0){
+    strcpy(self->input,text);
+  }else{
+    int index=get_text_index(self,self->cursor);    
+    //printf("index=%d cursor=%d\n",index,self->cursor);
+    if(index==1){
+      index=0;
+    }else if(index>=0){
+      insert_string(self->input+index,0,text);
+    }
+  }
+  
+  //strcpy(self->input,text);
   self->cursor_total+=utf8_strlen(text);
   
 }
 
-char * get_index_text(edit_t *self,int index){
-  int i;
-  int count=0;
-  for(i=0;i<utf8_strlen(self->input);i+=utf8_surrogate_len(self->input+i)){
-    if(count==i){
-      return self->input+i;
+void gl_edit_char_event(edit_t  *self,int ch,int mods){
+  if(self!=NULL){
+    
+    char* input=(char*)&ch;
+    int len=utf8_surrogate_len(input);
+    char buf[10]={0};
+    utf8_encode(buf,ch);
+    
+    printf("get char %d %x len==>%d %s\n",ch,ch,len,buf );
+    
+    if(self->cursor<=self->cursor_total ){
+      gl_add_edit_text(self,buf);
+      self->cursor++;
     }
-    count++;
-    //self->cursor+=utf8_surrogate_len(text);
+    //printf("key event %d action=%d self->cursor=%d total=%d\n",key,action, self->cursor,self->cursor_total);
+
   }
 }
 

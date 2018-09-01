@@ -559,7 +559,8 @@
  glfw-destroy-window
  glfw-create-standard-cursor
  glfw-set-cursor
- 
+
+ glfw-make-char-mods-callback
  get-glfw-get-proc-address
  glfw-make-cursor-pos-callback
  glfw-set-cursor-pos-callback
@@ -570,7 +571,8 @@
  glfw-set-scroll-callback
  glfw-make-scroll-callback
  glfw-make-char-callback
- glfw-set-char-callback 
+ glfw-set-char-callback
+ glfw-set-char-mods-callback
  glfw-get-clipboard-string
  glfw-set-clipboard-string
  glfw-post-empty-event
@@ -1158,9 +1160,11 @@
     (define $glfw-set-joystick-callback
      (foreign-procedure "glfwSetJoystickCallback" (void* void*) void*))
 
-     (define $glfw-set-char-callback
+    (define $glfw-set-char-callback
      (foreign-procedure "glfwSetCharCallback" (void* void*) void*))
-    
+
+    (define $glfw-set-char-mods-callback
+      (foreign-procedure "glfwSetCharModsCallback" (void* void*) void*))
 
      (define glfw-get-clipboard-string
        (foreign-procedure "glfwGetClipboardString" (void* ) string))
@@ -1204,6 +1208,8 @@
   (define (glfw-set-window-size-callback win fun)
     ($glfw-set-window-size-callback win (glfw-make-window-size-callback fun)  ))
 
+   (define (glfw-set-char-mods-callback win fun)
+    ($glfw-set-char-mods-callback win (glfw-make-char-mods-callback fun)))
  
   ;; (define (glfw-set-framebuffer-size-callback win fun)
   ;;   ($glfw-set-framebuffer-size-callback win (glfw-make-framebuffer-size-callback fun)  ))
@@ -1241,6 +1247,14 @@
       (let ([code (foreign-callable p (void* int int   int  int) void)])
 	(lock-object code)
 	(foreign-callable-entry-point code))))
+
+
+  (define glfw-make-char-mods-callback
+    (lambda (p)
+      (let ([code (foreign-callable p (void* int int) void)])
+	(lock-object code)
+	(foreign-callable-entry-point code))))
+  
 
   (define glfw-make-cursor-pos-callback 
     (lambda (p)

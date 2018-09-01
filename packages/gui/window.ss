@@ -7,6 +7,10 @@
    window-create
    window-destroy
    window-loop
+   window-get-mouse-pos
+   window-get-mouse-x
+   window-get-mouse-y
+   window-show-fps
    )
 
   (import (scheme)
@@ -20,10 +24,25 @@
 
   (define mouse-x 0)
   (define mouse-y 0)
+  (define is-show-fps #f)
+  
 
   (define fb-width  (cffi-alloc 8) )
   (define fb-height (cffi-alloc 8))
 
+  (define (window-show-fps t)
+    (set! is-show-fps t)
+    )
+
+  (define (window-get-mouse-x window)
+    mouse-x)
+  
+  (define (window-get-mouse-y window)
+    mouse-y)
+  
+  (define (window-get-mouse-pos window)
+    (list mouse-x mouse-y))
+  
   (define (window-event-init window)
     (glfw-set-cursor-pos-callback
      window 
@@ -50,6 +69,12 @@
        (widget-mouse-button-event  (vector button action mods mouse-x mouse-y) )
        ))
 
+    (glfw-set-key-callback
+     window 
+     (lambda (w k s a m)
+       (widget-event 2 (vector k s a m))
+       ;;(display (format "w=~x key=~a scancode=~a action=~a mods=~a\n" w k s a m))
+       ))
     (glfw-set-scroll-callback
      window
      (lambda (w x y)
@@ -84,8 +109,9 @@
     (while (= (glfw-window-should-close window) 0)
 	   ;;(glClearColor 1.0  0.0  0.0  1.0 )
 	   (glClearColor 0.3 0.3 0.32 1.0 )
-	   (glClear (+   GL_COLOR_BUFFER_BIT )) ;;
-	   (graphic-draw-text 0.0 20.0 (format "fps=~a\n" (graphic-get-fps) ))
+	   (glClear (+   GL_COLOR_BUFFER_BIT ))
+	   (if is-show-fps
+	       (graphic-draw-text 0.0 20.0 (format "fps=~a\n" (graphic-get-fps) )))
 	   (glfw-wait-events)
 	   (widget-render)
 	   ;;(glfw-poll-events)

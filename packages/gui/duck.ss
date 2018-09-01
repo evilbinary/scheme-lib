@@ -41,6 +41,8 @@
    widget-set-cursor
    widget-new
    widget-copy
+   widget-set-text-font-size
+   widget-set-text-font-color
    flow-layout
    frame-layout
    %gx
@@ -75,13 +77,14 @@
   (define %parent 17)
   (define %gx 18)
   (define %gy 19)
-
+  (define %text 20)
+  (define %last-common-attr 21)
   ;;private
-  (define %scroll-direction 20)
-  (define %scroll-rate 21)
-  (define %scroll-x 22)
-  (define %scroll-y 23)
-  (define %scroll-height 24)
+  (define %scroll-direction (+ %last-common-attr 0))
+  (define %scroll-rate (+ %last-common-attr 1))
+  (define %scroll-x (+ %last-common-attr 2))
+  (define %scroll-y (+ %last-common-attr 3))
+  (define %scroll-height (+ %last-common-attr 4))
 
   (define %status-active 1)
   (define %status-default 0)
@@ -125,9 +128,9 @@
     (graphic-draw-solid-quad  x y
 			      (+ x w) (+ y h)
 			      31.0 31.0 31.0 0.9)
-    (graphic-draw-text (- (+ x (/ w 2.0 ))
-			  20.5)
-		       (+ y 20) text)
+    (graphic-draw-text (+ x (/ w 2.0 ) -5)
+		       (+ y (/ h 2.0) 5)
+		       text)
     )
 
   (define (draw-image x y w h src)
@@ -844,7 +847,13 @@
        ))
       widget
       ))
-  
+
+(define (widget-set-text-font-size widget size)
+  (graphic-set-text-font-size (vector-ref widget %text) size)
+  )
+(define (widget-set-text-font-color widget r g b a)
+ (graphic-set-text-font-color (vector-ref widget %text) r g b a ) )
+
 (define (button w h text)
   (let ((widget (widget-new 0.0 0.0 w h text)))
     (widget-set-draw
@@ -854,6 +863,7 @@
        ;;(printf "     ~a ~a\n" w h)
        ;;(vector-set! widget %x (+ (vector-ref parent %x) 0))
        ;;(vector-set! widget %y (+ (vector-ref parent %y) 0))
+      
        (let ((gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
 	     (gy   (+ (vector-ref parent %gy) (vector-ref widget %y))))
 	 (vector-set! widget %gx gx)
@@ -903,6 +913,13 @@
     	       ))
 	 (graphic-sissor-end)
     	 )))
+
+    (widget-add-event
+     widget
+     (lambda (widget parent type data)
+       (if (and (= type %event-mouse-button) (= (vector-ref data 1) 1) )
+	   (widget-active widget))))
+    
     (widget-set-padding widget 10.0 10.0 40.0 40.0)
 
     (widget-add widget)
@@ -998,8 +1015,8 @@
 			   (- (vector-ref widget %x) mx)
 			   (- (vector-ref widget %y) my)))
 
-		    (widget-child-rect-event-mouse-button widget type data)
 		    ;;child event
+		    (widget-child-rect-event-mouse-button widget type data)
 	
 		    ))
 	      (if (= type %event-motion)
@@ -1054,6 +1071,9 @@
 	    '() ;;parent
 	    0.0 ;;gx
 	    0.0 ;;gy
+	    text  ;;text
+	    '()
+	    '()
 	    '()
 	    '()
 	    '()
@@ -1076,8 +1096,18 @@
   )
   
 
+(define (widget-at widget)
+  (let loop ((w $widgets) (index 0) )
+    (if (pair? w)
+	(begin
+	  (if (eqv? (car w) widget)
+	      index
+	      (loop (cdr w) (+ index 1))
+		)))))
+
 (define (widget-active widget)
-  '())
+    (set! $widgets (remove! widget $widgets ))
+    (set! $widgets (append $widgets (list  widget))) )
 
 (define (widget-get-attr widget index)
   (vector-ref widget index))

@@ -62,7 +62,20 @@
 	  (loop (+ i 1)))
 	)))
 
-
+(define (test-video)
+ (let ((d (dialog 20.0 80.0 300.0 400.0 "测试scroll~"))
+	(p (scroll 280.0 360.0))
+	(v (video 280.0 250.0  "/Users/evil/Downloads/WeChatSight513.mp4"))
+	)
+   (widget-add-draw
+    v
+    (lambda (w p)
+      (window-post-empty-event)
+      ))
+   (widget-add p v)
+   (widget-add d p)
+   ))
+   
 (define (test-scroll)
   ;;test scroll
   (let ((d (dialog 20.0 80.0 300.0 400.0 "测试scroll~"))
@@ -193,15 +206,66 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
     
     ))
 
+(define (test-editor)
+  (let ((p (scroll 280.0 360.0))
+	(editor (edit 200.0 400.0 "hello，world")))
+    (widget-add p)
+    (widget-add p editor))
+  )
+
+(define (test-tab)
+  (let ((p (dialog 40.0 20.0 500.0 400.0 "tab窗体啦啦~"))
+	(t (tab 450.0 300.0 (list "标签1" "标签2" "标签3" )))
+	(tab1 (scroll 400.0 280.0)))
+
+    (let ((button1 (button 120.0 30.0 "窗体调大"))
+	  (button2 (button 120.0 30.0 "窗体调小"))
+	  (button3 (button 120.0 30.0 "按钮3"))
+	  (button4 (button 120.0 30.0 "按钮"))
+	  (img (image 180.0 180.0 "./duck.png"))
+	  (icon (image 180.0 180.0 "face.png")))
+
+      (widget-add-event
+       button1
+       (lambda (w p t d)
+	 (widget-resize p (+ (vector-ref p %w) 10) (+ (vector-ref p %h) 10))
+	 (printf "button1 event type ~a ~a\n" t d)
+	 ))
+
+     
+       (widget-add tab1 img)
+       (widget-add tab1 icon)
+       (widget-add tab1 button1)
+       (widget-add tab1 button2)
+       (widget-add tab1 button3)
+       (widget-add tab1 button4)
+       (widget-add tab1 (text 140.0 30.0 "文本内容"))
+      )
+    
+    (widget-add t (edit 280.0 120.0 "scheme-lib 是一个scheme使用的库。目前支持android mac linux windows，其它平台在规划中。官方主页啦啦啦啦gagaga：http://scheme-lib.evilbinary.org/ 
+ ;;QQ群：Lisp兴趣小组239401374 啊哈哈"))
+		
+    ;;(widget-add t (text 20.0 30.0 "标签2:我是内容哈啦啦啦啦"))
+    (widget-add t (text 20.0 30.0 "标签3:金发拉数据大幅标"))
+    (widget-add t  tab1)
+
+    (widget-add p t)
+    ))
+
 (define (duck-test)
   (set! window (window-create width height "鸭子gui"))
+  (window-set-fps-pos 750.0 0.0)
+  ;;(window-set-fps-pos  20.0  20.0)
   (window-show-fps #t)
+  
   ;;widget add here
-  (test-mobile-ui)
-  ;;(test-mutil-widget)
-  (test-scroll)
+  ;;(test-mobile-ui)
+  ;;(test-scroll)
   ;;(test-multi-dialog)
-  (test-multi-widget)
+  ;;(test-multi-widget)
+  ;;(test-video)
+  ;;(test-editor)
+  (test-tab)
   
   ;;run
   (window-loop window)

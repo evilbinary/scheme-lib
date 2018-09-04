@@ -92,6 +92,14 @@
        ;;(printf "w=~x x=~a y=~a\n" w x y)
        (widget-scroll-event (vector x y mouse-x mouse-y))
        ))
+    (glfw-set-window-size-callback
+     window
+     (lambda (w width height)
+       (widget-window-resize width height)
+       ;;(printf "resize ~a ~a\n" width height)
+       )
+     )
+    
     )
 
   (define (collect-thread)
@@ -130,8 +138,8 @@
 	   ;;(glClearColor 1.0  0.0  0.0  1.0 )
 	   (glClearColor 0.3 0.3 0.32 1.0 )
 	   (glClear (+   GL_COLOR_BUFFER_BIT ))
-	   (if is-show-fps
-	       (graphic-draw-text fps-x fps-y (format "fps=~a\n" (graphic-get-fps) )))
+	   ;;(if is-show-fps
+	       ;;(graphic-draw-text fps-x fps-y (format "fps=~a\n" (graphic-get-fps) )))
 	   (glfw-wait-events)
 	   (widget-render)
 	   ;;(glfw-poll-events)
@@ -140,7 +148,7 @@
 	   ))
   
   (define (window-destroy window)
-    (graphic-destroy)
+    (widget-destroy)
     (glfw-destroy-window window);
     (glfw-terminate))
    

@@ -5,15 +5,14 @@
 (library (gui graphic)
     (export
      graphic-init
+     graphic-resize
+     graphic-draw-text
      graphic-draw-line
      graphic-draw-solid-quad
      graphic-draw-texture-quad
      graphic-draw-line-strip
-     graphic-draw-text
      graphic-render
      graphic-destroy
-     graphic-set-text-font-size
-     graphic-set-text-font-color
      graphic-sissor-begin
      graphic-sissor-end
 
@@ -26,6 +25,8 @@
      gl-markup-set-font-size
      gl-edit-set-markup
      gl-edit-char-event
+     gl-free-markup
+     
      
      graphic-get-fps
      gl-edit-key-event
@@ -39,23 +40,25 @@
     (def-function shader-load-from-string "shader_load_from_string" (string string) int)
     (def-function shader-load "shader_load" (string string) int)
    
-    (def-function gl-render-text "gl_render_text" (void* float float) void)
-    (def-function gl-update-text "gl_update_text" (void* string) void)
-    (def-function gl-new-text "gl_new_text" (int float float) void*)
-    (def-function gl-destroy-text "gl_destroy_text" (void*) void)
-    (def-function gl-set-text-font-size "gl_set_text_font_size" (void* float) void)
-    (def-function gl-set-text-font-color "gl_set_text_font_color" (void* float float float float) void)
-
-
+   
+    (def-function gl-resize-edit-window "gl_resize_edit_window" (void* float float ) void)
+    (def-function gl-free-markup "gl_free_markup" (void*) void)
     (def-function gl-new-markup "gl_new_markup" (string float) void*)
     (def-function gl-markup-set-foreground "gl_markup_set_foreground" (void* float float float float) void)
     (def-function gl-markup-set-background "gl_markup_set_background" (void* float float float float) void)
     (def-function gl-markup-set-font-size "gl_markup_set_font_size" (void* float) void)
 
+
+    (def-function gl-edit-set-editable "gl_edit_set_editable" (void*  int) void)
+
+    
     (def-function gl-edit-set-markup "gl_edit_set_markup" (void* void* int) void)
     (def-function gl-new-edit "gl_new_edit" (int float float float float) void*)
     (def-function gl-edit-add-text "gl_add_edit_text" (void*  string ) void)
     (def-function gl-render-edit "gl_render_edit" ( void* float float) void)
+    (def-function gl-render-edit-once "gl_render_edit_once" ( void* float float string void*) void)
+
+    
     (def-function gl-edit-key-event "gl_edit_key_event" ( void* int int int int) void)
     (def-function gl-edit-char-event "gl_edit_char_event" ( void* int int) void)
 
@@ -132,7 +135,9 @@
     (define  uniform-font-model 0)
     (define uniform-font-view 0)
     (define uniform-font-projection 0)
-    
+    (define gtext 0)
+    (define all-edit-cache (make-hashtable equal-hash eqv?) )
+
     (define f-font-shader-str
       "uniform sampler2D texture;
        void main()
@@ -155,8 +160,18 @@
        gl_Position      =projection*(view*(model*vec4(vertex,1.0)));\n
        }"
     )
-
-    (define ptext 0)
+    
+    (define (graphic-resize width height)
+      (set! my-width width)
+      (set! my-height height)
+      (gl-resize-edit-window gtext width height)
+      (let ((eds (vector->list (hashtable-values all-edit-cache))))
+	(let loop ((ed eds))
+	  (if (pair? ed)
+	      (begin
+		(gl-resize-edit-window (car ed) width height)
+		(loop (cdr ed))))))
+      )
     
     (define (graphic-init width height)
       (set! my-width width)
@@ -234,65 +249,31 @@
       (set! uniform-font-projection (glGetUniformLocation font-program "projection"))
 
       
-      ;;(set! ptext (gl-new-text font-program my-width my-height))
-
+      (set! gtext (gl-new-edit font-program my-width my-height my-width my-height))
+      (gl-edit-set-editable gtext 0)
+      ;;(printf "gtext ~x\n" gtext)
+      
       )
 
     (define (graphic-new-edit w h)
-      (gl-new-edit font-program w h my-width my-height)
-      )
+      (let ((ed (gl-new-edit font-program w h my-width my-height) ))
+	(hashtable-set! all-edit-cache ed  ed)
+	ed
+	))
 
     (define (graphic-draw-edit edit x y)
       (gl-render-edit edit x  (-  my-height y)))
 
-    (define (graphic-edit-add-text edit text markup)
-       (gl-edit-add-text edit text))
+    (define (graphic-edit-add-text edit text)
+      (gl-edit-add-text edit text))
 
     (define (graphic-new-markup name size)
       (gl-new-markup name size))
-    
 
-    (define (graphic-new-text text)
-      (let ((t (gl-new-text font-program my-width my-height)))
-      t))
-    
-    (define graphic-draw-text
-      (case-lambda
-       [(t x1 y1 t2)
-        (gl-render-text t x1 y1)]
-       [(x1 y1 text)
-	(let ((p (hashtable-ref font-string-cache text '())))
-	  (if (null? p)
-	      (begin
-		(set! p (graphic-new-text text))
-		(gl-update-text p text)
-		(hashtable-set! font-string-cache text  p)
-		))
-	  (gl-render-text p x1 (- my-height y1)))
-	]
-       ))
+    (define (graphic-draw-text x y  text)
+      (gl-render-edit-once gtext x (- my-height y) text 0)
+      )
 
-    (define (graphic-set-text-font-size text size)
-      (let ((p (hashtable-ref font-string-cache text '())))
-	(if (null? p)
-	    (begin
-	      (set! p (graphic-new-text text))
-	      (gl-update-text p text)
-	      (hashtable-set! font-string-cache text  p)
-	      ))
-	(gl-set-text-font-size p size)
-	))
-
-    (define (graphic-set-text-font-color text r g b a)
-      (let ((p (hashtable-ref font-string-cache text '())))
-	(if (null? p)
-	    (begin
-	      (set! p (graphic-new-text text))
-	      (gl-update-text p text)
-	      (hashtable-set! font-string-cache text  p)
-	      ))
-	(gl-set-text-font-color p r g b a)
-	))
 
     (define (graphic-draw-line x1 y1 x2 y2 r g b a)
       (let ((vertices (v 'float (list x1 y1 x2 y2))))

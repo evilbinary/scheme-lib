@@ -20,17 +20,21 @@
 
 #endif
 
+#include "vec234.h"
 #include "mat4.h"
-#include "freetype-gl.h"
-#include "font-manager.h"
-#include "vertex-buffer.h"
-#include "text-buffer.h"
-#include "markup.h"
+#include "utf8-utils.h"
+
+
 #include <stdio.h>
 #include <time.h>
+#include <sys/time.h>
 
+#define FONTSTASH_IMPLEMENTATION
+#include "fontstash.h"
 
-font_manager_t * gfont_manager=NULL;
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 
 long get_time(){
   struct timeval tv;  
@@ -59,16 +63,6 @@ long get_fps(){
 
 
 //editor here
-const int MARKUP_NORMAL      = 0;
-const int MARKUP_DEFAULT     = 0;
-const int MARKUP_ERROR       = 1;
-const int MARKUP_WARNING     = 2;
-const int MARKUP_OUTPUT      = 3;
-const int MARKUP_BOLD        = 4;
-const int MARKUP_ITALIC      = 5;
-const int MARKUP_BOLD_ITALIC = 6;
-const int MARKUP_FAINT       = 7;
-#define   MARKUP_COUNT         8
 
 typedef struct {
     float x, y, z;
@@ -80,47 +74,48 @@ typedef struct _edit_t{
   char *prompt;
   char *input;
   size_t max_input;
-  size_t         cursor;
-  size_t         cursor_total;
-  
-  vertex_buffer_t * buffer;
-  texture_atlas_t *atlas;
-  vec2 pen;
+  size_t cursor;
+  size_t cursor_total;
   vec4 bound;
-  markup_t       markup[MARKUP_COUNT];
+  vec2 pen;
   int shader;
   mat4 model;
   mat4 view;
   mat4 projection;
   int editable;
-  
+
+  struct sth_stash* stash;
+  unsigned char* data;
+  int font;
+  float font_size;
+
+  float window_width;
+  float window_height;
   
 }edit_t;
 
 
-void gl_edit_set_markup(edit_t *self,markup_t * m,int index){
+void gl_edit_set_markup(edit_t *self,void * m,int index){
   //printf("gl_edit_set_marku\n");
-  m->font = texture_font_new_from_file( self->atlas, m->size,m->family);
-  self->markup[index]=*m;
+  //m->font = texture_font_new_from_file( self->atlas, m->size,m->family);
+  //self->markup[index]=*m;
 }
 
-void gl_markup_set_foreground(markup_t *m,float r,float g,float b,float a){
+void gl_markup_set_foreground(void *m,float r,float g,float b,float a){
   
   if(m!=NULL){
-    vec4 color = {{r/255.0,g/255.0,b/255.0,a}};
-    m->foreground_color=color;
+   
   }
 }
-void gl_markup_set_background(markup_t *m,float r,float g,float b,float a){
+void gl_markup_set_background(void *m,float r,float g,float b,float a){
   if(m!=NULL){
-    vec4 color = {{r/255.0,g/255.0,b/255.0,a}};
-    m->background_color=color;
+    
   }
 }
 
-void gl_markup_set_font_size(markup_t *m,float font_size){
+void gl_markup_set_font_size(void *m,float font_size){
   if(m!=NULL){
-    m->size=font_size;
+    //m->size=font_size;
   }
 }
 
@@ -128,37 +123,12 @@ void gl_free_markup(void* m){
   free(m);
 }
 
-markup_t * gl_new_markup(char* name,float font_size){
-
+void * gl_new_markup(char* name,float font_size){
   char *font_name   = "Roboto-Regular.ttf";
   if(name!=NULL){
     font_name=name;
   }
-  vec4 white = {{1,1,1,1}};
-  vec4 black = {{0,0,0,1}};
-  vec4 none = {{0,0,1,0}};
-  
-  markup_t normal = {
-    .family  = font_name,
-    .size    = font_size, .bold    = 0,   .italic  = 0,
-    .spacing = 0.0,  .gamma   = 1.,
-    .foreground_color    = white, .background_color    = none,
-    .underline           = 0,     .underline_color     = white,
-    .overline            = 0,     .overline_color      = white,
-    .strikethrough       = 0,     .strikethrough_color = white,
-    .font = 0,
-  };
-
-  if(gfont_manager==NULL){
-    gfont_manager=font_manager_new( 512, 512, LCD_FILTERING_ON);
-  }
-  
-  normal.font = font_manager_get_from_markup(gfont_manager,&normal );
-  //font_manager_delete( font_manager );
-  markup_t* markup=(markup_t *) malloc(sizeof(markup_t));
-  *markup=normal;
-
-  return  markup;
+  return  NULL;
 }
 
 void gl_edit_set_editable(edit_t * self,int v){
@@ -179,91 +149,33 @@ edit_t * gl_new_edit(int shader,float w,float h,float width,float height){
   self->input[0]='\0';
   self->cursor_total = 0;
   self->cursor=0;
-  self->buffer = vertex_buffer_new( "vertex:3f,tex_coord:2f,color:4f" );
   self->pen.x = self->pen.y = 0;
-  self->atlas = texture_atlas_new( 512, 512, 1 );
   self->editable=1;
-  glGenTextures( 1, &self->atlas->id );
+  self-> font_size=40.0;
 
   self->bound.width=w*2;
   self->bound.height=h*2;
   self->bound.left=0;
   self->bound.top=0;
+  self->window_width=width;
+  self->window_height=height;
   
-  vec4 white = {{1,1,1,1}};
-  vec4 black = {{0,0,0,1}};
-  vec4 none = {{0,0,1,0}};
-
-  float font_size=28.0;
   char *font_name   = "Roboto-Regular.ttf";
   
-
-  markup_t normal;
-    normal.family  = font_name;
-    normal.size    = font_size;
-    normal.bold    = 0;
-    normal.italic  = 0;
-    normal.spacing = 0.0;
-    normal.gamma   = 1.0;
-    normal.foreground_color    = white;
-    normal.background_color    = none;
-    normal.underline           = 0;
-    normal.underline_color     = white;
-    normal.overline            = 0;
-    normal.overline_color      = white;
-    normal.strikethrough       = 0;
-    normal.strikethrough_color = white;
-
-    normal.font = texture_font_new_from_file( self->atlas, font_size, font_name );
-
-    markup_t bold = normal;
-    bold.bold = 1;
-    bold.font = texture_font_new_from_file( self->atlas, font_size, "fonts/VeraMoBd.ttf" );
-
-    markup_t italic = normal;
-    italic.italic = 1;
-    bold.font = texture_font_new_from_file( self->atlas, font_size, "fonts/VeraMoIt.ttf" );
-
-    markup_t bold_italic = normal;
-    bold.bold = 1;
-    italic.italic = 1;
-    italic.font = texture_font_new_from_file( self->atlas, font_size, "fonts/VeraMoBI.ttf" );
-
-    markup_t faint = normal;
-    faint.foreground_color.r = 0.35;
-    faint.foreground_color.g = 0.35;
-    faint.foreground_color.b = 0.35;
-
-    markup_t error = normal;
-    error.foreground_color.r = 1.00;
-    error.foreground_color.g = 0.00;
-    error.foreground_color.b = 0.00;
-
-    markup_t warning = normal;
-    warning.foreground_color.r = 1.00;
-    warning.foreground_color.g = 0.50;
-    warning.foreground_color.b = 0.50;
-
-    markup_t output = normal;
-    output.foreground_color.r = 0.00;
-    output.foreground_color.g = 0.00;
-    output.foreground_color.b = 1.00;
-  
-  self->markup[MARKUP_NORMAL] = normal;
-  self->markup[MARKUP_ERROR] = error;
-  self->markup[MARKUP_WARNING] = warning;
-  self->markup[MARKUP_OUTPUT] = output;
-  self->markup[MARKUP_FAINT] = faint;
-  self->markup[MARKUP_BOLD] = bold;
-  self->markup[MARKUP_ITALIC] = italic;
-  self->markup[MARKUP_BOLD_ITALIC] = bold_italic;
   
   mat4_set_identity( &self->projection );
   mat4_set_identity( &self->model );
   mat4_set_identity( &self->view );
-  //mat4_set_orthographic( &text->projection, 0, width*2,height*2,0,-1,1);
+
+  //mat4_set_orthographic( &self->projection, 0, width*2,height*2,0,-1,1);
   mat4_set_orthographic( &self->projection, 0, width*2, 0, height*2,-1,1);
-    
+  
+  self->stash = sth_create(512,512);
+  self->font = sth_add_font(self->stash,font_name);
+  //sth_add_font_from_memory(self->stash, self->data);
+  
+  //printf("load font %d\n",self->regular_font);
+ 
   return self;
 }
 
@@ -303,48 +215,7 @@ int get_text_index(edit_t *self,int index){
   return -1;
 }
 
-//encode a Unicode code point as UTF-8 byte array
-int utf8_encode(char *out, uint32_t utf)
-{
-  if (utf <= 0x7F) {
-    // Plain ASCII
-    out[0] = (char) utf;
-    out[1] = 0;
-    return 1;
-  }
-  else if (utf <= 0x07FF) {
-    // 2-byte unicode
-    out[0] = (char) (((utf >> 6) & 0x1F) | 0xC0);
-    out[1] = (char) (((utf >> 0) & 0x3F) | 0x80);
-    out[2] = 0;
-    return 2;
-  }
-  else if (utf <= 0xFFFF) {
-    // 3-byte unicode
-    out[0] = (char) (((utf >> 12) & 0x0F) | 0xE0);
-    out[1] = (char) (((utf >>  6) & 0x3F) | 0x80);
-    out[2] = (char) (((utf >>  0) & 0x3F) | 0x80);
-    out[3] = 0;
-    return 3;
-  }
-  else if (utf <= 0x10FFFF) {
-    // 4-byte unicode
-    out[0] = (char) (((utf >> 18) & 0x07) | 0xF0);
-    out[1] = (char) (((utf >> 12) & 0x3F) | 0x80);
-    out[2] = (char) (((utf >>  6) & 0x3F) | 0x80);
-    out[3] = (char) (((utf >>  0) & 0x3F) | 0x80);
-    out[4] = 0;
-    return 4;
-  }
-  else { 
-    // error - use replacement character
-    out[0] = (char) 0xEF;  
-    out[1] = (char) 0xBF;
-    out[2] = (char) 0xBD;
-    out[3] = 0;
-    return 0;
-  }
-}
+
 
 
 void gl_add_edit_text(edit_t * self,char* text){
@@ -415,216 +286,212 @@ void gl_edit_key_event(edit_t  *self,int key, int scancode, int action, int mods
   }
 }
 
-void gl_add_glyph(edit_t *self,char* current,
-		 char* previous,
-		 markup_t *markup )
-{
-    texture_glyph_t *glyph  = texture_font_get_glyph( markup->font, current );
-    if(glyph==NULL){
-      printf("glyph is null\n");
-      return ;
-    }
-    if( previous )
-    {
-        self->pen.x += texture_glyph_get_kerning( glyph, previous );
-    }
-    float r = markup->foreground_color.r;
-    float g = markup->foreground_color.g;
-    float b = markup->foreground_color.b;
-    float a = markup->foreground_color.a;
-    int x0  = self->pen.x + glyph->offset_x;
-    int y0  = self->pen.y + glyph->offset_y;
-    int x1  = x0 + glyph->width;
-    int y1  = y0 - glyph->height;
-    float s0 = glyph->s0;
-    float t0 = glyph->t0;
-    float s1 = glyph->s1;
-    float t1 = glyph->t1;
 
-   
-    
-    if(*current=='\n'){
-      //self->pen.y += markup->font->descender;
-      self->pen.y -=markup->font->ascender;
-      //self->pen.y+=glyph->height;
-      self->pen.x=self->bound.left;
-    }else{
-      GLuint indices[] = {0,1,2, 0,2,3};
-      vertex_t vertices[] = { { x0,y0,0,  s0,t0,  r,g,b,a },
-			      { x0,y1,0,  s0,t1,  r,g,b,a },
-			      { x1,y1,0,  s1,t1,  r,g,b,a },
-			      { x1,y0,0,  s1,t0,  r,g,b,a } };
-      vertex_buffer_push_back( self->buffer, vertices, 4, indices, 6 );
-
-      //printf(" pen.x=%f w=%f  %f\n",self->pen.x,(self->bound.left+ self->bound.width),self->bound.width);
       
-      if((self->pen.x+glyph->advance_x+glyph->advance_x ) > (self->bound.left+ self->bound.width)){
-	self->pen.y -=markup->font->ascender;
-	self->pen.x=self->bound.left;
-      }else{
-	self->pen.x += glyph->advance_x;
-	self->pen.y += glyph->advance_y;
-      
-      }
-       
-    }
-    
-   
-}
+void draw_solid_quad(edit_t* self,float x1, float y1, float x2, float y2, float r, float g, float b, float a){
 
-void gl_render_shader(edit_t *self ){
+  
   glUseProgram( self->shader );
   {
-    glUniform1i( glGetUniformLocation( self->shader, "texture" ),
-		 0 );
+
+    //glDisable( GL_TEXTURE_2D );
+    //glActiveTexture(GL_TEXTURE1);
+    glEnable( GL_TEXTURE_2D );
+    glUniform1i( glGetUniformLocation( self->shader, "texture" ),0);
     glUniformMatrix4fv( glGetUniformLocation( self->shader, "model" ),
 			1, 0,self->model.data);
     glUniformMatrix4fv( glGetUniformLocation( self->shader, "view" ),
 			1, 0, self->view.data);
     glUniformMatrix4fv( glGetUniformLocation( self->shader, "projection" ),
 			1, 0, self->projection.data);
-	
-    vertex_buffer_render( self->buffer, GL_TRIANGLES );
+
+
+  GLfloat vVertices[] = {x1,  y1,
+  			 x2,  y1,
+  			 x2,  y2,
+  			 x1,  y2};
+  float color[]={r,g,b,a,
+		 r,g,b,a,
+		 r,g,b,a,
+		 r,g,b,a};
+  
+ 
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, vVertices);
+  glEnableVertexAttribArray(0);
+  
+  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, color);
+  glEnableVertexAttribArray(2);
+
+  glDrawArrays(GL_QUADS, 0, 4);
+  glDisableVertexAttribArray(0);
+  glDisableVertexAttribArray(2);
+
+  }
+
+
+}
+static int idx = 1;
+static int idx2 = 1;
+
+void gl_render_cursor(edit_t *self){
+
+  
+  float cursor_x = self->pen.x;
+  float cursor_y =self->pen.y;
+  struct sth_font* fnt = NULL;
+  char* s =self->input;
+  int count=0;
+  short isize = (short)(self->font_size*10.0f);
+  unsigned int codepoint;
+  unsigned int state = 0;
+  struct sth_glyph* glyph = NULL;
+
+  char* cursor_text="|";
+  
+ fnt = self->stash->fonts;
+ decutf8(&state, &codepoint, *(unsigned char*)cursor_text);
+ glyph = get_glyph(self->stash, fnt, codepoint, isize);
+
+ cursor_x-= + (glyph->xadv)/2 ;
+ float sx=cursor_x;
+ float sy=cursor_y;
+ //while(fnt != NULL && fnt->idx != idx2) fnt = fnt->next;
+ if (fnt == NULL){
+    printf("gl_render_cursor null\n");
+
+   return;
+ } 
+ if (fnt->type != BMFONT && !fnt->data){
+   return;
+ }
+ 
+
+ for (; *s; ++s){
+   if (decutf8(&state, &codepoint, *(unsigned char*)s)){
+      continue;
+   }
+   glyph = get_glyph(self->stash, fnt, codepoint, isize);
+   if (!glyph){
+     count++;
+     continue;
+   }
+  
+   if(self->bound.width >0 && cursor_x >=(self->bound.width+sx- glyph->xadv )){
+     cursor_y-=self->stash->fonts->lineh* self->font_size;
+     cursor_x=sx;
+   }else if(*s =='\n'||*s=='\r'){
+     cursor_y-=self->stash->fonts->lineh*self->font_size;
+     cursor_x=sx;
+   }
+   if(self->cursor==count){
+     break;
+   }
+   count++;
+   cursor_x+=sth_get_advace(self->stash,fnt,glyph,isize);
+   
+ }
+ //printf("x =%d,%d\n",cursor_x,cursor_y);
+   
+ glUseProgram( self->shader );
+ {
+
+   glDisable( GL_TEXTURE_2D );
+   //glActiveTexture(GL_TEXTURE1);
+   //glEnable( GL_TEXTURE_2D );
+   glUniform1i( glGetUniformLocation( self->shader, "texture" ),0);
+   glUniformMatrix4fv( glGetUniformLocation( self->shader, "model" ),
+		       1, 0,self->model.data);
+   glUniformMatrix4fv( glGetUniformLocation( self->shader, "view" ),
+		       1, 0, self->view.data);
+   glUniformMatrix4fv( glGetUniformLocation( self->shader, "projection" ),
+		       1, 0, self->projection.data);
+
+   float dx=0,dy=0;
+   sth_begin_draw(self->stash);
+   sth_draw_text(self->stash, self->font,self->font_size,
+		 cursor_x,cursor_y,
+		 self->bound.width,self->bound.height,
+		 cursor_text,1.0,0.0,0.0,1.0, &dx,&dy);
+   //printf("%f %f %f %f\n",self->pen.x,self->pen.y,self->bound.width,self->bound.height);
+   sth_end_draw(self->stash);
+
+ }
+
+ //draw_solid_quad(self,cursor_x,cursor_y,cursor_x+4.0,cursor_y+20.0 ,1.0,0.0,0.0,1.0);
+ //draw_solid_quad(self,0.0,0.0,20.0,20.0,1.0,0.0,0.0,1.0);
+}
+
+void gl_render_params(edit_t *self ){
+
+  //printf("shader->%d\n",self->shader);
+  
+  glUseProgram( self->shader );
+  {
+    glUniform1i( glGetUniformLocation( self->shader, "texture" ),0);
+    glUniformMatrix4fv( glGetUniformLocation( self->shader, "model" ),
+			1, 0,self->model.data);
+    glUniformMatrix4fv( glGetUniformLocation( self->shader, "view" ),
+			1, 0, self->view.data);
+    glUniformMatrix4fv( glGetUniformLocation( self->shader, "projection" ),
+			1, 0, self->projection.data);
+
+    float dx=0,dy=0;
+    sth_begin_draw(self->stash);
+    sth_draw_text(self->stash, self->font,self->font_size,
+    		  self->pen.x,self->pen.y,
+    		  self->bound.width,self->bound.height,
+    		  self->input,1.0,1.0,1.0,1.0, &dx,&dy);
+    //printf("%f %f %f %f\n",self->pen.x,self->pen.y,self->bound.width,self->bound.height);
+    sth_end_draw(self->stash);
+
+
   }
 }
-void gl_render_cursor(edit_t *self,markup_t* markup,int cursor_x,int cursor_y){
-  // Cursor (we use the black character (NULL) as texture )
-  texture_glyph_t *glyph  = texture_font_get_glyph( markup->font, NULL );
-  float r = markup->foreground_color.r;
-  float g = markup->foreground_color.g;
-  float b = markup->foreground_color.b;
-  float a = markup->foreground_color.a;
-  int x0  = cursor_x+1;
-  int y0  = cursor_y + markup->font->descender;
-  int x1  = cursor_x+2;
-  int y1  = y0 + markup->font->height - markup->font->linegap;
-  float s0 = glyph->s0;
-  float t0 = glyph->t0;
-  float s1 = glyph->s1;
-  float t1 = glyph->t1;
-  GLuint indices[] = {0,1,2, 0,2,3};
-  vertex_t vertices[] = { { x0,y0,0,  s0,t0,  r,g,b,a },
-			  { x0,y1,0,  s0,t1,  r,g,b,a },
-			  { x1,y1,0,  s1,t1,  r,g,b,a },
-			  { x1,y0,0,  s1,t0,  r,g,b,a } };
-  vertex_buffer_push_back( self->buffer, vertices, 4, indices, 6 );
-    
-}
 
-void gl_render_input(edit_t * self,markup_t * markup){
 
-  char* cur_char;
-  char* prev_char;
-  int cursor_x = (int)self->pen.x;
-  int cursor_y = (int)self->pen.y;
-
-  int index=0;
-  int i;
-  int count=0;
-  
-  if( strlen(self->input) > 0 )
-    {
-        cur_char = self->input;
-        prev_char = NULL;
-	index+=utf8_surrogate_len(self->input);
-
-	cursor_x = (int) self->pen.x;
-	cursor_y =(int)self->pen.y;
-	
-        gl_add_glyph( self, cur_char, prev_char, markup );
-	
-        prev_char = cur_char;
-	
-	
-	count++;
-        for(;index < strlen(self->input); index+=utf8_surrogate_len(self->input+ index))
-        {
-            cur_char = self->input + index;
-	    //printf ("current %d===>%s\n",count,cur_char);
-
-	    if(self->cursor==count){
-	      cursor_x = (int) self->pen.x;
-	      cursor_y =(int)self->pen.y;
-	    }
-	    gl_add_glyph( self, cur_char, prev_char, markup );
-            prev_char = cur_char;
-           
-	    count++;
-        }
-	if(self->cursor==self->cursor_total){
-	  cursor_x = (int) self->pen.x;
-	  cursor_y =(int)self->pen.y;
-	}
-	//printf("%d %d\n",cursor_x,cursor_y);
-    }
-
-    if(  self->prompt[0] != '\0' || self->input[0] != '\0' )
-    {
-      //printf("hello.wolr\n");
-        glBindTexture( GL_TEXTURE_2D, self->atlas->id );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-        glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, self->atlas->width,
-                      self->atlas->height, 0, GL_RED, GL_UNSIGNED_BYTE,
-                      self->atlas->data );
-    }
-    if(self->editable==1){
-      gl_render_cursor(self,markup,cursor_x,cursor_y);
-    }
-
-    
-}
-
-void gl_render_edit_once(edit_t * self,float x ,float y ,char* text,markup_t * markup){
+void gl_render_edit_once(edit_t * self,float x ,float y ,char* text,void * markup){
 
   self->cursor=0;
   memset(self->input,0,strlen(self->input));
   gl_add_edit_text(self,text);
-  vertex_buffer_clear(self->buffer);
   
   self->bound.left=x*2;
   self->bound.top=y*2;
   self->pen.x=x*2;
   self->pen.y=y*2;
 
-  markup_t p;
-  if(markup==NULL){
-    p = self->markup[MARKUP_NORMAL];    
-  }else{
-    p=*markup;
+
+  gl_render_params(self);
+
+    
+  if(self->editable==1){
+    gl_render_cursor(self);
   }
-  self->pen.y -= p.font->height;
   
-  gl_render_input(self,&p);
-  gl_render_shader(self);
-  
+
 }
 
 
 void gl_render_edit(edit_t *self,float x,float y){
-  vertex_buffer_clear(self->buffer);
   
   self->bound.left=x*2;
   self->bound.top=y*2;
   self->pen.x=x*2;
   self->pen.y=y*2;
+
+  gl_render_params(self);
+
+    
+ if(self->editable==1){
+    gl_render_cursor(self);
+  }
   
-  markup_t markup;
-  
-  markup = self->markup[MARKUP_NORMAL];   
-  self->pen.y -= markup.font->height;
-  
-  gl_render_input(self,&markup);
-  gl_render_shader(self);
+
   
 }
 
 void gl_delete_edit(edit_t *self){
-  glDeleteTextures( 1, &self->atlas->id );
-  self->atlas->id = 0;
-  texture_atlas_delete( self->atlas );
+  
 }
 
 

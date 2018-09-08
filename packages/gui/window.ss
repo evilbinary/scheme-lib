@@ -116,7 +116,9 @@
     (let ((window '()))
       (glfw-init)
       (set! window (glfw-create-window width  height  title   0  0) )
-      (glfw-window-hint GLFW_DEPTH_BITS 16);
+      (glfw-window-hint GLFW_DEPTH_BITS 16)
+      (glfw-window-hint 0 GLFW_TRUE)
+      
       (glfw-make-context-current window);
       (glad-load-gles2-loader  (get-glfw-get-proc-address) )
       (glfw-get-framebuffer-size window fb-width fb-height)
@@ -138,11 +140,12 @@
 	   ;;(glClearColor 1.0  0.0  0.0  1.0 )
 	   (glClearColor 0.3 0.3 0.32 1.0 )
 	   (glClear (+   GL_COLOR_BUFFER_BIT ))
-	   ;;(if is-show-fps
-	       ;;(graphic-draw-text fps-x fps-y (format "fps=~a\n" (graphic-get-fps) )))
+	   (if is-show-fps
+	       (graphic-draw-text fps-x fps-y (format "fps=~a\n" (graphic-get-fps) )))
 	   (glfw-wait-events)
-	   (widget-render)
 	   ;;(glfw-poll-events)
+	   (widget-render)
+	  
 	   (glfw-swap-buffers window)
 	   (collect)
 	   ))

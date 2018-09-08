@@ -6,16 +6,14 @@
 
 
 TARGET = libgui.so 
-OBJS = gui.o shader.o mat4.o
+OBJS = gui.o shader.o mat4.o fontstash.o stb_truetype.o utf8-utils.o
 PLATFORM=
 BITS =$(shell getconf LONG_BIT)
 
 
-LIBS = -L../libgl -lgles -L../libfreetype-gl/ -lfreetype-gl 
+LIBS = -L../libgl -lgles
 CFLAGS = -Wall -Wformat  -DGLAD \
 	-I../libgl \
-	-I../libfreetype-gl/ -g \
-	-I/opt/local/include//freetype2/
 
 CXXFLAGS= -Wall -Wformat
 
@@ -35,7 +33,7 @@ endif
 
 ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"
-	LIBS +=  -L/opt/local/lib/ -lfreetype
+	LIBS +=  -L/opt/local/lib/ 
 	CXXFLAGS += 
 	CXXFLAGS += 
 	CFLAGS +=  -I/opt/local/include/ 

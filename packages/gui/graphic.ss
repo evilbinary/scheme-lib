@@ -140,11 +140,16 @@
 
     (define f-font-shader-str
       "uniform sampler2D texture;
+       varying vec2 v_TexCoordinate; 
+       varying vec4 v_color;
        void main()
       {
-        float a = texture2D(texture,gl_TexCoord[0].xy).r;
-        gl_FragColor = vec4(gl_Color.rgb, gl_Color.a*a);
+         gl_FragColor =vec4(v_color.rgb,texture2D(texture,v_TexCoordinate).a*v_color.a );
+
     }")
+    ;;float a = texture2D(texture,v_TexCoordinate.xy).r;
+    ;; gl_FragColor = vec4(v_color.rgb,v_color.a*a);
+
     
     (define v-font-shader-str
       "uniform mat4 model;\n
@@ -153,14 +158,21 @@
       attribute vec3 vertex;\n
       attribute vec2 tex_coord;\n
       attribute vec4 color;\n
+      varying vec2 v_TexCoordinate;
+      varying vec4 v_color; 
       void main()\n
       {\n
-       gl_TexCoord[0].xy = tex_coord;
-       gl_FrontColor     = color;\n
-       gl_Position      =projection*(view*(model*vec4(vertex,1.0)));\n
+
+       v_TexCoordinate=tex_coord;
+       v_color=color;
+       gl_Position =projection*(view*(model*vec4(vertex,1.0)));\n
        }"
-    )
+      )
+    ;; color;\n
+    ;; gl_TexCoord[0].xy = tex_coord;
+    ;;      
     
+
     (define (graphic-resize width height)
       (set! my-width width)
       (set! my-height height)
@@ -237,6 +249,9 @@
       (glAttachShader font-program font-vert-shader)
       (glAttachShader font-program font-frag-shader)
       
+      (glBindAttribLocation font-program 0 "vertex")
+      (glBindAttribLocation font-program 1 "tex_coord")
+      (glBindAttribLocation font-program 2 "color")
       (glLinkProgram font-program)
       (glUseProgram font-program)
 

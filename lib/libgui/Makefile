@@ -12,7 +12,7 @@ BITS =$(shell getconf LONG_BIT)
 
 
 LIBS = -L../libgl -lgles
-CFLAGS = -Wall -Wformat  -DGLAD \
+CFLAGS = -Wall -Wformat -g  -DGLAD \
 	-I../libgl \
 
 CXXFLAGS= -Wall -Wformat

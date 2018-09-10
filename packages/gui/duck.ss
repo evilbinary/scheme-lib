@@ -41,6 +41,8 @@
    widget-resize
    widget-get-attr
    widget-set-attr
+   widget-get-attrs
+   widget-set-attrs
    widget-disable-cursor
    widget-set-cursor
    widget-new
@@ -48,15 +50,23 @@
    widget-set-text-font-size
    widget-set-text-font-color
    widget-set-edit-font
+   widget-get-events
+   widget-set-events
+   widget-get-root
+   widget-layout-update
+   widget-set-child
    flow-layout
    frame-layout
    linear-layout
+   %match-parent
+   %wrap-conent
    %gx
    %gy
    %w
    %h
    %x
    %y
+   %text
    )
   (import (scheme) (utils libutil) (gui graphic ) (gui video) (gui stb))
 
@@ -86,7 +96,9 @@
   (define %text 20)
   (define %type 21)
   (define %attrs 22)
-  (define %last-common-attr 23)
+  (define %events 23)
+  
+  (define %last-common-attr 24)
   ;;private
   (define %scroll-direction (+ %last-common-attr 0))
   (define %scroll-rate (+ %last-common-attr 1))
@@ -112,7 +124,7 @@
   (define %event-motion 1)
   (define %event-resize 6)
 
-  (define %match-parent -1)
+  (define %match-parent -1.0)
   (define %wrap-conent 0)
 
   (define cursor-x 0)
@@ -135,6 +147,13 @@
     (graphic-draw-text (+ x 30) (+ y 0) title)
     
     )
+
+  (define (draw-panel x y w h text)
+    (graphic-draw-solid-quad  x y
+			      (+ x w) (+ y h)
+			      81.0 81.0 90.0 1.0)
+    (if (not (null? text))
+	(graphic-draw-text (+ x 30) (+ y 0) text)))
 
   (define (draw-button x y w h text)
     (graphic-draw-solid-quad  x y
@@ -225,7 +244,7 @@
 	    (y  (vector-ref widget %y))
 	    (w  (vector-ref widget %w))
 	    (h  (vector-ref widget %h))
-	    (top  (vector-ref widget %top))
+ 	    (top  (vector-ref widget %top))
 	    (left  (vector-ref widget %left))
 	    (right  (vector-ref widget %right))
 	    (bottom  (vector-ref widget %bottom))
@@ -236,21 +255,52 @@
 	    (let loop ((c child) (px left) (py top) )
 	      (if (pair? c)
 		  (begin
+		    ;;(printf "               ********* ~a               py=~a\n" (widget-get-attr (car c) %text)  py)
+		    
 		    (vector-set! (car c) %x px)
 		    (vector-set! (car c) %y py)
-		    
-		    ((vector-ref (car c) %layout) (car c))
-		    (if (= (widget-get-attr widget %status) 1)
-			(set! py (+ py (vector-ref (car child) %h))))
+		    (if (= (widget-get-attr (car c) %status) 1)
+			(begin
+			  ((vector-ref (car c) %layout) (car c))
+			  
+			  ;; (printf "               >>>>>>>>~a child total height=~a  py=~a\n"
+			  ;; 	  (widget-get-attr (car c ) %text)
+			  ;; 	  (calc-all-child-line-height (car c) 40.0)
+			  ;; 	  py
+			  ;; 	  )
+			  
+			  (set! py (+ py
+				      (widget-get-attr (car c) %h)
+				        ))
+			  )
+			(begin
+			  (widget-set-attr (car c) %h  (widget-get-attr (car c ) %top)  )		
+			  (set! py (+ py (widget-get-attr (car c ) %top) ))
+			  )
+			)
+
+		    ;; (printf " ~a  status=>~a height=~a  x=~a y=~a\n"
+		    ;; 	    (widget-get-attr (car c) %text)
+		    ;; 	    (widget-get-attr (car c) %status)
+		    ;; 	    (widget-get-attr (car c) %h)
+		    ;; 	    (widget-get-attr (car c) %x)
+		    ;; 	    (widget-get-attr (car c) %y)
+		    ;; 	    )
+	        
+		   
 		    ;;(printf "~a    pos=~a,~a  h=~a\n" (widget-get-attr (car child) %text) px py (vector-ref (car child) %h))
 		    (loop (cdr c) px py )
 		    )
 		  (widget-set-attr widget %h py)
 		  ;;(widget-set-attr widget %h (+ top (calc-all-child-line-height widget ) bottom) )
-		  ))
-	    ;;(widget-set-attr widget %h py)
-	    (widget-set-attr widget %h 40.0)
+		  )
+	      ;;(widget-set-attr widget %h py)
+	      )
+	    (widget-set-attr widget %h  (widget-get-attr widget %top) )
+	    
 	    )
+	(widget-update-pos widget)
+	(widget-child-update-pos widget)
 	
 	)]
      [(widget layout-info)
@@ -335,6 +385,7 @@
 				  ))
 		      )
 		    )
+
 		((vector-ref (car c) %layout) (car c))
 		(loop (cdr c) sx sy ww )
 		)
@@ -445,16 +496,42 @@
       ;;(printf "~a == ~a\n" (list x y w h) data)
      ))
 
-  (define (calc-all-child-line-height widget)
-    (let loop ((child (vector-ref widget %child))
-	       (height 0.0))
-      (if (pair? child)
-	  (begin
-	    (loop (cdr child) (+ height
-				 (vector-ref (car child) %h  )
-				 (calc-all-child-line-height (car child))
-				 ) ))
-	  height)))
+  (define calc-all-child-line-height
+    (case-lambda
+     [(widget height)
+      (let loop ((child (vector-ref widget %child))
+		 (h 0.0))
+	(if (pair? child)
+	    (begin
+
+	    (if (= 0 (widget-get-attr (car child) %status))
+		(set! h (+ h height))
+		(begin 
+		  (set! h (+ h (calc-all-child-line-height (car child) height)))
+		  ;;(vector-ref (car child) %h  )
+		  ))
+	    
+	      ;; (printf "==========child ~a status=~a sum height=~a\n"
+	      ;; 	      (widget-get-attr (car child) %text)
+	      ;; 	      (widget-get-attr (car child) %status)
+	    ;; 	      h)
+	    
+	      ;;(printf "child height=~a\n" (vector-ref (car child) %h  ))
+	      
+	      (loop (cdr child)
+		    h ))
+	    h))]
+     [(widget)
+      (let loop ((child (vector-ref widget %child))
+		 (h 0.0))
+	(if  (pair? child)
+	    (begin
+	      (loop (cdr child) (+ h
+				   (vector-ref (car child) %h  )
+				   ;;(calc-all-child-line-height (car child))
+				   ) ))
+	    h))]
+     ))
   
   (define (calc-child-height widget)
     (let loop ((child (vector-ref widget %child))
@@ -476,13 +553,6 @@
 	    (loop (cdr child)))
 	  )))
 
-  (define (widget-set-child widget index value)
-    (let loop ((child (vector-ref widget %child)))
-      (if (pair? child)
-	  (begin
-	    (vector-set! (car child) index value)
-	    (loop (cdr child)))
-	  )))
   
   (define (widget-child-key-event widget type data)
     (let loop ((child (vector-ref widget %child)))
@@ -556,9 +626,9 @@
 		 ;;(graphic-draw-solid-quad x y (+ x w) (+ y h) 0.0 255.0 0.0 0.2)
 		 
 		 ;;(graphic-sissor-begin gx gy  w  h )
-		 ;;(printf "haha ~a\n" (vector-ref widget %type))
+
 		 ;;(if (eqv? 'tree-item (vector-ref widget %type))
-		 (graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -1.0) (random 255.0) 255.0 0.0 0.3)
+		 ;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -1.0) (random 255.0) 255.0 0.0 0.3)
 		     ;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -10.0) (random 255.0)  0.0  0.0 0.5)
 		  ;;   )
 		 (draw-text gx
@@ -567,9 +637,10 @@
 		 
 		 
 		 ))
-	   ;;(if (= (widget-get-attr widget %status) 1)
+	   
+	   (if (= (widget-get-attr widget %status) 1)
 	       (widget-draw-child widget)
-	   ;;)
+	   )
 	   
 	   ;;(graphic-sissor-end)
 	   )))
@@ -583,7 +654,7 @@
 		   (draw-widget-child-rect parent widget )))
 	     )
 	 (begin
-	   (if (= type %event-mouse-button)
+	   (if (and (= type %event-mouse-button) (= (vector-ref data 1) 1) )
 	       (begin
 		 ;;(printf "tree click event ~a ~a ~a\n" type text data)
 		 ;;click head
@@ -592,16 +663,21 @@
 		       (if (= 0 (widget-get-attr widget %status) )
 			   (widget-set-attr widget %status 1)
 			   (widget-set-attr widget %status 0))
-		       
-		       (widget-layout-update  (widget-get-root widget ))
-		       
-		       (printf "haha ~a status=~a ~a\n" text (widget-get-attr widget %status)
-			       (widget-get-attr (widget-get-root widget ) %text) )
+
+		       ;;(widget-set-child-attr widget %status (widget-get-attr widget %status))
+		       (widget-layout-update (widget-get-root widget))
+		       (if (procedure? (widget-get-events widget 'click))
+			   ((widget-get-events widget 'click) widget parent type data)
+			   )
+		       ;; (printf "### ~a status=~a  ~a\n\n" (widget-get-attr (widget-get-root widget ) %text)
+		       ;; 	       (widget-get-attr widget %status)
+		       ;; 	       (widget-get-attr widget %h) )
 		       )
 		     )
 		 ;;(draw-widget-child-rect parent widget )
 		 ;;(widget-child-rect-event widget type data)
-		 (draw-widget-rect widget  (random 255.0) 0.0 0.0 1.0)
+
+		 ;;(draw-widget-rect widget  (random 255.0) 0.0 0.0 1.0)
 
 		 (let ((ret (widget-child-rect-event-mouse-button widget type data)))
 		   ;;(printf "child event ret ~a\n" ret )
@@ -765,6 +841,15 @@
     (let ((widget (widget-new 0.0 0.0 w h text))
 	  (ed (graphic-new-edit w h))
 	  )
+      
+      (widget-set-attrs widget 'editor ed)
+      (widget-set-attrs
+       widget
+       (format "event_~a" %text)
+       (lambda (ww text)
+	 (graphic-edit-set-text  (widget-get-attrs ww 'editor) text)
+	 ))
+      
       (vector-set! widget %edit-ed ed)
       (graphic-edit-add-text ed text)
       (widget-set-draw
@@ -907,7 +992,7 @@
 				      mx
 				      my)
 			     (begin
-			       (widget-set-child widget %status 0)
+			       (widget-set-child-attr widget %status 0)
 			       (vector-set! (car child) %status 1)
 			       ((vector-ref (car child) %event) (car child) widget  type data))
 			     )
@@ -1070,43 +1155,65 @@
   )
 
 
-(define (view w h text)
-  (let ((widget (widget-new 0.0 0.0 w h text))
+(define (view w h)
+  (let ((widget (widget-new 0.0 0.0 w h ""))
 	)
     (widget-set-draw
      widget
      (lambda (widget parent);;draw
-       ;;(printf "draw button ~a ~a\n" (vector-ref widget %x) (vector-ref widget %y))
-       ;;(printf "     ~a ~a\n" w h)
-       ;;(vector-set! widget %x (+ (vector-ref parent %x) 0))
-       ;;(vector-set! widget %y (+ (vector-ref parent %y) 0))
-      
-       (let ((gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
-	     (gy   (+ (vector-ref parent %gy) (vector-ref widget %y))))
-	 (vector-set! widget %gx gx)
-	 (vector-set! widget %gy gy)
-	 (draw-button gx
-		      gy
-		      w h text)
-	 
-	 ;;(printf "child count ~a\n" (length (widget-get-child widget)))
-	 (widget-draw-rect-child widget)
-	 )))
+       (let ((x  (vector-ref  widget %x))
+	       (y  (vector-ref widget %y))
+	       (w  (vector-ref  widget %w))
+	       (h  (vector-ref  widget %h))
+	       (draw (vector-ref widget %draw)))
+
+	   (if (null? parent)
+	       (let ((gx (+ (vector-ref widget %x)))
+		     (gy (+ (vector-ref widget %y))))
+		 (vector-set! widget %gx gx)
+		 (vector-set! widget %gy gy)		 
+		 (graphic-sissor-begin gx gy w h)
+
+		 (draw-panel gx gy w h '())
+		 )
+	       (let ((gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
+		     (gy   (+ (vector-ref parent %gy) (vector-ref widget %y))))
+		 (vector-set! widget %gx gx)
+		 (vector-set! widget %gy gy)
+		 (graphic-sissor-begin gx gy w h)
+
+		 (draw-panel gx gy w h '())
+		  ;; (draw-button gx
+		  ;; 	      gy
+		  ;; 	      w h text)
+		 ))
+	   
+	   (widget-draw-child widget)
+	   (graphic-sissor-end)
+	   )))
+
     (widget-set-event
      widget
-     (lambda (widget parent type data);;event	      	      		     
-       (if (null? parent)
+     (lambda (widget parent type data)
+       (if (and (= type %event-mouse-button) )
 	   (begin
-	     (if (= type %event-mouse-button)
-		 (draw-widget-child-rect parent widget ))) )
-       (begin
-	 (if (= type %event-mouse-button)
-	     (begin
-	       (printf "view click event ~a ~a ~a\n" type text data)
-	       (draw-widget-child-rect parent widget )
-	       #t
-	       )))
+	     ;;(widget-active widget)
+	     (widget-child-rect-event widget type data)
+	     ;;(printf "view click event ~a ~a ~a\n" type text data)
+	     ;;(draw-widget-child-rect parent widget )
+	     ))
+       (if (= type %event-scroll)
+	   (begin
+	     (widget-child-rect-event-scroll widget type data)
+	     ))
+       (if (and (or (= type %event-char) (= type %event-key)) (=  (vector-ref widget %status) %status-active) )
+	   (begin
+	     ;;(printf "\ndialog key event ~a ~a status=~a\n" type  data (vector-ref widget %status) )
+	     (widget-child-key-event widget type data)
+	     ;;(draw-widget-child-rect parent widget )
+	     ))
        ))
+    
     widget))
 
 (define (button w h text)
@@ -1188,8 +1295,11 @@
   (let loop ((child (vector-ref widget %child)))
     (if (pair? child)
 	(begin
-	  (if (is-in-widget widget (car child))
+	  (if (and (is-in-widget widget (car child));;在父亲矩形内
+		   (is-in (car child) (vector (vector-ref data 2) (vector-ref data 3) )  );;鼠标在区域内
+		   )
 	      (begin
+		;;(printf "is in-widget ~a\n" data)
 		((vector-ref (car child) %event) (car child)  widget type data )))
 	  (loop (cdr child)))
 	)))
@@ -1215,6 +1325,56 @@
 	  (loop (cdr child)))
 	)))
 
+(define (widget-update-pos ww)
+  (let ((x  (vector-ref  ww %x))
+	       (y  (vector-ref ww %y))
+	       (w  (vector-ref  ww %w))
+	       (h  (vector-ref  ww %h))
+	       (parent (widget-get-attr ww %parent))
+	       (draw (vector-ref ww %draw)))
+
+	   (if (null? parent)
+	       (let ((gx (+ (vector-ref ww %x)))
+		     (gy (+ (vector-ref ww %y))))
+		 (vector-set! ww %gx gx)
+		 (vector-set! ww %gy gy)
+		 )
+	       (let ((gx  (+ (vector-ref parent %gx) (vector-ref ww %x)))
+		     (gy   (+ (vector-ref parent %gy) (vector-ref ww %y))))
+		 (vector-set! ww %gx gx)
+		 (vector-set! ww %gy gy)
+		 ))
+	   )
+  )
+
+(define (widget-child-update-pos widget)
+  (let loop ((child (vector-ref widget %child)))
+    (if (pair? child)
+	(let ((ww (car child))
+	      (parent (widget-get-attr (car child) %parent)))
+	  
+	  (let ((x  (vector-ref  ww %x))
+	       (y  (vector-ref ww %y))
+	       (w  (vector-ref  ww %w))
+	       (h  (vector-ref  ww %h))
+	       (draw (vector-ref ww %draw)))
+
+	   (if (null? parent)
+	       (let ((gx (+ (vector-ref ww %x)))
+		     (gy (+ (vector-ref ww %y))))
+		 (vector-set! ww %gx gx)
+		 (vector-set! ww %gy gy)
+		 )
+	       (let ((gx  (+ (vector-ref parent %gx) (vector-ref ww %x)))
+		     (gy   (+ (vector-ref parent %gy) (vector-ref ww %y))))
+		 (vector-set! ww %gx gx)
+		 (vector-set! ww %gy gy)
+		 ))
+	   (widget-child-update-pos ww)
+	   )
+	  (loop (cdr child)))
+	)))
+
 (define (widget-copy widget)
   (vector-copy widget))
 
@@ -1224,6 +1384,16 @@
 
 (define (widget-set-attrs widget name value)
   (let ((h (vector-ref widget %attrs )))
+    (hashtable-set! h name value)))
+
+
+
+(define (widget-get-events widget name)
+  (let ((h (vector-ref widget  %events )))
+    (hashtable-ref h name '() )))
+
+(define (widget-set-events widget name value)
+  (let ((h (vector-ref widget %events )))
     (hashtable-set! h name value)))
 
 
@@ -1324,7 +1494,7 @@
 		    ))
 	      )
 	    (list )
-	    0.0
+	    0   ;;status
 	    0.0 ;;top
 	    0.0 ;;bottom
 	    0.0 ;;left
@@ -1341,6 +1511,7 @@
 	    text  ;;text
 	    '()  ;;
 	    (make-hashtable equal-hash equal?)  ;;attrs
+	    (make-hashtable equal-hash equal?)  ;events
 	    '()
 	    '()
 	    '()
@@ -1350,6 +1521,7 @@
 	    '()
 	    '()
 	    '()
+	    
 	    
 	    )
     ))
@@ -1380,8 +1552,32 @@
   (vector-ref widget index))
 
 (define (widget-set-attr widget index value)
-  (vector-set! widget index value))
+  (vector-set! widget index value)
+  (if (not (null? (widget-get-attrs widget (format "event_~a" index))))
+      ((widget-get-attrs widget (format "event_~a" index)) widget value))
+  
+  )
 
+(define (widget-set-child-attr widget index value)
+  (let loop ((child (vector-ref widget %child)))
+    (if (pair? child)
+	(begin
+	  (widget-set-attr (car child) index value)
+	  ;;(printf "=====>set child ~a ~a\n" (widget-get-attr (car child) %text) (widget-get-attr (car child) %status))
+	  (loop (cdr child)))
+	)))
+
+
+  ;; (define (widget-set-child widget index value)
+  ;;   (let loop ((child (vector-ref widget %child)))
+  ;;     (if (pair? child)
+  ;; 	  (begin
+  ;; 	    (vector-set! (car child) index value)
+  ;; 	    (loop (cdr child)))
+  ;; 	  )))
+
+(define (widget-set-child widget value)
+  (vector-set! widget %child value))
 
 (define (widget-get-child widget)
   (vector-ref widget %child))
@@ -1596,11 +1792,10 @@
 (define (widget-layout)
   (let loop ((w $widgets))
     (if (pair? w)
-	(begin
-	  (let ((layout (vector-ref (car w) %layout)))
-	    (layout (car w) ))
-	  (loop (cdr w)
-		)))))
+	(let ((layout (vector-ref (car w) %layout)))
+	  (if (procedure? layout)
+	      (layout (car w) ))
+	  (loop (cdr w))))))
 
 (define (widget-destroy)
   (graphic-destroy)

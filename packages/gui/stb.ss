@@ -9,7 +9,7 @@
      )
 
     (import (scheme) (utils libutil) (cffi cffi) (gles gles1))
-    (load-librarys  "libnanovg")
+    (load-librarys  "libgui")
 
     (def-function stbi-load
       "stbi_load" (string void* void* void* int) void*)

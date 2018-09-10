@@ -20,6 +20,8 @@
      graphic-draw-edit
      graphic-edit-add-text
      graphic-new-markup
+     graphic-edit-set-text
+     
      gl-markup-set-foreground
      gl-markup-set-background
      gl-markup-set-font-size
@@ -55,6 +57,9 @@
     (def-function gl-edit-set-markup "gl_edit_set_markup" (void* void* int) void)
     (def-function gl-new-edit "gl_new_edit" (int float float float float) void*)
     (def-function gl-edit-add-text "gl_add_edit_text" (void*  string ) void)
+    (def-function gl-edit-set-text  "gl_set_edit_text" (void*  string ) void)
+
+    
     (def-function gl-render-edit "gl_render_edit" ( void* float float) void)
     (def-function gl-render-edit-once "gl_render_edit_once" ( void* float float string void*) void)
 
@@ -281,6 +286,9 @@
 
     (define (graphic-edit-add-text edit text)
       (gl-edit-add-text edit text))
+
+    (define (graphic-edit-set-text edit text)
+      (gl-edit-set-text edit text))
 
     (define (graphic-new-markup name size)
       (gl-new-markup name size))

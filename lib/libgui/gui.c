@@ -144,14 +144,13 @@ edit_t * gl_new_edit(int shader,float w,float h,float width,float height){
   }
   self->prompt = strdup( ">>> " );
   self->shader=shader;
-  self->max_input=1024;
-  self->input = malloc(sizeof(char)*self->max_input) ;
-  self->input[0]='\0';
+  self->max_input=0;
+  self->input = NULL ;
   self->cursor_total = 0;
   self->cursor=0;
   self->pen.x = self->pen.y = 0;
   self->editable=1;
-  self-> font_size=40.0;
+  self-> font_size=38.0;
 
   self->bound.width=w*2;
   self->bound.height=h*2;
@@ -184,6 +183,7 @@ void gl_resize_edit_window(edit_t *self,float width,float height){
 }
 
 
+//no check size
 void insert_string(char* destination, int pos, char* seed){
     char * strC;
     strC = (char*)malloc(strlen(destination)+strlen(seed)+1);
@@ -217,31 +217,50 @@ int get_text_index(edit_t *self,int index){
 
 
 
-
 void gl_add_edit_text(edit_t * self,char* text){
-  size_t len = strlen(self->input);
-  //printf("len=%d max_input=%d text=%d str=>%s\n",len,self->max_input,strlen(text),text);
   
-  if((len+self->cursor) >= self->max_input ){
-    size_t alloc_size=self->max_input*2;
-    char* new_input=malloc(alloc_size);    
-    memcpy(new_input,self->input,self->max_input);
+  size_t len =0;
+  size_t text_len=strlen(text);
+  if(self->input==NULL){
+    size_t alloc_size=text_len;
+    self->input=malloc(alloc_size);
+    self->max_input=alloc_size;
+  }
+  len=strlen(self->input);
+  //printf("len=%d max_input=%d text_len=%d \n",len,self->max_input,text_len);
+  
+  if((len + text_len+self->cursor ) >= self->max_input ){
+    size_t alloc_size=0;
+    alloc_size=self->max_input*2;
+    if(alloc_size<text_len){
+      alloc_size=text_len+10;
+    }
+    //printf(" alloc_size=>%d\n",alloc_size);
+    char* new_input=malloc(alloc_size);
+    strncpy(new_input,self->input,strlen(self->input));
     char* old_input=self->input;
     self->input=new_input;
-    free(self->input);
     self->max_input=alloc_size;
-   }
+    if(old_input!=NULL){
+      free(old_input);
+    }
+  }
+    
 
 
-  if(strlen(self->input)==0){
+  if(len==0){
     strcpy(self->input,text);
   }else{
     int index=get_text_index(self,self->cursor);    
     //printf("index=%d cursor=%d\n",index,self->cursor);
     if(index==1){
       index=0;
-    }else if(index>=0){
-      insert_string(self->input+index,0,text);
+    }
+    if(index>=0&&index<self->max_input ){
+      printf("insert  %d max_input=>%d\n",index,self->max_input );
+      insert_string(self->input,index,text);
+    }else{
+      printf("insert err index=%d\n",index);
     }
   }
   
@@ -249,6 +268,15 @@ void gl_add_edit_text(edit_t * self,char* text){
   self->cursor_total+=utf8_strlen(text);
   
 }
+
+void gl_set_edit_text(edit_t * self,char* text){
+  self->cursor=0;
+  if(self->input!=NULL){
+    memset(self->input,0,strlen(self->input));
+  }
+  gl_add_edit_text(self,text);
+}
+
 
 void gl_edit_char_event(edit_t  *self,int ch,int mods){
   if(self!=NULL){
@@ -347,6 +375,9 @@ void gl_render_cursor(edit_t *self){
   struct sth_glyph* glyph = NULL;
 
   char* cursor_text="|";
+
+  if(s==NULL)
+    return;
   
  fnt = self->stash->fonts;
  decutf8(&state, &codepoint, *(unsigned char*)cursor_text);
@@ -370,19 +401,22 @@ void gl_render_cursor(edit_t *self){
    if (decutf8(&state, &codepoint, *(unsigned char*)s)){
       continue;
    }
+
    glyph = get_glyph(self->stash, fnt, codepoint, isize);
+   if(*s =='\n'){
+     cursor_y-=self->stash->fonts->lineh*self->font_size;
+     cursor_x=sx;
+   }
    if (!glyph){
      count++;
      continue;
    }
-  
-   if(self->bound.width >0 && cursor_x >=(self->bound.width+sx- glyph->xadv )){
+
+   if(self->bound.width >0 && cursor_x >= (self->bound.width+sx-sth_get_advace(self->stash,fnt,glyph,isize) )){
      cursor_y-=self->stash->fonts->lineh* self->font_size;
      cursor_x=sx;
-   }else if(*s =='\n'||*s=='\r'){
-     cursor_y-=self->stash->fonts->lineh*self->font_size;
-     cursor_x=sx;
    }
+  
    if(self->cursor==count){
      break;
    }
@@ -435,6 +469,8 @@ void gl_render_params(edit_t *self ){
     glUniformMatrix4fv( glGetUniformLocation( self->shader, "projection" ),
 			1, 0, self->projection.data);
 
+    if(self->input==NULL)
+      return;
     float dx=0,dy=0;
     sth_begin_draw(self->stash);
     sth_draw_text(self->stash, self->font,self->font_size,
@@ -452,7 +488,9 @@ void gl_render_params(edit_t *self ){
 void gl_render_edit_once(edit_t * self,float x ,float y ,char* text,void * markup){
 
   self->cursor=0;
-  memset(self->input,0,strlen(self->input));
+  if(self->input!=NULL){
+    memset(self->input,0,strlen(self->input));
+  }
   gl_add_edit_text(self,text);
   
   self->bound.left=x*2;

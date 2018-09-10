@@ -531,7 +531,7 @@ static void flush_draw(struct sth_stash* stash)
 	{
 		if (texture->nverts > 0)
 		{			
-
+		  glActiveTexture(GL_TEXTURE0);
 		  glBindTexture(GL_TEXTURE_2D, texture->id);
 		  glEnable(GL_TEXTURE_2D);
 
@@ -634,9 +634,15 @@ void sth_draw_text(struct sth_stash* stash,
     return;
 	
   for (; *s; ++s){
-    if (decutf8(&state, &codepoint, *(unsigned char*)s))
+    //printf("here  %c %x %x\n",*s,*s,'\n');
+    if (decutf8(&state, &codepoint, *(unsigned char*)s)){
       continue;
+    }
     glyph = get_glyph(stash, fnt, codepoint, isize);
+    if(*s =='\n'){
+      y-=stash->fonts->lineh*size;
+      x=sx;
+    }
     if (!glyph)
       continue;
     texture = glyph->texture;
@@ -644,16 +650,11 @@ void sth_draw_text(struct sth_stash* stash,
     if (texture->nverts+4 >= VERT_COUNT){
       flush_draw(stash);
     }
-    //printf("here  %c %d\n",*s,*s=='\n');
     
     if(width>0 && x>=(width+sx- glyph->xadv )){
       y-=stash->fonts->lineh*size;
       x=sx;
-    }else if(*s =='\n'||*s=='\r'){
-    
-      y-=stash->fonts->lineh*size;
-      x=sx;
-    }
+    } 
 		
     if (!get_quad(stash, fnt, glyph, isize, &x, &y, &q))
       continue;

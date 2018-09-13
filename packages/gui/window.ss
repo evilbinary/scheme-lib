@@ -95,7 +95,11 @@
     (glfw-set-window-size-callback
      window
      (lambda (w width height)
+       ;;(glClearColor 0.3 0.3 0.32 1.0 )
+       ;;(glClear (+   GL_COLOR_BUFFER_BIT ))
        (widget-window-resize width height)
+       (widget-render)
+       (glfw-swap-buffers window)
        ;;(printf "resize ~a ~a\n" width height)
        )
      )

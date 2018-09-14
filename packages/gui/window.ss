@@ -16,7 +16,7 @@
    )
 
   (import (scheme)
-	  (gui duck)
+	  (gui widget)
 	  (cffi cffi)
 	  (glfw glfw)
 	  (gui graphic)

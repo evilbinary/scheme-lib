@@ -10,6 +10,8 @@
 	 (gui stb)
 	 (gles gles1)
 	 (gui window)
+	 (gui layout)
+	 (gui widget)
 	 (cffi cffi)
 	 (gui video)
 	 (utils libutil) (utils macro) )
@@ -143,6 +145,8 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
 	     ))
 	 
        )))
+    (widget-set-edit-font e 40.0 255.0 0.0 0.0 1.0)
+    
     (widget-set-padding d 30.0 30.0 90.0 40.0)
 
     (widget-add d p)
@@ -201,14 +205,18 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
    
     (widget-add p (button 120.0 30.0 "button5"))
     (widget-add p (text 120.0 30.0 "总结:喜欢很大很大的"))
-    (widget-add p (edit 280.0 120.0 "scheme-lib 是一个scheme使用的库。目前支持android mac linux windows，其它平台在规划中。官方主页啦啦啦啦gagaga：http://scheme-lib.evilbinary.org/ 
+    (widget-add p (edit 280.0 120.0 "scheme-lib 是一个scheme使用的库。目前支持android mac linux windows，其它平台在规划中。官方主页啦啦啦啦gagaga：http://scheme-lib.evilbinary.org/
 QQ群：Lisp兴趣小组239401374 啊哈哈"))
     
     ))
 
 (define (test-editor)
   (let ((p (scroll 280.0 360.0))
-	(editor (edit 200.0 400.0 "hello，world")))
+	(editor (edit 200.0 400.0
+		      "hello，world
+a
+b
+")))
     (widget-add p)
     (widget-add p editor))
   )
@@ -287,21 +295,61 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
     )
   )
 
+(define (test-tree)
+  (let ((d (dialog 40.0 20.0 250.0 560.0 "树形控件"))
+	(t (tree 200.0 2500.0 "根节点")))
+    (let loop ((i 0))
+      (if (< i 8)
+	  (let ((v (tree  200.0 200.0  (format "节点~a\n" i)) ))
+	    (widget-set-margin v 4.0 4.0 4.0 4.0)
+	    (widget-add t v)
+	    (let loop2 ((j 0))
+	      (if (< j 3)
+		  (let ((vv (tree  120.0 40.0 (format " 节点~a ~a\n" i j))))
+		    ;;(widget-add v (view 120.0 40.0 (format "text ~a ~a\n" i j)))
+		     (widget-add v vv)
+		    (let loop3 ((k 0))
+		      (if (< k 4)
+			  (let ((vvv (tree  120.0 40.0 (format "  节点~a ~a ~a\n" i j k))))
+			    (widget-add vv vvv )
+			    (let loop4 ((l 0))
+			      (if (< l 4 )
+				  (let ()
+				    (widget-add vvv (tree 120.0 40.0 (format "   ~a ~a ~a ~a\n" i j k l)))
+				    ;;(widget-add vvv (view 0.0 40.0 (format "text ~a ~a ~a ~a\n" i j k l )))
+				    ;;(widget-add vvv (button 120.0 40.0 (format "text ~a ~a ~a ~a\n" i j k l )))
+				    
+				    (loop4 (+ l 1)))
+				    ))
+			    (loop3 (+ k 1))
+			    )))
+		    (loop2 (+ j 1))
+		    )))
+	      
+	    
+	    (loop (+ i 1))
+	    )
+	  ))
+    (widget-add d t)
+  ))
+
 (define (duck-test)
   (set! window (window-create width height "鸭子gui"))
   (window-set-fps-pos 750.0 0.0)
-  ;;(window-set-fps-pos  20.0  20.0)
+  (window-set-fps-pos  0.0  0.0)
   ;;(window-show-fps #t)
   
   ;;widget add here
   (test-mobile-ui)
-  ;;(test-scroll)
+  (test-scroll)
   ;;(test-multi-dialog)
-  ;;(test-multi-widget)
+  (test-multi-widget)
   ;;(test-video)
   ;;(test-editor)
-  (test-tab)
-  (test-calc)
+
+  ;;(test-tab)
+  ;;(test-calc)
+  ;;(test-tree)
   
   ;;run
   (window-loop window)

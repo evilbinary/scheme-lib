@@ -1,5 +1,5 @@
 # scheme-lib
-scheme-lib 是一个scheme使用的库。目前支持android mac linux windows，其它平台在规划中。
+scheme-lib 是一个scheme使用的库。目前支持android osx linux windows，其它平台在规划中。
 
 官方主页：[http://scheme-lib.evilbinary.org/](http://scheme-lib.evilbinary.org/)
 QQ群：Lisp兴趣小组239401374
@@ -15,6 +15,8 @@ QQ群：Lisp兴趣小组239401374
 1. 下载[scheme-lib-2.0-win32.zip][2]，解压后进入bin，打开cmd运行`run.bat ../apps/gui-test.ss`就可以运行例子了。
 
 ### 截图
+
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/editor.jpg" width="400px" />
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/new-gui.jpg" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/new-gui2.jpg" width="400px" />
 

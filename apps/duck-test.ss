@@ -89,10 +89,11 @@
     ;;  (lambda (w p)
     ;;    (glfw-post-empty-event)
     ;;    ))
-    (widget-add-event
-     p
-     (lambda (w p t d)
-       (printf "scroll event type ~a ~a\n" t d)))
+    
+    ;; (widget-add-event
+    ;;  p
+    ;;  (lambda (w p t d)
+    ;;    (printf "scroll event type ~a ~a\n" t d)))
     
     ;;(widget-add p v)
     (widget-add p (image 180.0 180.0 "test1.jpg"))
@@ -178,14 +179,16 @@ QQ群：Lisp兴趣小组239401374 啊哈哈"))
     (widget-add-event
      button1
      (lambda (w p t d)
-       (widget-resize p (+ (vector-ref p %w) 10) (+ (vector-ref p %h) 10))
+       (if (= t %event-mouse-button)
+	   (widget-resize p (+ (vector-ref p %w) 10) (+ (vector-ref p %h) 10)))
        ;;(printf "button1 event type ~a ~a\n" t d)
        ))
 
      (widget-add-event
       button2
       (lambda (w p t d)
-	(widget-resize p (- (vector-ref p %w) 10) (- (vector-ref p %h) 10))
+	(if (= t %event-mouse-button)
+	    (widget-resize p (- (vector-ref p %w) 10) (- (vector-ref p %h) 10)))
 	;;(printf "button2 event type ~a ~a\n" t d)
 	))
 
@@ -331,25 +334,67 @@ b
 	    )
 	  ))
     (widget-add d t)
+    ))
+
+
+(define (test-menu)
+  (let ((d (dialog 40.0 20.0 550.0 560.0 "pop控件"))
+	(t (pop 100.0 40.0 "根节点")))
+    (widget-set-attrs t 'is-root #t)
+    ;;(printf "get root status ~a\n" (widget-get-attr t %status))
+    (let loop ((i 0))
+      (if (< i 8)
+	  (let ((v (pop  100.0 40.0  (format "节点~a\n" i)) ))
+	    ;;(widget-set-margin v 4.0 4.0 4.0 4.0)
+	    (widget-add t v)
+	    (let loop2 ((j 0))
+	      (if (< j 3)
+		  (let ((vv (pop  120.0 40.0 (format " 节点~a ~a\n" i j))))
+		    ;;(widget-add v (view 120.0 40.0 (format "text ~a ~a\n" i j)))
+		     (widget-add v vv)
+		    (let loop3 ((k 0))
+		      (if (< k 4)
+			  (let ((vvv (pop  120.0 40.0 (format "  节点~a ~a ~a\n" i j k))))
+			    (widget-add vv vvv )
+			    (let loop4 ((l 0))
+			      (if (< l 4 )
+				  (let ()
+				    (widget-add vvv (pop 120.0 40.0 (format "   ~a ~a ~a ~a\n" i j k l)))
+				    ;;(widget-add vvv (view 0.0 40.0 (format "text ~a ~a ~a ~a\n" i j k l )))
+				    ;;(widget-add vvv (button 120.0 40.0 (format "text ~a ~a ~a ~a\n" i j k l )))
+				    
+				    (loop4 (+ l 1)))
+				    ))
+			    (loop3 (+ k 1))
+			    )))
+		    (loop2 (+ j 1))
+		    )))
+	      
+	    
+	    (loop (+ i 1))
+	    )
+	  ))
+    (widget-add d t)
   ))
 
 (define (duck-test)
   (set! window (window-create width height "鸭子gui"))
   (window-set-fps-pos 750.0 0.0)
   (window-set-fps-pos  0.0  0.0)
-  ;;(window-show-fps #t)
+  (window-show-fps #t)
   
   ;;widget add here
-  (test-mobile-ui)
-  (test-scroll)
+  ;;(test-mobile-ui)
+  ;;(test-scroll)
   ;;(test-multi-dialog)
-  (test-multi-widget)
+  ;;(test-multi-widget)
   ;;(test-video)
   ;;(test-editor)
 
   ;;(test-tab)
-  ;;(test-calc)
-  ;;(test-tree)
+  (test-calc)
+  (test-tree)
+  (test-menu)
   
   ;;run
   (window-loop window)

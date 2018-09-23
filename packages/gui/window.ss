@@ -59,7 +59,6 @@
      window 
      (lambda (w x y)
        ;;(display (format "w=~x ~x ~a,~a\n" w window x y ))
-       (glfw-post-empty-event)
        (set! mouse-x x)
        (set! mouse-y y)
        (widget-event 1 (vector x y))
@@ -95,8 +94,8 @@
     (glfw-set-window-size-callback
      window
      (lambda (w width height)
-       ;;(glClearColor 0.3 0.3 0.32 1.0 )
-       ;;(glClear (+   GL_COLOR_BUFFER_BIT ))
+       (glClearColor 0.3 0.3 0.32 1.0 )
+       (glClear (+   GL_COLOR_BUFFER_BIT ))
        (widget-window-resize width height)
        (widget-render)
        (glfw-swap-buffers window)

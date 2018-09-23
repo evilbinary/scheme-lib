@@ -8,6 +8,10 @@
    frame-layout
    flow-layout
    grid-layout
+   pop-layout
+
+   calc-child-height
+   calc-all-child-line-height
    
    %match-parent
    %wrap-conent
@@ -26,6 +30,62 @@
       '()
       )
     )
+
+(define pop-layout
+    (case-lambda
+     [(widget)
+      (process-match-parent widget)
+      (let ((x  (vector-ref widget %x))
+	    (y  (vector-ref widget %y))
+	    (w  (vector-ref widget %w))
+	    (h  (vector-ref widget %h))
+	    (top  (vector-ref widget %top))
+	    (left  (vector-ref widget %left))
+	    (right  (vector-ref widget %right))
+	    (bottom  (vector-ref widget %bottom))
+	    (sx 0.0)
+	    (sy 0.0)
+	    (child (vector-ref widget %child))
+	    )
+        (begin
+	  (if (equal? #t (widget-get-attrs widget 'is-root))
+	      (begin
+		;;(printf "root status ~a\n" (widget-get-attr widget %status))
+		(widget-set-attr widget %status 0)
+		
+		(set! sy h)
+		(set! sx 0.0))
+	      (begin
+		(set! sy 0.0)
+		(set! sx w))
+		  )
+	      )
+	
+	(let loop ((c child) (px sx) (py sy) )
+	  (if (pair? c)
+	      (begin
+		;;(process-match-parent (car c))
+
+		(if (procedure? (vector-ref (car c) %layout))
+		    ((vector-ref (car c) %layout) (car c)))
+
+		(vector-set! (car c) %x px)
+		(vector-set! (car c) %y py)
+		(set! py (+ py (widget-get-attr (car c) %h)))
+		
+		(loop (cdr c) px py)
+		)
+	      ))
+	)]
+     [(widget layout-info)
+      (let ((x  (vector-ref  widget %x))
+	    (y  (vector-ref widget %y))
+	    (w  (vector-ref  widget %w))
+	    (h  (vector-ref  widget %h)))
+	'()
+	)]
+      
+     ))   
 
   (define (process-match-parent c )
     ;;match-parent attrib
@@ -220,6 +280,56 @@
 	)]
       
      ))
+
+
+  
+  (define calc-all-child-line-height
+    (case-lambda
+     [(widget height)
+      (let loop ((child (vector-ref widget %child))
+		 (h 0.0))
+	(if (pair? child)
+	    (begin
+
+	      (if (= 0 (widget-get-attr (car child) %status))
+		  (set! h (+ h height))
+		  (begin 
+		    (set! h (+ h (calc-all-child-line-height (car child) height)))
+		    ;;(vector-ref (car child) %h  )
+		    ))
+	      
+	      ;; (printf "==========child ~a status=~a sum height=~a\n"
+	      ;; 	      (widget-get-attr (car child) %text)
+	      ;; 	      (widget-get-attr (car child) %status)
+	      ;; 	      h)
+	      
+	      ;;(printf "child height=~a\n" (vector-ref (car child) %h  ))
+	      
+	      (loop (cdr child)
+		    h ))
+	    h))]
+     [(widget)
+      (let loop ((child (vector-ref widget %child))
+		 (h 0.0))
+	(if  (pair? child)
+	     (begin
+	       (loop (cdr child) (+ h
+				    (vector-ref (car child) %h  )
+				    ;;(calc-all-child-line-height (car child))
+				    ) ))
+	     h))]
+     ))
+
+  ;;calc visible child height
+  (define (calc-child-height widget)
+    (let loop ((child (vector-ref widget %child))
+	       (height 0.0))
+      (if (pair? child)
+	  (begin
+	    (if (= (widget-get-attr (car child) %status) 1)
+		(set! height (+ height (vector-ref (car child) %h  ))))
+	    (loop (cdr child) height ))
+	  height)))
   
   
 )

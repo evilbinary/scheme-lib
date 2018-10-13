@@ -141,6 +141,15 @@ int sth_add_glyph_for_char(struct sth_stash* stash, int idx, GLuint id, const ch
 void sth_begin_draw(struct sth_stash* stash);
 void sth_end_draw(struct sth_stash* stash);
 
+void sth_draw_text_colors(struct sth_stash* stash,
+			  int idx,
+			  float size,
+			  float x, float y,
+			  float width,float height,
+			  const char* s,
+			  int * colors,
+			  float* dx,float *dy);
+
 void sth_draw_text(struct sth_stash* stash,
 		   int idx, float size,
 		   float x, float y,

@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <AL/alut.h>
+
 
 /*
  * This program loads and plays a variety of files.

@@ -25,6 +25,8 @@
 	  (gui video)
 	  (gui widget)
 	  (gui layout)
+	  (gui syntax)
+	  (cffi cffi)
 	  (gui stb))
 
 
@@ -90,7 +92,7 @@
   
   
   (define (draw-video v x y w h )
-    (let l ((i 3))
+    (let l ((i 2))
       (if (> i 0)
 	  (begin
 	    (video-render v x y (+ x w) (+ y h) )
@@ -168,6 +170,7 @@
 		 
 		 ;;(graphic-sissor-begin gx gy w h)
 		 ;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h) 255.0 0.0 0.0 0.5)
+		 (draw-item gx gy w h text)
 		 )
 	       (let ((gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
 		     (gy   (+ (vector-ref parent %gy) (vector-ref widget %y))))
@@ -183,8 +186,8 @@
 		 ;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -10.0) (random 255.0)  0.0  0.0 0.5)
 		 ;;   )
 		 (draw-item gx gy w h text)
-		 
-		 (if (= (widget-get-attr widget %status) %status-active)
+		 ;;hover
+		 (if  (= (widget-get-attr widget %status) %status-active)
 		     (draw-rect gx
 				gy
 				(widget-get-attr widget %w)
@@ -193,7 +196,10 @@
 		 
 		 ))
 	   
-	   (if (= (widget-get-attr widget %status) 1)
+	   (if (equal? #t (widget-get-attrs widget 'static))
+	       (widget-set-attr widget %status 1))
+	   
+	   (if  (= (widget-get-attr widget %status) 1)
 	       (widget-draw-child widget)
 	       )
 	   
@@ -211,6 +217,7 @@
 	 (begin
 	   (if (= type %event-motion)
 	       (begin
+		 ;;(printf "motion ~a\n" (widget-get-attr widget %text))
 		 (if (is-in widget data)
 		     (begin
 		       ;;(printf "motion ~a\n" (widget-get-attr widget %text))
@@ -233,6 +240,7 @@
 		 ;;click widget
 		 (if (is-in-widget widget (vector-ref data 3) (vector-ref data 4))
 		     (let ()
+		      
 		       (if (= 0 (widget-get-attr widget %status) )
 			   (begin 
 			     (if (not (null? (widget-get-attr widget %parent)))
@@ -246,20 +254,27 @@
 					   widget
 					   (lambda (p)
 					     ;;(printf " ~a ~a\n" (widget-get-attr p %text) (widget-get-attrs p 'is-root) )
-					     (widget-get-attrs p 'is-root)
+					     (widget-get-attrs p 'root)
 					     )
 					   )))
 			       ;;(printf " ee=~a ~a \n" (widget-get-attr proot %text) (widget-get-attr proot %status) )
 			       ;;(draw-widget-rect proot)
+			       
 			       (widget-set-attr proot %status 0)
-			       (widget-set-child-attr proot %status 0)))
-			   )
+			       (widget-set-child-attr proot %status 0)
 
+			       ))
+			   )
 		       ;;(widget-set-child-attr widget %status (widget-get-attr widget %status))
 		       (widget-layout-update (widget-get-root widget))
+
+
+		       ;;(printf "click ->~a ~a\n" (widget-get-events widget 'click) (widget-get-attr widget %text))
 		       (if (procedure? (widget-get-events widget 'click))
 			   ((widget-get-events widget 'click) widget parent type data)
 			   )
+		       ;;(widget-child-rect-event-mouse-button widget type data)
+		       
 		       ;; (printf "### ~a status=~a  ~a\n\n" (widget-get-attr (widget-get-root widget ) %text)
 		       ;; 	       (widget-get-attr widget %status)
 		       ;; 	       (widget-get-attr widget %h) )
@@ -269,7 +284,10 @@
 		 (let ((ret (widget-child-rect-event-mouse-button widget type data)))
 		   ;;(printf "child event ret ~a\n" ret )
 		   '()
-		   ))))
+		   )
+		 ))
+	   
+	   )
 	 #t
 	 ))
       widget
@@ -346,17 +364,16 @@
 				        (vector-ref data 3)
 					(vector-ref data 4) )
 		     (let ()
-		       ;;(printf "here\n")
 		       (if (= 0 (widget-get-attr widget %status) )
 			   (widget-set-attr widget %status 1)
 			   (widget-set-attr widget %status 0))
-
+		       
 		       ;;(widget-set-child-attr widget %status (widget-get-attr widget %status))
 		       (widget-layout-update (widget-get-root widget))
 		       (if (procedure? (widget-get-events widget 'click))
 			   ((widget-get-events widget 'click) widget parent type data)
 			   )
-		       ;; (printf "### ~a status=~a  ~a\n\n" (widget-get-attr (widget-get-root widget ) %text)
+		       ;; (printf "### ~a status=~a  ~a\n\n" (widget-get-attr  widget  %text)
 		       ;; 	       (widget-get-attr widget %status)
 		       ;; 	       (widget-get-attr widget %h) )
 		       )
@@ -476,8 +493,8 @@
 		   ))	)
 	   (if (= type %event-mouse-button)
 	       (begin
-		 (widget-child-rect-event widget type data)
-		 ;;(printf "button click event ~a ~a ~a\n" type text data)
+		 (widget-child-rect-event-mouse-button widget type data)
+		 ;;(printf "scroll click event ~a ~a ~a\n" type text data)
 		 ;;(draw-widget-child-rect parent widget )
 		 ))
 	   (if (= type %event-key)
@@ -492,7 +509,7 @@
 		 ))
 	   (if (= type %event-motion)
 	       (begin
-		 '()
+		  (widget-child-rect-event-mouse-motion widget type data)
 		 ;;(printf "motion ~a ~a\n" type data)
 		 ))
 	   )
@@ -513,9 +530,23 @@
        (format "%event-~a" %text)
        (lambda (ww text)
 	 (graphic-edit-set-text  (widget-get-attrs ww '%editor) text)
+	
 	 ))
+
+      (widget-set-attrs
+       widget
+       "%event-syntax-on-hook"
+       (lambda (ww)
+	 (if (equal? #t (widget-get-attrs widget 'syntax-on))
+	     (let ((syntax-cache (cffi-alloc (* 64 (string-length text)))))
+	       (init-syntax)
+	       (widget-set-attrs widget 'syntax-cache syntax-cache)
+	       (parse-syntax syntax-cache text)		
+	       (gl-edit-set-highlight ed syntax-cache)
+	       ))))
       
       (graphic-edit-add-text ed text)
+
       (widget-set-draw
        widget
        (lambda (widget parent);;draw
@@ -539,6 +570,9 @@
 				  (vector-ref data 1)
 				  (vector-ref data 2)
 				  (vector-ref data 3) )
+	       (if (equal? #t (widget-get-attrs widget 'syntax-on))
+		   (parse-syntax (widget-get-attrs widget 'syntax-cache) text)
+		   )
 	       ))
 	 (if (= type %event-char)
 	     (begin
@@ -860,8 +894,8 @@
        (lambda (widget parent type data)
 	 (if (and (= type %event-mouse-button) )
 	     (begin
-	       ;;(widget-active widget)
-	       (widget-child-rect-event widget type data)
+	       ;;(widget-active widget)	       
+	       (widget-child-rect-event-mouse-button widget type data)
 	       ;;(printf "view click event ~a ~a ~a\n" type text data)
 	       ;;(draw-widget-child-rect parent widget )
 	       ))
@@ -871,10 +905,12 @@
 	       ))
 	 (if (and (or (= type %event-char) (= type %event-key)) (=  (vector-ref widget %status) %status-active) )
 	     (begin
-	       ;;(printf "\ndialog key event ~a ~a status=~a\n" type  data (vector-ref widget %status) )
+	       ;;(printf "\nview key event ~a ~a status=~a\n" type  data (vector-ref widget %status) )
 	       (widget-child-key-event widget type data)
 	       ;;(draw-widget-child-rect parent widget )
 	       ))
+	 (if (= type %event-motion)
+	     (widget-child-rect-event-mouse-motion widget type data))
 	 ))
       
       widget))
@@ -935,10 +971,10 @@
 	   ;;(draw-widget-rect widget)
 	   (vector-set! widget %gx x)
 	   (vector-set! widget %gy y)
-	   
+
 	   (graphic-sissor-begin x y w h)
 	   (draw-dialog x y w h title)
-	   
+
 	   (let loop ((child (vector-ref widget %child)))
 	     (if (pair? child)
 		 (begin

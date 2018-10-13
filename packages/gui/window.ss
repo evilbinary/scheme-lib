@@ -13,6 +13,7 @@
    window-show-fps
    window-post-empty-event
    window-set-fps-pos
+   window-add-loop
    )
 
   (import (scheme)
@@ -29,6 +30,7 @@
   (define is-show-fps #f)
   (define fps-x 0.0)
   (define fps-y 0.0)
+  (define all-loops (list))
   
 
   (define fb-width  (cffi-alloc 8) )
@@ -135,6 +137,19 @@
       window
       ))
 
+  (define (window-add-loop fun)
+    (set! all-loops (append all-loops (list fun)))
+    )
+
+  (define (window-run-loop)
+    (let loop ((l all-loops))
+      (if (pair? l)
+	  (begin
+	    ((car l))
+	    (loop (cdr l))
+	    )))
+    )
+
   (define (window-loop window)
     (glEnable GL_BLEND)
     (glBlendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA)
@@ -148,9 +163,10 @@
 	   (glfw-wait-events)
 	   ;;(glfw-poll-events)
 	   (widget-render)
-	  
+	   (window-run-loop)
+	   
 	   (glfw-swap-buffers window)
-	   (collect)
+	   ;;(collect)
 	   ))
   
   (define (window-destroy window)

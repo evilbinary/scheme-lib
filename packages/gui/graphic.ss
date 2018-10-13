@@ -21,11 +21,18 @@
      graphic-edit-add-text
      graphic-new-markup
      graphic-edit-set-text
+     graphic-draw-string
+     graphic-get-font
+     graphic-draw-string-prepare
+     graphic-draw-string-end
+     graphic-draw-string-colors
+
      
      gl-markup-set-foreground
      gl-markup-set-background
      gl-markup-set-font-size
      gl-edit-set-markup
+     gl-edit-set-highlight
      gl-edit-char-event
      gl-free-markup
      
@@ -69,6 +76,26 @@
 
     (def-function graphic-get-fps "get_fps" (void) int)
 
+    (def-function sth-create "sth_create" (int int) void*)
+    (def-function sth-add-font "sth_add_font" (void* string) void*)
+    (def-function mvp-create "mvp_create" (int int int) void*)
+    (def-function font-create "font_create" (string) void*)
+
+    (def-function gl-render-string "gl_render_string" ( void* float string
+							     float float
+							     void* void* int) void)
+
+    (def-function gl-render-string-colors "gl_render_string_colors" (void*
+								     float 
+								     float float
+								     string
+								     void*
+								     float) void)
+    
+    (def-function gl-render-prepare-string "gl_render_prepare_string" (void* void*) void)
+    (def-function gl-render-end-string "gl_render_end_string" (void*) void)
+
+    (def-function gl-edit-set-highlight "gl_edit_set_highlight" (void* void*) void)
     
     (define texture-vert-shader 0)
     (define texture-frag-shader 0)
@@ -133,7 +160,7 @@
     (define font-string-cache (make-hashtable equal-hash eqv?) )
 
     (define font-program 0)
-
+    
     (define font-vert-shader 0)
     (define font-frag-shader 0)
     (define uniform-font-texture 0)
@@ -142,7 +169,9 @@
     (define uniform-font-projection 0)
     (define gtext 0)
     (define all-edit-cache (make-hashtable equal-hash eqv?) )
-
+    (define all-font-cache (make-hashtable equal-hash eqv?))
+    (define default-mvp 0)
+    
     (define f-font-shader-str
       "uniform sampler2D texture;
        varying vec2 v_TexCoordinate; 
@@ -272,6 +301,7 @@
       (set! gtext (gl-new-edit font-program my-width my-height my-width my-height))
       (gl-edit-set-editable gtext 0)
       ;;(printf "gtext ~x\n" gtext)
+      (set! default-mvp (grpahic-new-mvp))
       
       )
 
@@ -297,7 +327,41 @@
       (gl-render-edit-once gtext x (- my-height y) text 0)
       )
 
+    (define (graphic-get-font name)
+      (let ((font (hashtable-ref all-font-cache name '())))
+	(if (null? font)
+	    (begin 
+	      (set! font  (font-create name))
+	      (hashtable-set! all-font-cache name font)
+	      font)
+	    font
+	    )))
+    
+    (define (grpahic-new-mvp)
+      (mvp-create font-program my-width my-height ))
 
+    (define (graphic-draw-string-prepare  font)
+      (gl-render-prepare-string  default-mvp font)
+      )
+
+    (define (graphic-draw-string-end font)
+      (gl-render-end-string font)
+      )
+
+    (define cache-dx (cffi-alloc 8))
+    (define cache-dy (cffi-alloc 8))
+    
+    (define (graphic-draw-string font size color x y text )
+      (let ((ret '()))
+	;;(printf "font=~a\n" font)
+	(gl-render-string font size text x (- (* 2 my-height) y) cache-dx cache-dy color )
+	(set! ret (list (cffi-get-float cache-dx) (cffi-get-float cache-dy)))
+	ret
+	))
+
+    (define (graphic-draw-string-colors font size x y text colors width)
+      (gl-render-string-colors font size  x (- (* 2 my-height) y) text colors width) )
+    
     (define (graphic-draw-line x1 y1 x2 y2 r g b a)
       (let ((vertices (v 'float (list x1 y1 x2 y2))))
 	(glUseProgram solid-program)

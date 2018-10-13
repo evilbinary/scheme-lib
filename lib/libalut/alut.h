@@ -7,6 +7,8 @@
 
 #include "scm.h"
 
+#include <AL/alut.h>
+
 SCM_API int alut_init();
 SCM_API void alut_exit();
 SCM_API int alut_play_file (const char *fileName);

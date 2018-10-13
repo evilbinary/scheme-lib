@@ -632,7 +632,7 @@ void sth_draw_text(struct sth_stash* stash,
     return;
   if (fnt->type != BMFONT && !fnt->data)
     return;
-	
+      
   for (; *s; ++s){
     //printf("here  %c %x %x\n",*s,*s,'\n');
     if (decutf8(&state, &codepoint, *(unsigned char*)s)){
@@ -676,6 +676,105 @@ void sth_draw_text(struct sth_stash* stash,
   }	
   if (dx) *dx = x;
   if (dy) *dy= y;
+}
+
+void sth_draw_text_colors(struct sth_stash* stash,
+			  int idx,
+			  float size,
+			  float x, float y,
+			  float width,float height,
+			  const char* s,
+			  int * colors,
+			  float* dx,float *dy)
+{
+  unsigned int codepoint;
+  struct sth_glyph* glyph = NULL;
+  struct sth_texture* texture = NULL;
+  unsigned int state = 0;
+  struct sth_quad q;
+  short isize = (short)(size*10.0f);
+  float* v;
+  float* c;
+  float sx=x;
+  float sy=y;
+  size_t count=0;
+  struct sth_font* fnt = NULL;
+	
+  if (stash == NULL)
+    return;
+  
+  y-=stash->fonts->lineh*size;
+  sy=y;
+  fnt = stash->fonts;
+  while(fnt != NULL && fnt->idx != idx) fnt = fnt->next;
+  if (fnt == NULL)
+    return;
+  if (fnt->type != BMFONT && !fnt->data)
+    return;
+      
+  for (; *s; ++s){
+    if (decutf8(&state, &codepoint, *(unsigned char*)s)){
+      continue;
+    }
+    
+    int color=colors[count];
+    //printf("%c %x %x \n",*s,*s,color );
+    count++;
+    
+    glyph = get_glyph(stash, fnt, codepoint, isize);
+
+    if(*s==0x0a ){
+      y-=stash->fonts->lineh*size;
+      x=sx;
+    }
+    if (!glyph){
+      //count++;
+      continue;
+    }
+
+  
+    
+    texture = glyph->texture;
+
+    if (texture->nverts+4 >= VERT_COUNT){
+      flush_draw(stash);
+    }
+    
+    if(width>0 && x>=(width+sx- glyph->xadv )){
+      y-=stash->fonts->lineh*size;
+      x=sx;
+
+    } 
+		
+    if (!get_quad(stash, fnt, glyph, isize, &x, &y, &q)){
+      continue;
+    }
+		
+    v = &texture->verts[texture->nverts*4];
+		
+    v = setv(v, q.x0, q.y0, q.s0, q.t0);
+    v = setv(v, q.x1, q.y0, q.s1, q.t0);
+    v = setv(v, q.x1, q.y1, q.s1, q.t1);
+    v = setv(v, q.x0, q.y1, q.s0, q.t1);
+		
+    c= &texture->colors[texture->nverts*4];
+    
+    //printf("%x ",color);
+    
+    float b=(color&0xff)/255.0;
+    float g=(color>>8&0xff)/255.0;
+    float r=(color>>16&0xff)/255.0;
+    float a=(color>>24&0xff)/255.0;
+    c=setc(c,r,g,b,a);
+    c=setc(c,r,g,b,a);
+    c=setc(c,r,g,b,a);
+    c=setc(c,r,g,b,a);
+
+    texture->nverts += 4;
+  }	
+  if (dx) *dx = x;
+  if (dy) *dy= y;
+  //printf("\n\n");
 }
 
 void sth_dim_text(struct sth_stash* stash,

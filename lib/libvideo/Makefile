@@ -21,6 +21,10 @@ CFLAGS = -Wall -Wformat -g  -DGLAD \
 	-L../libgl -lgles \
 	-L../3rdparty/lib \
 	-lavformat -lavcodec -lswscale -lswresample -lz -lm -lavutil \
+	-I../libalut \
+	-I../libscm \
+	-L../libalut -lalut \
+	-framework OpenAL \
 
 CXXFLAGS= -Wall -Wformat
 

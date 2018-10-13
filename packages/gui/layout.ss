@@ -48,7 +48,7 @@
 	    (child (vector-ref widget %child))
 	    )
         (begin
-	  (if (equal? #t (widget-get-attrs widget 'is-root))
+	  (if (equal? #t (widget-get-attrs widget 'root))
 	      (begin
 		;;(printf "root status ~a\n" (widget-get-attr widget %status))
 		(widget-set-attr widget %status 0)
@@ -58,8 +58,16 @@
 	      (begin
 		(set! sy 0.0)
 		(set! sx w))
-		  )
 	      )
+	  (if (equal? #t (widget-get-attrs widget 'center))
+	      (begin
+		;;(printf "root status ~a\n" (widget-get-attr widget %status))
+		;;(widget-set-attr widget %status 0)
+		(set! sy 0.0)
+		(set! sx 0.0 ))
+	      )
+	  
+	  )
 	
 	(let loop ((c child) (px sx) (py sy) )
 	  (if (pair? c)
@@ -71,7 +79,9 @@
 
 		(vector-set! (car c) %x px)
 		(vector-set! (car c) %y py)
-		(set! py (+ py (widget-get-attr (car c) %h)))
+		(if (equal? #t (widget-get-attrs widget 'center))
+		    (set! px (+ px (widget-get-attr (car c ) %w)))
+		    (set! py (+ py (widget-get-attr (car c) %h))))
 		
 		(loop (cdr c) px py)
 		)

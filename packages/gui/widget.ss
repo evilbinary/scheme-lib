@@ -72,6 +72,7 @@
    %event-scroll
    %child
    %status
+   %visible
    %gx
    %gy
    %w
@@ -126,8 +127,9 @@
   (define %type 21)
   (define %attrs 22)
   (define %events 23)
+  (define %visible 24)
   
-  (define %last-common-attr 24)
+  (define %last-common-attr 25)
  
 
     
@@ -479,7 +481,11 @@
 
   (define (widget-set-attrs widget name value)
     (let ((h (vector-ref widget %attrs )))
-      (hashtable-set! h name value)))
+      (hashtable-set! h name value)
+      (let ((hook (hashtable-ref h (format "%event-~a-hook" name) '())))
+	(if (procedure? hook)
+	    (hook widget)))
+      ))
 
   (define (widget-get-events widget name)
     (let ((h (vector-ref widget  %events )))
@@ -533,12 +539,15 @@
 				     (set! resize-status (vector-ref data 1) )))
 			       (if (and (= (vector-ref data 1) 0) (= resize-status 1)) ;;rlease mouse
 				   (set! resize-status 0))
-			       
+
+		        
 			       (set! active (vector-ref data 1))
-			       (widget-set-attrs widget '%drag (vector-ref data 1))
+			       (widget-set-attrs widget '%drag 1)
+				   
+			       
 			       ))
 			 
-			 (if (and (= type %event-mouse-button) (= (vector-ref data 1) 1) ) ;;click down
+			 (if (and  (= type %event-mouse-button) (= (vector-ref data 1) 1) ) ;;click down
 			     (let ((mx (vector-ref data 3))
 				   (my (vector-ref data 4)))
 			       ;;(printf "haha\n")
@@ -551,11 +560,18 @@
 			       ;;child event
 			       (widget-child-rect-event-mouse-button widget type data)
 
+			       ;;process child event after unvisible
+			       (if (not  (widget-get-attr widget %visible))
+				   (begin
+				     (widget-set-attrs widget '%drag 0)
+				     ))
+			       
 			       ))
 			 (if (= type %event-motion)
 			     (begin
-			       (if (= active %status-active) ;;dragging
+			       (if (and (= active %status-active) (= (widget-get-attrs widget '%drag) 1) );;dragging
 				   (let ()
+				     ;;(printf "drag ~a\n" (widget-get-attrs widget '%drag))
 				     ;;(printf " ~a ~a == \n" (vector-ref data 0) (vector-ref data 1) )
 				     (if (= 1 resize-status)
 					 (let ((mx (vector-ref data 0))
@@ -576,7 +592,7 @@
 					   (vector-set! widget  %y  (+ (vector-ref data 1) (vector-ref offset 1)  ) )))
 				     ))
 			       ;;mouse motion btn
-			       (widget-child-rect-event-mouse-motion widget type data)
+			       ;;(widget-child-rect-event-mouse-motion widget type data)
 			       
 			       )
 			     )
@@ -613,6 +629,7 @@
 		       '()  ;;
 		       (make-hashtable equal-hash equal?)  ;;attrs
 		       (make-hashtable equal-hash equal?)  ;events
+		       #t ;;visible
 		       '()
 		       '()
 		       '()
@@ -713,24 +730,81 @@
 		     (draw widget parent)
 		     (event widget  parent )
 		     ))))
-
+  ;;mouse motion key char
   (define (widget-event type data )
     (if (= type %event-motion)
 	(begin
 	  (set! cursor-x (vector-ref data 0))
 	  (set! cursor-y (vector-ref data 1))
 	  ))
+    ;;process virtual rect
+    (let l ((w $widgets))
+      (if (pair? w)
+	  (begin
+	    ;;(widget-set-attr (car w) %status %status-default)
+	    (let ((fun (widget-get-attrs  (car w) '%event-rect-function)))
+	      (if (procedure? fun)
+		  (if (fun (car w)  cursor-x cursor-y)
+		      (let ((event (vector-ref  (car w) %event)))
+			(event  (car w) '() type data)
+			))))
+	    (l (cdr w)))
+	  ))
     (let loop ((len (- (length $widgets) 1) ))
       (if (>= len 0)
 	  (let ((w (list-ref $widgets  len)))
 	    ;;(printf "~a  ~a\n" len (list-ref $widgets len))
-	    (if (or (equal? %status-active  (widget-get-attrs w '%drag))
-		    (is-in-widget w cursor-x cursor-y )
-		    )
+	    (if (and (widget-get-attr w %visible)
+		     (or (equal? %status-active  (widget-get-attrs w '%drag))
+			 (is-in-widget w cursor-x cursor-y )))
 		(let ((event (vector-ref w %event)))
 		  (event w '() type data)
 		  )
 		(loop  (- len 1))))
+	  )))
+
+    (define (widget-mouse-button-event data )
+    (let l ((w $widgets))
+      (if (pair? w)
+	  (begin
+	    (vector-set! (car w) %status %status-default)
+	    
+	    (let ((fun (widget-get-attrs (car w) '%event-rect-function)))
+	      (if (procedure? fun)
+		  (if  (and (widget-get-attr (car w) %visible) (fun (car w)  (vector-ref data 3) (vector-ref data 4) ))
+		      ((vector-ref (car w) %event) (car w) '() %event-mouse-button data))))
+	    
+	    (l (cdr w)))
+	  ))
+    (let loop ((len (- (length $widgets) 1) ))
+      (if (>= len 0)
+	  (let ((w (list-ref $widgets  len)))
+	    ;;(draw-widget-rect w)
+	    (if (and (widget-get-attr w %visible) (is-in-widget w  (vector-ref data 3) (vector-ref data 4) ))
+		(begin
+		  ;;(draw-widget-rect w)
+		  (vector-set! w %status %status-active);;status
+		  ;;(printf "=get visible=>~a status=~a ~a\n" (widget-get-attr w %visible) (widget-get-attr w %status)   (widget-get-attr  w %text))
+		  ((vector-ref w %event) w '() %event-mouse-button data))
+		(loop  (- len 1)))
+	    )
+	  
+	  )
+      ))
+
+  (define (widget-scroll-event data )
+    (let loop ((len (- (length $widgets) 1) ))
+      (if (>= len 0)
+	  (let ((w (list-ref $widgets  len)))
+	    (if (and (widget-get-attr  w %visible)
+		     (is-in-widget w  (vector-ref data 2) (vector-ref data 3) ))
+		(begin
+		  ;;(printf "scroll event data=>~a\n"  data)
+		  ;;(draw-widget-rect w)
+		  ;;(vector-set! w %status (vector-ref data 1 ));;status
+		  ((vector-ref w %event) w '() %event-scroll data))
+		(loop  (- len 1)))
+	    )
 	  )))
 
   ;;鼠标区域事件位置处理函数
@@ -880,52 +954,17 @@
 	      )))]
      ))
 
-  (define (widget-mouse-button-event data )
-    (let l ((w $widgets))
-      (if (pair? w)
-	  (begin
-	    (vector-set! (car w) %status %status-default)
-	    (l (cdr w)))
-	  ))
-    (let loop ((len (- (length $widgets) 1) ))
-      (if (>= len 0)
-	  (let ((w (list-ref $widgets  len)))
-	    ;;(draw-widget-rect w)
-	    (if (is-in-widget w  (vector-ref data 3) (vector-ref data 4) )
-		(begin
-		  ;;(draw-widget-rect w)
-		  (vector-set! w %status %status-active);;status
-		  ((vector-ref w %event) w '() %event-mouse-button data))
-		(loop  (- len 1)))
-	    )
-	  
-	  )
-      ))
-
-  (define (widget-scroll-event data )
-    (let loop ((len (- (length $widgets) 1) ))
-      (if (>= len 0)
-	  (let ((w (list-ref $widgets  len)))
-	    (if (is-in-widget w  (vector-ref data 2) (vector-ref data 3) )
-		(begin
-		  ;;(printf "scroll event data=>~a\n"  data)
-		  ;;(draw-widget-rect w)
-		  ;;(vector-set! w %status (vector-ref data 1 ));;status
-		  ((vector-ref w %event) w '() %event-scroll data))
-		(loop  (- len 1)))
-	    )
-	  )))
-
-
   (define (widget-render)
     ;;(printf "dialog=====>~a\n" $widgets)
     (let loop ((w $widgets))
       (if (pair? w)
 	  (begin
-	    (let ((draw (vector-ref (car w) %draw)))	   
-	      (draw (car w) '() ))
-	    (loop (cdr w)
-		  ))))
+	    ;;(printf "~a ~a\n" (widget-get-attr (car w) %text) (widget-get-attr (car w) %visible))
+	    (if (widget-get-attr (car w) %visible)
+		(let ((draw (vector-ref (car w) %draw)))
+		  (draw (car w) '() )))
+	    (loop (cdr w))
+	    )))
     ;;(graphic-draw-solid-quad cursor-x cursor-y (+ cursor-x 10.0) (+ cursor-y 10.0) 255.0 0.0 0.0 0.5)
     ;;(if (> cursor-arrow 0)
     ;;   (draw-image cursor-x cursor-y 22.0 24.0 cursor-arrow))
@@ -984,7 +1023,11 @@
 	  )))
 
   (define (widget-layout-update widget)
-    ((widget-get-attr widget %layout) widget))
+    (if (not (null? widget))
+	(let ((layout (widget-get-attr widget %layout)))
+	  (if (procedure? layout)
+	      (layout widget))))
+    )
 
 
 

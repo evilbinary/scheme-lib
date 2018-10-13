@@ -65,17 +65,19 @@
 	)))
 
 (define (test-video)
- (let ((d (dialog 20.0 80.0 300.0 400.0 "测试视频"))
-	(p (scroll 280.0 360.0))
+ (let ((d (dialog 20.0 80.0 300.0 560.0 "测试视频"))
+	;;(p (scroll 280.0 580.0))
 	(v (video 280.0 250.0  "/Users/evil/Downloads/WeChatSight513.mp4"))
+	;;(v (video (/ 540.0 2.0) (/ 960.0 2.0) "/Users/evil/Downloads/0E40154524ECB7665EF37D8505DC857A.mp4"))
 	)
    (widget-add-draw
     v
     (lambda (w p)
       (window-post-empty-event)
+      '()
       ))
-   (widget-add p v)
-   (widget-add d p)
+   ;;(widget-add p v)
+   (widget-add d v)
    ))
    
 (define (test-scroll)
@@ -340,7 +342,7 @@ b
 (define (test-menu)
   (let ((d (dialog 40.0 20.0 550.0 560.0 "pop控件"))
 	(t (pop 100.0 40.0 "根节点")))
-    (widget-set-attrs t 'is-root #t)
+    (widget-set-attrs t 'root #t)
     ;;(printf "get root status ~a\n" (widget-get-attr t %status))
     (let loop ((i 0))
       (if (< i 8)
@@ -375,26 +377,125 @@ b
 	    )
 	  ))
     (widget-add d t)
+    (widget-add  t)
+    ))
+
+(define (test-draw-string)
+  (let ((font (graphic-get-font "Roboto-Regular.ttf"))
+	)
+    (graphic-draw-string font 40.0 #xffff0000 200.0 100.0 "鸭子gui")
   ))
+
+
+;;(load-librarys "foo")
+;;(def-function print-array "print_array" (void* int) void)
+
+(define (render-color-string colored)
+  (let ((font (graphic-get-font "Roboto-Regular.ttf"))
+	(col (car colored))
+	(count (cadr colored)))
+    ;;(printf "#######>>>>~a\n\n\n" colored)
+    (graphic-draw-string-prepare font)
+    (let loop ((i 0)
+	       (it (vector-ref col 0))
+	       (x 10.0)
+	       (y 10.0))
+      (if (< i count)
+	  (let ((ret (graphic-draw-string font 40.0 (cdr it)  x y (car it) ) )) ;;
+	    ;;(printf "==>~a ~a\n" ret (car it))
+	    ;;(printf "==>~a\n" (cdr it))
+	    (set! x (car ret))
+	    (if (or (> x 600.0) (string=? (car it) "\r") )
+	    	(begin
+	    	  (set! x 10.0)
+	    	  (set! y (+ y 40.0))))
+	    (loop (+ i 1) (vector-ref col (+ i 1))  x y ))
+	  )
+      )
+    (graphic-draw-string-end font)
+    ))
+
+
+(define (render-gui-view2 text)
+  (let ((colored (parse-syntax (cffi-alloc (* 64 (string-length text))) text))
+	(font (graphic-get-font "Roboto-Regular.ttf"))
+	(panel (view %match-parent %match-parent))
+	  )
+    (printf "parse end\n")
+    ;;(printf "addr ~x\n" colored)
+    ;;(print-array colored (string-length text))
+
+    ;;(printf "~a\n" colored)
+      ;;(render-color-string colored)
+      (widget-add-draw
+       panel
+       (lambda (w p)
+      	 ;; (let ((font (graphic-get-font "Roboto-Regular.ttf")))
+      	 ;;   ;;(printf "render\n")
+	 (graphic-draw-string-prepare font)
+      	 (graphic-draw-string-colors font 38.0  10.0 10.0 text colored  800.0)
+	 (graphic-draw-string-end font)
+       ))
+      (widget-add panel)
+      ;;(cffi-free colored)
+      ))
+
+
+(define (render-gui-view text)
+   (let ((colored (parse-syntax2 text))
+	  (panel (view %match-parent %match-parent))
+	  )
+      (printf "parse end\n")
+    ;;(printf "~a\n" colored)
+      ;;(render-color-string colored)
+      (widget-add-draw
+       panel
+       (lambda (w p)
+      	 ;; (let ((font (graphic-get-font "Roboto-Regular.ttf")))
+      	 ;;   ;;(printf "render\n")
+      	 ;;   (graphic-draw-string font 38.0 #xffff0000 200.0 100.0 text))
+      	 (render-color-string colored)
+       ))
+      (widget-add panel)
+      
+      ))
+
+(define (test-parser)
+  (init-syntax)
+  (let ((text (readlines "http-test.ss")));;
+    ;;(let ((text (readlines "/Users/evil/dev/ChezScheme/s/cpnanopass.ss"))) ;;cp0
+    ;;(printf "~a\n" text)
+    (printf  "read end\n")
+    (render-gui-view2 text)
+    
+    (time (parse-syntax2 text))
+    (printf "parse end\n")
+
+    ))
 
 (define (duck-test)
   (set! window (window-create width height "鸭子gui"))
   (window-set-fps-pos 750.0 0.0)
-  (window-set-fps-pos  0.0  0.0)
+  ;;(window-set-fps-pos  0.0  0.0)
   (window-show-fps #t)
   
   ;;widget add here
-  ;;(test-mobile-ui)
   ;;(test-scroll)
   ;;(test-multi-dialog)
-  ;;(test-multi-widget)
-  ;;(test-video)
+  (test-multi-widget)
+  (test-video)
   ;;(test-editor)
 
   ;;(test-tab)
-  (test-calc)
-  (test-tree)
-  (test-menu)
+  ;;(test-calc)
+  ;;(test-tree)
+  ;;(test-menu)
+  ;;(test-mobile-ui)
+
+  ;;(window-add-loop
+  ;;(lambda ()
+  ;;(test-draw-string)
+  ;;   ))
   
   ;;run
   (window-loop window)

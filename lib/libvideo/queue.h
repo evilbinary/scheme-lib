@@ -7,7 +7,7 @@
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
-#define SIZE 10
+#define SIZE 512
 #define INCRESIZE 100
 #define true 1
 #define false 0
@@ -71,7 +71,7 @@ int queue_in(pQueue Q,type e){	//入队列
       queue_incre(Q);
       
     }else{
-      printf("queue is full\n");
+      printf("queue %p is full\n",Q);
       return false;
     }
   }

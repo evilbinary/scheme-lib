@@ -7,7 +7,7 @@
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
-#define SIZE 512
+#define SIZE 1024
 #define INCRESIZE 100
 #define true 1
 #define false 0

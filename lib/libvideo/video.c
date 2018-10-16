@@ -25,7 +25,7 @@
 #define TEXTURE_DEFAULT   1
 #define TEXTURE_ROTATE    0
 #define TEXTURE_HALF      0  
-#define NUM_BUFFERS 32
+#define NUM_BUFFERS 16
 
 #define OUT_PCM_FILE 0
 
@@ -256,12 +256,21 @@ void video_al_init(video_t *video){
     printf("alcOpenDevice erro\n");
   }
 
- 
+  ALenum error=alGetError(); 
+  if(error != AL_NO_ERROR){
+    fprintf(stderr, "Error init %x\n",error);
+  }
+  
   alGenBuffers(NUM_BUFFERS, video->alBuffers);
   alGenSources(1, &video->alSource);
-  alSourcei(video->alSource, AL_LOOPING, AL_FALSE);   
-  alSourcef(video->alSource, AL_SOURCE_TYPE, AL_STREAMING); 
-  //alSpeedOfSound(1.0);
+  /* alSourcei(video->alSource, AL_LOOPING, AL_FALSE);    */
+  /* alSourcef(video->alSource, AL_SOURCE_TYPE, AL_STREAMING);  */
+  /* alSpeedOfSound(1.0); */
+
+  error=alGetError(); 
+  if(error != AL_NO_ERROR){
+    fprintf(stderr, "Error init2 %x\n",error);
+  }
   
   int sample_fmt = video->aCodecCtx->sample_fmt;
   int channels=video->aCodecCtx->channels;
@@ -344,17 +353,7 @@ void video_al_init(video_t *video){
       printf("Could not init resampler!");
     }
   }
-  
-  /* alSpeedOfSound(1.0); */
-  /* alDopplerVelocity(1.0); */
-  /* alDopplerFactor(1.0); */
-  /* alSourcef( video->alSource, AL_PITCH, 1.0f); */
-  /* alSourcef( video->alSource, AL_GAIN, 1.0f); */
-  /* alSourcei( video->alSource, AL_LOOPING, AL_FALSE); */
-  alSourcef( video->alSource, AL_SOURCE_TYPE, AL_STREAMING);
-  
-  //alSourcePlay(video->alSource);
-
+ 
   
 }
 void video_al_destroy(video_t * video){
@@ -365,7 +364,7 @@ void video_al_destroy(video_t * video){
 }
 int play=0;
 
-void video_update_audio_buffer(video_t *video,int index){
+void video_update_audio_buffer(video_t *video,ALuint buffer){
   int ret=-1;
   int data_size=0;
   uint8_t* data;
@@ -404,7 +403,7 @@ void video_update_audio_buffer(video_t *video,int index){
   
   //printf("data_size %d %d %d\n",data_size,video->outFmt,video->aCodecCtx->sample_rate);
   
-  alBufferData(video->alBuffers[index],video->fmt ,data, data_size, video->aCodecCtx->sample_rate );
+  alBufferData(buffer,video->fmt ,data, data_size, video->aCodecCtx->sample_rate );
 
 
   //printf("size=%d format=%x freq=%d chanel=%d channel_layout=%d\n",size,format,freq,video->aCodecCtx->channels,video->aCodecCtx->channel_layout );
@@ -619,108 +618,126 @@ void* decode_audio(void* arg){
   video_t * video=(video_t*)arg;
   int index=0;
   int first=0;
+  int firstCount=0;
+
+  //al init
+  video_al_init(video);
+  
 #if  OUT_PCM_FILE
    file = fopen("test.pcm", "w+b");
 #endif   
 
    //printf("decode audio video->audioStream=>%d queue=%p\n",video->audioStream,&video->packets[video->audioStream]);
-  while(video->is_end==0) {
-    pthread_mutex_lock(&video->audio_mutex);
-    AVPacket* packet = queue_out(&video->packets[video->audioStream]);
-    if(packet!=NULL){
-      //printf("queue%d out %p len=%d\n",video->audioStream,packet,queue_get_length(&video->packets[video->audioStream]));
-      //printf("decode_audio packet=%p\n",packet);
-      // while(packet->size>0){
-	avcodec_send_packet(video->aCodecCtx,packet);
-	if (avcodec_receive_frame(video->aCodecCtx, video->aFrame) == 0){
-	  video->aframeFinished=1;
-	}
-
-	//int len=avcodec_decode_audio4(video->aCodecCtx, video->aFrame, &video->aframeFinished,packet);
-	if(video->aframeFinished){
-	  //render audio
-	  AVStream *stream=video->pFormatCtx->streams[packet->stream_index];
-
-	  video->audioclock=video->aFrame->pkt_pts*av_q2d(stream->time_base);
-	  //printf("audioclock=>%f\n",video->audioclock);
-
+   while(video->is_end==0) {
 	  
-	  ALint processed;
-	  alGetSourcei(video->alSource, AL_BUFFERS_PROCESSED, &processed);
-	  alSourceUnqueueBuffers(video->alSource, processed, (ALuint[NUM_BUFFERS]){});
+     pthread_mutex_lock(&video->audio_mutex);
+     AVPacket* packet = queue_out(&video->packets[video->audioStream]);
+     if(packet!=NULL){
+       //printf("queue%d out %p len=%d\n",video->audioStream,packet,queue_get_length(&video->packets[video->audioStream]));
+       //printf("decode_audio packet=%p\n",packet);
+       // while(packet->size>0){
+       avcodec_send_packet(video->aCodecCtx,packet);
+       if (avcodec_receive_frame(video->aCodecCtx, video->aFrame) == 0){
+	 video->aframeFinished=1;
+       }
+	
+       //int len=avcodec_decode_audio4(video->aCodecCtx, video->aFrame, &video->aframeFinished,packet);
+       if(video->aframeFinished){
 
-
-	  ALint queued;
-	  alGetSourcei(video->alSource, AL_BUFFERS_QUEUED, &queued);
-	  if(queued < NUM_BUFFERS){
-	    video_update_audio_buffer(video,index);
-	    alSourceQueueBuffers(video->alSource, 1, &video->alBuffers[index]);
-	    //printf("queued=>%d %d\n",queued,index);
-	    index++;
-	    queued++;
-	  }else{
-	    index=0;
-	    ALint stateVaue;
-	    alGetSourcei(video->alSource, AL_SOURCE_STATE, &stateVaue);
-	    if (stateVaue != AL_PLAYING){
-	      alSourcePlay(video->alSource);
-	    }
-	    //PRINT("star play\n");
-	    do{
-	      alGetSourcei(video->alSource, AL_SOURCE_STATE, &stateVaue);
-	      struct timespec ts = {0, 1 * 100};
-	      //nanosleep(&ts, NULL);
-	      usleep(100);
-	    }while(stateVaue==AL_PLAYING);
-	    //PRINT("end ..........\n");
-	     
-	    ALint state;
-	    alGetSourcei(video->alSource, AL_SOURCE_STATE, &state);
-	    if(state == AL_STOPPED){
-	      alGetSourcei(video->alSource, AL_BUFFERS_PROCESSED, &processed);
-	      alSourceUnqueueBuffers(video->alSource, processed, (ALuint[NUM_BUFFERS]){});
-	      alSourceRewind(video->alSource);
-	    }
-	  }
-	  
 #if OUTPUT_PCM
-	  if (video->aCodecCtx->sample_fmt==AV_SAMPLE_FMT_S16P){ // Audacity: 16bit PCM little endian stereo
-	    int16_t* ptr_l = (int16_t*)video->aFrame->extended_data[0];
-	    int16_t* ptr_r = (int16_t*)video->aFrame->extended_data[1];
+	 if (video->aCodecCtx->sample_fmt==AV_SAMPLE_FMT_S16P){ // Audacity: 16bit PCM little endian stereo
+	   int16_t* ptr_l = (int16_t*)video->aFrame->extended_data[0];
+	   int16_t* ptr_r = (int16_t*)video->aFrame->extended_data[1];
 	   
-	    /*for (int i=0; i<video->pFrame->nb_samples; i++){
-	      fwrite(ptr_l++, sizeof(int16_t), 1, outfile);
-	      fwrite(ptr_r++, sizeof(int16_t), 1, outfile);
-	      }*/
-	  }else if (video->aCodecCtx->sample_fmt==AV_SAMPLE_FMT_FLTP){ //Audacity: big endian 32bit stereo start offset 7 (but has noise)
-	    float* ptr_l = (float*)video->aFrame->extended_data[0];
-	    float* ptr_r = (float*)video->aFrame->extended_data[1];
+	   /*for (int i=0; i<video->pFrame->nb_samples; i++){
+	     fwrite(ptr_l++, sizeof(int16_t), 1, outfile);
+	     fwrite(ptr_r++, sizeof(int16_t), 1, outfile);
+	     }*/
+	 }else if (video->aCodecCtx->sample_fmt==AV_SAMPLE_FMT_FLTP){ //Audacity: big endian 32bit stereo start offset 7 (but has noise)
+	   float* ptr_l = (float*)video->aFrame->extended_data[0];
+	   float* ptr_r = (float*)video->aFrame->extended_data[1];
 	    
-	    /*for (int i=0; i<frame->nb_samples; i++){
-	      fwrite(ptr_l++, sizeof(float), 1, outfile);
-	      fwrite(ptr_r++, sizeof(float), 1, outfile);
-	      }*/
-	  }
+	   /*for (int i=0; i<frame->nb_samples; i++){
+	     fwrite(ptr_l++, sizeof(float), 1, outfile);
+	     fwrite(ptr_r++, sizeof(float), 1, outfile);
+	     }*/
+	 }
 #endif
+	 //render audio
+	 AVStream *stream=video->pFormatCtx->streams[packet->stream_index];
+	 video->audioclock=video->aFrame->pkt_pts*av_q2d(stream->time_base);
+	 //printf("audioclock=>%f\n",video->audioclock);
+	 
+	 if(firstCount<(NUM_BUFFERS-1) ){
+	   //printf("#firstCount=>%d buffer=%d\n",firstCount,video->alBuffers[firstCount]);
+	   video_update_audio_buffer(video,video->alBuffers[firstCount]);
+	   
+	   ALenum error=alGetError(); 
+	   if(error != AL_NO_ERROR){
+	     fprintf(stderr, "Error loading %x\n",error);
+	   }else{
+	     firstCount++;
+	   }
+	 }else if(firstCount==(NUM_BUFFERS-1)){
+	   //printf("=firstCount=>%d buffer=%d\n",firstCount,video->alBuffers[firstCount]);
+	   alSourceQueueBuffers(video->alSource, NUM_BUFFERS, video->alBuffers);
+	   alSourcePlay(video->alSource);
+	   if(alGetError() != AL_NO_ERROR){
+	     fprintf(stderr, "Error starting \n");
+	     //return 1;
+	   }
+	   firstCount++;
+	 }else{
+	   //printf(">firstCount=>%d\n",firstCount);
+	   
+	    ALuint buffer;
+	    ALint val;
+	    ALenum error;
 
-	  pthread_cond_broadcast(&video->audio_cond);
+	    do{
+	      alGetSourcei(video->alSource, AL_BUFFERS_PROCESSED, &val);
+	      usleep(2000);
+	    }while(val<=0);
+	    
+	    alSourceUnqueueBuffers(video->alSource, 1, &buffer);
 
-	}
-	//packet->data += len;
-      /* 	packet->size-=len; */
-      /* } */
+	    error=alGetError(); 
+	    if(error != AL_NO_ERROR){
+	      fprintf(stderr, "Error buffering1  %x\n",error);
+	    }
+	    video_update_audio_buffer(video,buffer);
 
-      
-      av_free_packet(packet);
-      free(packet);
-      
-    }else{
-      //printf("decode audio wait packet=%d\n",packet);
-      //pthread_cond_wait(&video->cond,&video->mutex);
-    }
-    pthread_mutex_unlock(&video->audio_mutex);
+	    error=alGetError(); 
+	    if(error != AL_NO_ERROR){
+	      fprintf(stderr, "Error buffering2  %x\n",error);
+	    }
+	    
+	    alSourceQueueBuffers(video->alSource, 1, &buffer);
+	    error=alGetError(); 
+	    if(error != AL_NO_ERROR){
+	      fprintf(stderr, "Error buffering  %x\n",error);
+	    }
+	
+	     alGetSourcei(video->alSource, AL_SOURCE_STATE, &val);
+	     if(val != AL_PLAYING){
+	       alSourcePlay(video->alSource);
+	     }
+	 }
+	 pthread_cond_broadcast(&video->audio_cond);
 
-  }
+       }
+       //packet->data += len;
+       /* 	packet->size-=len; */
+       /* } */
+
+       av_free_packet(packet);
+       free(packet);
+     }else{
+       //printf("decode audio wait packet=%d\n",packet);
+       pthread_cond_wait(&video->audio_cond,&video->audio_mutex);
+     }
+     pthread_mutex_unlock(&video->audio_mutex);
+   }
 }
 
 void video_render(video_t* video,float x1,float y1,float x2,float y2){
@@ -730,6 +747,7 @@ void video_render(video_t* video,float x1,float y1,float x2,float y2){
   AVPacket* packet = queue_out(&video->packets[video->videoStream]);
   //printf("#queue%d out %p len=%d\n",video->videoStream,packet,queue_get_length(&video->packets[video->videoStream]));
   if(packet!=NULL){
+    
     //printf("decode video packet=%p\n",packet);
     avcodec_decode_video2(video->pCodecCtx, video->pFrame, &video->frameFinished,packet);
     if(video->frameFinished) {
@@ -781,13 +799,13 @@ void video_render(video_t* video,float x1,float y1,float x2,float y2){
             usleep((unsigned long)((video->timestamp - video->audioclock)*1000000 ));
 	  }
 	}
-      }
+	}
       
-      pthread_cond_broadcast(&video->video_cond);
       break;
-    }    
+    }
     av_free_packet(packet);
     free(packet);
+    pthread_cond_broadcast(&video->video_cond);
   }else{
     pthread_cond_wait(&video->video_cond,&video->video_mutex);
   }
@@ -939,12 +957,11 @@ if(avcodec_open2(video->aCodecCtx, video->aCodec, NULL)<0){
   
   //gl init
   video_gl_init(video);
-  //al init
-  video_al_init(video);
+ 
 
   for(int i=0;i<MAX_STREAM;i++){
     queue_init(&video->packets[i]);
-    //printf("queue %d %p %d\n",i,&video->packets[i],queue_get_length(&video->packets[i]) );
+    printf("queue %d %p %d\n",i,&video->packets[i],queue_get_length(&video->packets[i]) );
   }
   //thread init
   pthread_mutex_init(&video->audio_mutex,NULL);

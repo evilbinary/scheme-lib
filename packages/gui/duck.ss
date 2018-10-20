@@ -54,12 +54,31 @@
     (graphic-draw-text (+ x 30) (+ y 0) title)
     )
 
-  (define (draw-panel x y w h text)
-    (graphic-draw-solid-quad  x y
+  (define draw-panel
+    (case-lambda
+     [(x y w h text)
+      (graphic-draw-solid-quad  x y
 			      (+ x w) (+ y h)
 			      81.0 81.0 90.0 1.0)
-    (if (not (null? text))
-	(graphic-draw-text (+ x 30) (+ y 0) text)))
+     (if (not (null? text))
+	 (graphic-draw-text (+ x 30) (+ y 0) text))]
+     [(x y w h text color)
+
+      ;;(printf "color ~x\n" (bitwise-bit-field color 24 32))
+      (graphic-draw-solid-quad  x y
+				(+ x w) (+ y h)
+				(fixnum->flonum  (bitwise-bit-field color 16 24))
+				(fixnum->flonum  (bitwise-bit-field color 8 16))
+				(fixnum->flonum  (bitwise-bit-field color 0 8))
+				(/ (fixnum->flonum  (if (= 0 (bitwise-bit-field color 24 32))
+						        255
+							(bitwise-bit-field color 24 32)
+							)) 255.0)
+				)
+      (if (not (null? text))
+	  (graphic-draw-text (+ x 30) (+ y 0) text))]
+     ))
+ 
 
   (define (draw-button x y w h text)
     (graphic-draw-solid-quad  x y
@@ -76,8 +95,13 @@
      (+ x w) (+ y h)
      0.0 0.0 1.0 1.0 src))
 
-  (define (draw-text x y  text)
-    (graphic-draw-text x y text )
+  (define draw-text
+     (case-lambda
+      [(x y text)
+      (graphic-draw-text x y text )]
+      [(x y text color)
+       (graphic-draw-text x y text color)
+       ])
     )
 
   (define (draw-rect x y w h)
@@ -864,20 +888,30 @@
 
 	   (if (null? parent)
 	       (let ((gx (+ (vector-ref widget %x)))
-		     (gy (+ (vector-ref widget %y))))
+		     (gy (+ (vector-ref widget %y)))
+		     (background (widget-get-attrs  widget 'background ))
+		     )
 		 (vector-set! widget %gx gx)
 		 (vector-set! widget %gy gy)		 
 		 (graphic-sissor-begin gx gy w h)
 
-		 (draw-panel gx gy w h '())
+		 (if (equal? '() background)
+		     (draw-panel gx gy w h '())
+		     (draw-panel gx gy w h '() background))
+
 		 )
 	       (let ((gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
-		     (gy   (+ (vector-ref parent %gy) (vector-ref widget %y))))
+		     (gy   (+ (vector-ref parent %gy) (vector-ref widget %y)))
+		     (background (widget-get-attrs  widget 'background ))
+		     )
 		 (vector-set! widget %gx gx)
 		 (vector-set! widget %gy gy)
 		 (graphic-sissor-begin gx gy w h)
 
-		 (draw-panel gx gy w h '())
+		 (if (equal? '() background)
+		     (draw-panel gx gy w h '())
+		     (draw-panel gx gy w h '() background))
+
 		 ;; (draw-button gx
 		 ;; 	      gy
 		 ;; 	      w h text)

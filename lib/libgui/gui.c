@@ -107,31 +107,36 @@ typedef struct {
 
 
 typedef struct _edit_t {
-    char *prompt;
-    char *input;
-    size_t max_input;
-    size_t cursor;
-    size_t cursor_total;
-    vec4 bound;
-    vec2 pen;
-    int shader;
-    mat4 model;
-    mat4 view;
-    mat4 projection;
-    int editable;
+  char *prompt;
+  char *input;
+  size_t max_input;
+  size_t cursor;
+  size_t cursor_total;
+  vec4 bound;
+  vec2 pen;
+  int shader;
+  mat4 model;
+  mat4 view;
+  mat4 projection;
+  int editable;
 
-    struct sth_stash *stash;
-    unsigned char *data;
-    int font;
-    float font_size;
+  struct sth_stash *stash;
+  unsigned char *data;
+  int font;
+  float font_size;
+  int color;
 
-    float window_width;
-    float window_height;
+  float window_width;
+  float window_height;
 
-    void *colors;
+  void *colors;
 
 } edit_t;
 
+
+void gl_edit_set_color(edit_t * self,int color){
+  self->color=color;
+}
 
 void gl_edit_set_markup(edit_t *self, void *m, int index) {
     //printf("gl_edit_set_marku\n");
@@ -198,6 +203,7 @@ edit_t *gl_new_edit(int shader, float w, float h, float width, float height) {
     self->window_width = width;
     self->window_height = height;
     self->colors=NULL;
+    self->color=0xffffff;
 
     char *font_name = "Roboto-Regular.ttf";
 
@@ -576,7 +582,7 @@ void gl_render_string_colors(
   
 }
 
-void gl_render_params(edit_t *self) {
+void gl_render_params(edit_t *self,void* pcolor) {
 
     //printf("shader->%d\n",self->shader);
 
@@ -596,11 +602,30 @@ void gl_render_params(edit_t *self) {
 	
 	if(self->colors==NULL){
 	  float dx = 0, dy = 0;
+	  float r,g,b,a;
+	  if(pcolor==NULL){
+	     b=(self->color&0xff)/255.0;
+	     g=(self->color>>8&0xff)/255.0;
+	     r=(self->color>>16&0xff)/255.0;
+	     a=(self->color>>24&0xff)/255.0;
+	    if(a==0){
+	      a=1.0;
+	    }
+	  }else{
+	    int color=*(int*)pcolor;
+	    b=(color&0xff)/255.0;
+	    g=(color>>8&0xff)/255.0;
+	    r=(color>>16&0xff)/255.0;
+	    a=(color>>24&0xff)/255.0;
+	    if(a==0){
+	      a=1.0;
+	    }
+	  }
 	  sth_begin_draw(self->stash);
 	  sth_draw_text(self->stash, self->font, self->font_size,
 			self->pen.x, self->pen.y,
 			self->bound.width, self->bound.height,
-			self->input, 1.0, 1.0, 1.0, 1.0, &dx, &dy);
+			self->input, r, g, b, a, &dx, &dy);
 	  //printf("%f %f %f %f\n",self->pen.x,self->pen.y,self->bound.width,self->bound.height);
 	  sth_end_draw(self->stash);
 	}else{
@@ -621,7 +646,7 @@ void gl_render_params(edit_t *self) {
 }
 
 
-void gl_render_edit_once(edit_t *self, float x, float y, char *text, void *markup) {
+void gl_render_edit_once(edit_t *self, float x, float y, char *text,int color) {
 
     self->cursor = 0;
     if (self->input != NULL) {
@@ -635,7 +660,7 @@ void gl_render_edit_once(edit_t *self, float x, float y, char *text, void *marku
     self->pen.y = y * 2;
 
 
-    gl_render_params(self);
+    gl_render_params(self,&color);
 
 
     if (self->editable == 1) {
@@ -653,7 +678,7 @@ void gl_render_edit(edit_t *self, float x, float y) {
     self->pen.x = x * 2;
     self->pen.y = y * 2;
 
-    gl_render_params(self);
+    gl_render_params(self,NULL);
 
 
     if (self->editable == 1) {

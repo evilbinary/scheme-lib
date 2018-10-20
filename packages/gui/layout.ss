@@ -252,23 +252,25 @@
 	      (begin
 		(vector-set! (car c) %status 1);;force visible may change
 		(process-match-parent (car c))
-		(vector-set! (car c) %x sx)
-		(vector-set! (car c) %y sy)
+		(vector-set! (car c) %x (+ sx (vector-ref (car c) %margin-left)))
+		(vector-set! (car c) %y (+ sy (vector-ref (car c) %margin-top)))
 		
 		(if (pair? (cdr c))
 		    (set! ww (vector-ref (car (cdr c)) %w)))
 		
- 		(if (> (+ sx (vector-ref (car c) %w) ww ) (- w right) )
+ 		(if (> (+ sx (vector-ref (car c) %w) ww ) (- w right
+							     (vector-ref (car c) %margin-right)
+							     (vector-ref (car c) %margin-left) ) )
 		    (begin
 		      (set! sx left)
 		      (set! sy (+ sy (vector-ref (car c) %h)
-				  (vector-ref (car c) %margin-top)
+				  ;;(vector-ref (car c) %margin-top)
 				  (vector-ref (car c) %margin-bottom)
 				  ))
 		      )
 		    (begin
 		      (set! sx (+ sx (vector-ref (car c) %w)
-				  (vector-ref (car c) %margin-left)
+				  ;;(vector-ref (car c) %margin-left)
 				  (vector-ref (car c) %margin-right)
 				  ))
 		      )

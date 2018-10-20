@@ -26,7 +26,7 @@
      graphic-draw-string-prepare
      graphic-draw-string-end
      graphic-draw-string-colors
-
+     graphic-edit-set-color
      
      gl-markup-set-foreground
      gl-markup-set-background
@@ -60,7 +60,8 @@
 
     (def-function gl-edit-set-editable "gl_edit_set_editable" (void*  int) void)
 
-    
+    (def-function gl-edit-set-color "gl_edit_set_color" (void*  int) void)
+
     (def-function gl-edit-set-markup "gl_edit_set_markup" (void* void* int) void)
     (def-function gl-new-edit "gl_new_edit" (int float float float float) void*)
     (def-function gl-edit-add-text "gl_add_edit_text" (void*  string ) void)
@@ -68,7 +69,7 @@
 
     
     (def-function gl-render-edit "gl_render_edit" ( void* float float) void)
-    (def-function gl-render-edit-once "gl_render_edit_once" ( void* float float string void*) void)
+    (def-function gl-render-edit-once "gl_render_edit_once" ( void* float float string int) void)
 
     
     (def-function gl-edit-key-event "gl_edit_key_event" ( void* int int int int) void)
@@ -320,12 +321,19 @@
     (define (graphic-edit-set-text edit text)
       (gl-edit-set-text edit text))
 
+    (define (graphic-edit-set-color edit color)
+      (gl-edit-set-color edit color))
+    
     (define (graphic-new-markup name size)
       (gl-new-markup name size))
 
-    (define (graphic-draw-text x y  text)
-      (gl-render-edit-once gtext x (- my-height y) text 0)
-      )
+    (define graphic-draw-text
+      (case-lambda
+       [(x y  text)
+	(gl-render-edit-once gtext x (- my-height y) text #xffffff)]
+       [(x y text color)
+	(gl-render-edit-once gtext x (- my-height y) text color)]
+      ))
 
     (define (graphic-get-font name)
       (let ((font (hashtable-ref all-font-cache name '())))

@@ -7,6 +7,8 @@
    video-new
    video-render
    video-destroy
+   video-get-fps
+   video-set-pause
    )
 
   (import (scheme) (utils libutil) (cffi cffi) (gles gles2) )
@@ -15,7 +17,8 @@
   (def-function video-new "video_new" (void* float float) void*)
   (def-function video-render "video_render" (void* float float float float) void)
   (def-function video-destroy "video_destroy" (void*) void)
-
+  (def-function video-get-fps "video_get_fps" (void*) int)
+  (def-function video-set-pause "video_set_pause" (void* int) void)
  
 
   )

@@ -6,6 +6,7 @@
   (export
    draw-image
    draw-dialog
+   draw-text
    dialog
    button
    image
@@ -92,12 +93,8 @@
   
   
   (define (draw-video v x y w h )
-    (let l ((i 2))
-      (if (> i 0)
-	  (begin
-	    (video-render v x y (+ x w) (+ y h) )
-	    (l (- i 1))
-	    ))))
+    (video-render v x y (+ x w) (+ y h) )
+    )
   
   (define (draw-tab x y w h active)
     (if active
@@ -769,6 +766,7 @@
   (define (video w h src)
     (let ((widget (widget-new 0.0 0.0 w h src))
 	  (vv (video-new src (widget-get-window-width) (widget-get-window-height) )))
+      (widget-set-attrs widget 'video vv)
       (widget-set-draw
        widget
        (lambda (widget parent);;draw

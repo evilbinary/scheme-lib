@@ -15,7 +15,8 @@ SUB_DIR :=  libscm \
 	libcffi libglfw \
 	libnanovg libgui \
 	libalut \
-	libc
+	libc \
+	libvideo \
 
 LIBSCM =./libscm/libscm.so
 LIBGLUT =./libglut/libglut.so
@@ -23,11 +24,12 @@ LIBFFI = ./libcffi/libcffi.so
 LIBGLFW = ./libglfw/libglfw.so
 LIBGLES= ./libgl/libgles.so
 LIBSOCKET=./libsocket/libsocket.so
+LIBVIDEO=./libvideo/libvideo.so
 
 UNAME_S := $(shell uname -s)
 OS_NAME :=$(shell echo $(UNAME_S) | tr '[A-Z]' '[a-z]')
 LIBS_ALL= libscm.so libimgui.so libglfw.so libcffi.so libgles.so libnanovg.so \
-	libalut.so libgui.so libsocket.so libc.so
+	libalut.so libgui.so libsocket.so libc.so 
 
 ifeq ($(UNAME_S), MINGW32_NT-6.1)
   OS_NAME:=windows
@@ -46,6 +48,9 @@ $(TARGET): $(OS_NAME) $(LIBS_ALL)
 	$(MAKE) -C scheme
 libscm.so: $(LIBSCM) 
 	$(MAKE) -C libscm
+
+libvideo.so: $(LIBVIDEO) libgui.so libgles.so
+	$(MAKE) -C libvideo
 
 libc.so:
 	$(MAKE) -C libc

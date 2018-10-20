@@ -65,37 +65,82 @@
 	)))
 
 (define (test-video)
- (let ((d (dialog 20.0 80.0 680.0 420.0 "测试视频"))
-	;;(p (scroll 280.0 580.0))
+ (let ((d (dialog 20.0 80.0 680.0 450.0 "测试视频"))
+       (play (button 120.0 30.0 "播放"))
+       (stop (button 120.0 30.0 "暂停"))
+
 	;;(v (video 280.0 250.0  "/Users/evil/Downloads/WeChatSight513.mp4"))
        ;;(v (video (/ 540.0 2.0) (/ 960.0 2.0) "/Users/evil/Downloads/0E40154524ECB7665EF37D8505DC857A.mp4"))
        (v (video (/ 640.0 1.0) (/ 360.0 1.0) "/Users/evil/Downloads/bigbuckbunny.m4v"))
-       
 	)
    (widget-add-draw
     v
-    (lambda (w p)
+    (lambda (widget parent)
+      (let ((fps (video-get-fps (widget-get-attrs widget 'video)))
+      	    (gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
+      	    (gy   (+ (vector-ref parent %gy) (vector-ref widget %y))))
+      	  (draw-text (+ gx )
+      		     (+ gy)
+      		     (format "fps ~a" fps)
+      	  ))
+
       (window-post-empty-event)
       '()
       ))
+   
    ;;(widget-add p v)
    (widget-add d v)
+   (widget-set-margin play 10.0 10.0 10.0 10.0)
+   (widget-set-margin stop 10.0 10.0 10.0 10.0)
+
+   (widget-set-events
+	   play
+	   'click
+	   (lambda (widget p type data)
+	     ;;(printf "click play\n")
+	     (video-set-pause (widget-get-attrs v 'video) 0)
+
+	     ))
+   
+    (widget-set-events
+	   stop
+	   'click
+	   (lambda (widget p type data)
+	     (video-set-pause (widget-get-attrs v 'video) 1)
+	     ;;(printf "click stop\n")
+	    
+	     ))
+   
+   (widget-add d play)
+   (widget-add d stop)
+
    ))
 
 (define (test-online-video)
  (let ((d (dialog 20.0 80.0 (* 340.0 2) (* 240.0 2) "测试在线视频播放"))
        ;;(v (video (/ 640.0 1) (/ 360.0 1) "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"))
        ;;https://media.w3.org/2010/05/sintel/trailer.mp4
-       (v (video (/ 640.0 1) (/ 360.0 1) "https://221.228.226.23/11/t/j/v/b/tjvbwspwhqdmgouolposcsfafpedmb/sh.yinyuetai.com/691201536EE4912BF7E4F1E2C67B8119.mp4"))
-       ;;(v (video (/ 640.0 1) (/ 360.0 1) "http://221.228.226.5/15/t/s/h/v/tshvhsxwkbjlipfohhamjkraxuknsc/sh.yinyuetai.com/88DC015DB03C829C2126EEBBB5A887CB.mp4"))
+       ;;(v (video (/ 640.0 1) (/ 360.0 1) "https://221.228.226.23/11/t/j/v/b/tjvbwspwhqdmgouolposcsfafpedmb/sh.yinyuetai.com/691201536EE4912BF7E4F1E2C67B8119.mp4"))
+       (v (video (/ 640.0 1) (/ 360.0 1) "http://221.228.226.5/15/t/s/h/v/tshvhsxwkbjlipfohhamjkraxuknsc/sh.yinyuetai.com/88DC015DB03C829C2126EEBBB5A887CB.mp4"))
+       ;;(v (video (/ 640.0 1) (/ 360.0 1) "http://ivi.bupt.edu.cn/hls/cctv6hd.m3u8"))
 	)
    (widget-add-draw
     v
-    (lambda (w p)
+    (lambda (widget parent)
+      (let ((fps (video-get-fps (widget-get-attrs widget 'video)))
+      	    (gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
+      	    (gy   (+ (vector-ref parent %gy) (vector-ref widget %y))))
+	(draw-text (+ gx )
+		   (+ gy)
+		   (format "fps ~a" fps)
+		   ))
       (window-post-empty-event)
+      ;;(sleep (make-time 'time-duration 30000000 0))
+
       '()
       ))
    ;;(widget-add p v)
+   
    (widget-add d v)
    ))
    
@@ -502,8 +547,8 @@ b
   ;;(test-scroll)
   ;;(test-multi-dialog)
   (test-multi-widget)
-  ;;(test-video)
-  (test-online-video)
+  (test-video)
+  ;;(test-online-video)
   
   ;;(test-editor)
 

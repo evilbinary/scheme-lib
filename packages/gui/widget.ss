@@ -726,7 +726,7 @@
     (let ((draw (vector-ref widget %draw)))
       (vector-set! widget %draw
 		   (lambda (widget parent)
-		     (event widget  parent )
+		     ;;(event widget  parent )
 		     (draw widget parent)
 		     (event widget  parent )
 		     ))))

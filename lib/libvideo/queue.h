@@ -7,7 +7,7 @@
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
-#define SIZE 1024
+#define SIZE 256
 #define INCRESIZE 100
 #define true 1
 #define false 0
@@ -20,6 +20,15 @@ typedef struct queue
   int fron,rear;
   type* data;
 }* pQueue,Queue;
+
+void queue_init_with_size(pQueue Q,int size){
+  Q->data=malloc(sizeof(type)*size);
+  Q->fron=0;
+  Q->rear=0;
+  Q->size=size;
+  Q->len=0;
+  Q->is_auto_size=0; 
+}
 
 void queue_init(pQueue Q)	//队列初始化
 {
@@ -71,7 +80,7 @@ int queue_in(pQueue Q,type e){	//入队列
       queue_incre(Q);
       
     }else{
-      printf("queue %p is full\n",Q);
+      //printf("queue %p is full\n",Q);
       return false;
     }
   }

@@ -37,7 +37,8 @@
   (define fb-height (cffi-alloc 8))
 
   (define (window-post-empty-event)
-    (glfw-post-empty-event))
+    (glfw-post-empty-event)
+    )
 
   (define (window-set-fps-pos x y)
     (set! fps-x x)

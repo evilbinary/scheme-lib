@@ -31,8 +31,6 @@ QQ群：Lisp兴趣小组239401374
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/game-demo.png" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/gui-demo.png" width="400px" />
 
 
-<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld2.png" width="400px" /> <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/showimage.png" width="400px" />
-
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/draw-image.png" width="400px" /> <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/box2d-demo.png" width="400px" />
 
 # android

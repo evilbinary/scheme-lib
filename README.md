@@ -26,10 +26,9 @@ QQ群：Lisp兴趣小组239401374
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/editor.jpg" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/editor2.png" width="400px" />
 
-<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/new-gui.jpg" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/new-gui2.jpg" width="400px" />
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/wechat-demo.png" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/new-gui2.jpg" width="400px" />
 
-<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/game-demo.png" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/wechat-demo.png" width="400px" />
-
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/game-demo.png" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/new-gui.jpg" width="400px" />
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/draw-image.png" width="400px" /> <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/box2d-demo.png" width="400px" />
 

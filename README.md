@@ -20,7 +20,7 @@ QQ群：Lisp兴趣小组239401374
 4. 进入`bin`目录，执行`source env.sh`，然后运行`./scheme --script ../apps/hello.ss`就可以运行例子。
 
 # windows
-1. 下载[scheme-lib-2.0-win32.zip][2]，解压后进入bin，打开cmd运行`run.bat ../apps/gui-test.ss`就可以运行例子了。
+1. 下载已经去除了，因为有人说抱怨运行报错，这下你只能自己编译。真需要的话，加群下载。
 
 ### 截图
 

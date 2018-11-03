@@ -305,7 +305,7 @@
     (let loop ((child (vector-ref widget %child)))
       (if (pair? child)
 	  (begin
-	    ;;(printf "in here\n")
+	    ;;(printf "in here ~a\n" (widget-get-attr (car child) %text))
 	    ((vector-ref (car child) %event) (car child) widget  type data)
 	    (loop (cdr child)))
 	  )))
@@ -484,7 +484,7 @@
       (hashtable-set! h name value)
       (let ((hook (hashtable-ref h (format "%event-~a-hook" name) '())))
 	(if (procedure? hook)
-	    (hook widget)))
+	    (hook widget name value)))
       ))
 
   (define (widget-get-events widget name)
@@ -1061,15 +1061,22 @@
     (let ((x  (vector-ref  widget %gx))
 	(y  (vector-ref widget %gy))
 	(w  (vector-ref  widget 2))
-	(h  (vector-ref  widget 3)))
-    (graphic-draw-solid-quad x y (+ x w) (+ y  h)  128.0 30.0 34.0 0.5)
+	(h  (vector-ref  widget 3))
+	(background (widget-get-attrs  widget 'background ))
+	)
+      (if (equal? '() background)
+	  (graphic-draw-solid-quad x y (+ x w) (+ y  h)  128.0 30.0 34.0 0.5)
+	  (graphic-draw-solid-quad x y (+ x w) (+ y  h)  background))
     )]
     [(widget r g b a)
     (let ((x  (vector-ref  widget %gx))
 	(y  (vector-ref widget %gy))
 	(w  (vector-ref  widget 2))
-	(h  (vector-ref  widget 3)))
-    (graphic-draw-solid-quad x y (+ x w) (+ y  h)  r g b a)
+	(h  (vector-ref  widget 3))
+	(background (widget-get-attrs  widget 'background )))
+      (if (equal? '() background)
+	  (graphic-draw-solid-quad x y (+ x w) (+ y  h)  r g b a)
+	  (graphic-draw-solid-quad x y (+ x w) (+ y  h)  background))
     )]))
 
 (define (draw-widget-child-rect widget child)
@@ -1083,13 +1090,16 @@
 	    (cy  (vector-ref  child %gy))
 	    (cw  (vector-ref  child %w))
 	    (ch  (vector-ref  child %h))
+	    (background (widget-get-attrs  widget 'background ))
 	    )
 	
 	;;(graphic-draw-solid-quad (+ x cx) (+ y cy) (+ x cx cw) (+ y cy  ch)  128.0 30.0 34.0 0.5)
 	
 	;;(printf "draw child rect\n")
-	(graphic-draw-solid-quad cx cy (+ cx cw) (+ cy ch)  128.0 30.0 34.0 0.5)
-
+	(if (equal? '() background)
+	    (graphic-draw-solid-quad cx cy (+ cx cw) (+ cy ch)  128.0 30.0 34.0 0.5)
+	    (graphic-draw-solid-quad cx cy (+ cx cw) (+ cy ch) background)
+	    )
 	)))
   
   )

@@ -7,6 +7,7 @@
    draw-image
    draw-dialog
    draw-text
+   draw-line
    dialog
    button
    image
@@ -54,6 +55,10 @@
     (graphic-draw-text (+ x 30) (+ y 0) title)
     )
 
+  (define (draw-line x1 y1 x2 y2 color)
+    (graphic-draw-line x1 y1 x2 y2
+		       color))
+
   (define draw-panel
     (case-lambda
      [(x y w h text)
@@ -67,13 +72,7 @@
       ;;(printf "color ~x\n" (bitwise-bit-field color 24 32))
       (graphic-draw-solid-quad  x y
 				(+ x w) (+ y h)
-				(fixnum->flonum  (bitwise-bit-field color 16 24))
-				(fixnum->flonum  (bitwise-bit-field color 8 16))
-				(fixnum->flonum  (bitwise-bit-field color 0 8))
-				(/ (fixnum->flonum  (if (= 0 (bitwise-bit-field color 24 32))
-						        255
-							(bitwise-bit-field color 24 32)
-							)) 255.0)
+				color
 				)
       (if (not (null? text))
 	  (graphic-draw-text (+ x 30) (+ y 0) text))]
@@ -290,8 +289,13 @@
 		       (widget-layout-update (widget-get-root widget))
 
 
-		       ;;(printf "click ->~a ~a\n" (widget-get-events widget 'click) (widget-get-attr widget %text))
-		       (if (procedure? (widget-get-events widget 'click))
+		       ;; (printf "click ->~a ~a visible=~a\n"
+		       ;; 	       (widget-get-events widget 'click)
+		       ;; 	       (widget-get-attr widget %text)
+		       ;; 	       (widget-get-attr widget %status)
+		       ;; 	       )
+		       (if (and (procedure? (widget-get-events widget 'click))
+				(equal? %status-active (widget-get-attr widget %status) ))
 			   ((widget-get-events widget 'click) widget parent type data)
 			   )
 		       ;;(widget-child-rect-event-mouse-button widget type data)
@@ -550,14 +554,29 @@
        widget
        (format "%event-~a" %text)
        (lambda (ww text)
-	 (graphic-edit-set-text  (widget-get-attrs ww '%editor) text)
-	
+	 (graphic-edit-set-text  (widget-get-attrs ww '%edit) text)
+
+	 (if (equal? #t (widget-get-attrs ww 'syntax-on))
+	     (let ((syntax-cache (widget-get-attrs ww 'syntax-cache))
+		   )
+	       ;;(printf "re render syntax ~a\n" syntax-cache )
+	       (parse-syntax syntax-cache text)
+	       ;;(gl-edit-set-highlight ed syntax-cache)
+	       )
+	     )
+	 ))
+      
+      (widget-set-attrs
+       widget
+       "%event-color-hook"
+       (lambda (ww name color)
+	 (graphic-edit-set-color (widget-get-attrs ww '%edit) color)
 	 ))
 
       (widget-set-attrs
        widget
        "%event-syntax-on-hook"
-       (lambda (ww)
+       (lambda (ww name val)
 	 (if (equal? #t (widget-get-attrs widget 'syntax-on))
 	     (let ((syntax-cache (cffi-alloc (* 64 (string-length text)))))
 	       (init-syntax)
@@ -585,23 +604,40 @@
 	 ;;(printf ">>>>>>>event ~a ~a\n" type data)
 	 (if (= type %event-key)
 	     (begin
-	       (printf "edit key event ~a ~a\n" type data )
+	       ;;(printf "edit key event ~a ~a\n" type data )
 	       (gl-edit-key-event ed
 				  (vector-ref data 0)
 				  (vector-ref data 1)
 				  (vector-ref data 2)
 				  (vector-ref data 3) )
 	       (if (equal? #t (widget-get-attrs widget 'syntax-on))
-		   (parse-syntax (widget-get-attrs widget 'syntax-cache) text)
+		   (let ((syntax-cache (widget-get-attrs widget 'syntax-cache))
+			 (params '())
+			 )
+		     (set! params (gl-edit-get-text ed))
+		     ;;(printf "re render syntax ~a ~a\n" syntax-cache params)
+		     (parse-syntax syntax-cache params)
+		     ;;(gl-edit-set-highlight ed syntax-cache)
+		     )
 		   )
 	       ))
 	 (if (= type %event-char)
 	     (begin
-	       (printf ">edit char event ~a ~a\n" type data )
+	       ;;(printf ">edit char event ~a ~a\n" type data )
 	       (gl-edit-char-event ed
 				   (vector-ref data 0)
 				   (vector-ref data 1)
 				   )
+	       (if (equal? #t (widget-get-attrs widget 'syntax-on))
+		   (let ((syntax-cache (widget-get-attrs widget 'syntax-cache))
+			 (params '())
+			 )
+		     (set! params (gl-edit-get-text ed))
+		     ;;(printf "re render syntax ~a ~a\n" syntax-cache params)
+		     (parse-syntax syntax-cache params)
+		     ;;(gl-edit-set-highlight ed syntax-cache)
+		     )
+		   )
 	       ))
 	 (if (null? parent)
 	     (begin
@@ -935,9 +971,9 @@
 	     (begin
 	       (widget-child-rect-event-scroll widget type data)
 	       ))
-	 (if (and (or (= type %event-char) (= type %event-key)) (=  (vector-ref widget %status) %status-active) )
+	 (if (and (or (= type %event-char) (= type %event-key))  ) ;;(=  (vector-ref widget %status) %status-active)
 	     (begin
-	       ;;(printf "\nview key event ~a ~a status=~a\n" type  data (vector-ref widget %status) )
+	       ;;(printf "\nview ~a key event ~a ~a status=~a\n" (widget-get-attr widget %text)  type  data (vector-ref widget %status) )
 	       (widget-child-key-event widget type data)
 	       ;;(draw-widget-child-rect parent widget )
 	       ))
@@ -1029,7 +1065,6 @@
       (widget-add widget)
       widget
       ))
-
 
 
 

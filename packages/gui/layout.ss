@@ -270,7 +270,7 @@
 		      )
 		    (begin
 		      (set! sx (+ sx (vector-ref (car c) %w)
-				  ;;(vector-ref (car c) %margin-left)
+				  (vector-ref (car c) %margin-left)
 				  (vector-ref (car c) %margin-right)
 				  ))
 		      )

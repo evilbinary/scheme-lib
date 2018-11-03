@@ -34,6 +34,7 @@
      gl-edit-set-markup
      gl-edit-set-highlight
      gl-edit-char-event
+     gl-edit-get-text
      gl-free-markup
      
      
@@ -66,7 +67,9 @@
     (def-function gl-new-edit "gl_new_edit" (int float float float float) void*)
     (def-function gl-edit-add-text "gl_add_edit_text" (void*  string ) void)
     (def-function gl-edit-set-text  "gl_set_edit_text" (void*  string ) void)
+    (def-function gl-edit-get-text  "gl_get_edit_text" (void* ) string)
 
+    
     
     (def-function gl-render-edit "gl_render_edit" ( void* float float) void)
     (def-function gl-render-edit-once "gl_render_edit_once" ( void* float float string int) void)
@@ -370,16 +373,38 @@
     (define (graphic-draw-string-colors font size x y text colors width)
       (gl-render-string-colors font size  x (- (* 2 my-height) y) text colors width) )
     
-    (define (graphic-draw-line x1 y1 x2 y2 r g b a)
-      (let ((vertices (v 'float (list x1 y1 x2 y2))))
-	(glUseProgram solid-program)
-	(glUniform2f uniform-solid-screen-size (* 1.0 my-width) (* 1.0 my-height))
-	(glUniform4f uniform-solid-color (/ r 255.0) (/ g 255.0) (/ b 255.0) (* a 1.0))
-	(glVertexAttribPointer 0 2 GL_FLOAT GL_FALSE 0 vertices)
-	(glEnableVertexAttribArray 0)
-	(glDrawArrays GL_LINE_STRIP 0 2)
-	(glUseProgram 0)
-	(uv vertices)
+    (define graphic-draw-line
+      (case-lambda
+       [( x1 y1 x2 y2 r g b a)
+	(let ((vertices (v 'float (list x1 y1 x2 y2))))
+	  (glUseProgram solid-program)
+	  (glUniform2f uniform-solid-screen-size (* 1.0 my-width) (* 1.0 my-height))
+	  (glUniform4f uniform-solid-color (/ r 255.0) (/ g 255.0) (/ b 255.0) (* a 1.0))
+	  (glVertexAttribPointer 0 2 GL_FLOAT GL_FALSE 0 vertices)
+	  (glEnableVertexAttribArray 0)
+	  (glDrawArrays GL_LINE_STRIP 0 2)
+	  (glUseProgram 0)
+	  (uv vertices)
+	  )]
+        [( x1 y1 x2 y2 color)
+	 (let ((vertices (v 'float (list x1 y1 x2 y2)))
+	       (r (fixnum->flonum  (bitwise-bit-field color 16 24)))
+	       (g (fixnum->flonum  (bitwise-bit-field color 8 16)))
+	       (b (fixnum->flonum  (bitwise-bit-field color 0 8)))
+	       (a  (/ (fixnum->flonum  (if (= 0 (bitwise-bit-field color 24 32))
+					   255
+					   (bitwise-bit-field color 24 32)
+					   )) 255.0)) )
+	       
+	  (glUseProgram solid-program)
+	  (glUniform2f uniform-solid-screen-size (* 1.0 my-width) (* 1.0 my-height))
+	  (glUniform4f uniform-solid-color (/ r 255.0) (/ g 255.0) (/ b 255.0) (* a 1.0))
+	  (glVertexAttribPointer 0 2 GL_FLOAT GL_FALSE 0 vertices)
+	  (glEnableVertexAttribArray 0)
+	  (glDrawArrays GL_LINE_STRIP 0 2)
+	  (glUseProgram 0)
+	  (uv vertices)
+	  )]
 	))
 
     (define (graphic-draw-line-strip lines r g b a)
@@ -405,19 +430,43 @@
        (glDisable GL_SCISSOR_TEST)
     )
 
-    (define (graphic-draw-solid-quad x1 y1 x2 y2  r g b a)
-      (let ((vertices (v 'float (list x1 y2
-				      x1 y1
-				      x2 y2 x2 y1))))
-	(glUseProgram solid-program)
-	(glUniform2f uniform-solid-screen-size (* 1.0 my-width) (* 1.0 my-height))
-	(glUniform4f uniform-solid-color (/ r 255.0) (/ g 255.0) (/ b 255.0) (* a 1.0))
-	(glVertexAttribPointer 0 2 GL_FLOAT GL_FALSE 0 vertices)
-	(glEnableVertexAttribArray 0)
-	(glDrawArrays GL_TRIANGLE_STRIP 0 4)
-	(glUseProgram 0)
-	(uv vertices)
-	))
+    (define graphic-draw-solid-quad
+      (case-lambda
+       [(x1 y1 x2 y2  r g b a)
+	(let ((vertices (v 'float (list x1 y2
+					x1 y1
+					x2 y2 x2 y1))))
+	  (glUseProgram solid-program)
+	  (glUniform2f uniform-solid-screen-size (* 1.0 my-width) (* 1.0 my-height))
+	  (glUniform4f uniform-solid-color (/ r 255.0) (/ g 255.0) (/ b 255.0) (* a 1.0))
+	  (glVertexAttribPointer 0 2 GL_FLOAT GL_FALSE 0 vertices)
+	  (glEnableVertexAttribArray 0)
+	  (glDrawArrays GL_TRIANGLE_STRIP 0 4)
+	  (glUseProgram 0)
+	  (uv vertices)
+	  )]
+       [(x1 y1 x2 y2  color)
+	(let ((vertices (v 'float (list x1 y2
+					x1 y1
+					x2 y2 x2 y1)))
+	      (r (fixnum->flonum  (bitwise-bit-field color 16 24)))
+	      (g (fixnum->flonum  (bitwise-bit-field color 8 16)))
+	      (b (fixnum->flonum  (bitwise-bit-field color 0 8)))
+	      (a  (/ (fixnum->flonum  (if (= 0 (bitwise-bit-field color 24 32))
+					       255
+					       (bitwise-bit-field color 24 32)
+					       )) 255.0)) )
+	
+	  (glUseProgram solid-program)
+	  (glUniform2f uniform-solid-screen-size (* 1.0 my-width) (* 1.0 my-height))
+	  (glUniform4f uniform-solid-color (/ r 255.0) (/ g 255.0) (/ b 255.0) (* a 1.0))
+	  (glVertexAttribPointer 0 2 GL_FLOAT GL_FALSE 0 vertices)
+	  (glEnableVertexAttribArray 0)
+	  (glDrawArrays GL_TRIANGLE_STRIP 0 4)
+	  (glUseProgram 0)
+	  (uv vertices)
+	  )]
+      ))
 
 
     (define (graphic-draw-texture-quad x1 y1 x2 y2 tx1 ty1 tx2 ty2 texture-id)

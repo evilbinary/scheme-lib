@@ -35,6 +35,7 @@
      gl-edit-set-highlight
      gl-edit-char-event
      gl-edit-get-text
+     gl-edit-set-font
      gl-free-markup
      
      
@@ -62,6 +63,7 @@
     (def-function gl-edit-set-editable "gl_edit_set_editable" (void*  int) void)
 
     (def-function gl-edit-set-color "gl_edit_set_color" (void*  int) void)
+    (def-function gl-edit-set-font "gl_edit_set_font" (void* string float) void)
 
     (def-function gl-edit-set-markup "gl_edit_set_markup" (void* void* int) void)
     (def-function gl-new-edit "gl_new_edit" (int float float float float) void*)

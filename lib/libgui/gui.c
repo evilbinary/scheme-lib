@@ -146,6 +146,15 @@ edit_t *gl_new_edit(int shader, float w, float h, float width, float height) {
     return self;
 }
 
+void gl_edit_set_font(edit_t *self,char* font_name,float size){
+  if(font_name!=NULL){
+    self->font = sth_add_font(self->stash, font_name);
+  }
+  if(size>0){
+    self->font_size=size;
+  }
+}
+
 void gl_resize_edit_window(edit_t *self, float width, float height) {
     mat4_set_orthographic(&self->projection, 0, width * 2, 0, height * 2, -1, 1);
 }
@@ -226,10 +235,10 @@ void gl_add_edit_text(edit_t *self, char *text) {
         if (index >= 0 && index < self->max_input) {
             //printf("insert  %d max_input=>%d\n",index,self->max_input );
             insert_string(self->input, index, text);
-	    int ulen=utf8_strlen(text);
-	    for(int i=0;i<ulen;i++){
-	      self->cursor_current_col++;
-	    }
+	    /* int ulen=utf8_strlen(text); */
+	    /* for(int i=0;i<ulen;i++){ */
+	    /*   self->cursor_current_col++; */
+	    /* } */
 	    calc_cursor_pos(self);
 
         } else {
@@ -329,7 +338,6 @@ char* get_next_line(edit_t *self,char* s,int * n,int *len,float *cursor_x,float 
       *cursor_x = sx;
       col=0;
       row++;
-      s++;
       count++;
       //printf("break %d %d %c\n",count,*len,*s);
       break;
@@ -386,7 +394,7 @@ void get_line_col(edit_t *self,char* s,int * n,int *len,float *cursor_x,float * 
       //*cursor_x = sx;
       //*cursor_y -= self->stash->fonts->lineh * self->font_size;
       //self->cursor_current_row++;
-      //col--;
+      col++;
       count++;
       break;
     }
@@ -458,6 +466,8 @@ void calc_cursor_pos(edit_t *self){
     if(i==self->cursor_current_row){
       int cn;
       int clen;
+      //printf("   #%d %d\n",self->cursor_current_row,self->cursor_current_col);
+
       if(n>0){
 	
 	get_line_col(self,s,&cn,&clen,&cursor_x,&cursor_y);
@@ -466,21 +476,25 @@ void calc_cursor_pos(edit_t *self){
 	self->cursor_current_col=0;
 	cursor_x=self->pen.x-glyph->xadv;
       }
-      //printf("row=%d cols=%d cn=%d\n",i,n,cn);
+      //printf("row=%d cols=%d col=%d\n",i,n,cn);
 
       break;
     }
     row_count+=n;
     //printf("row_count %d %d\n",row_count,n);
-    s=ss;
+    s=ss+1;
     i++;
-    self->cursor_prev_cols=n-1;
+    self->cursor_prev_cols=n;
   }while(*ss);
+  //printf("   %d %d\n",self->cursor_current_row,self->cursor_current_col);
   //printf("cursor= %f %f %d %d\n",cursor_y,cursor_x,self->cursor_current_row,self->cursor_current_col);
   self->cursor_y=cursor_y;
   self->cursor_x=cursor_x;
   self->cursor_current_cols=n;
   self->cursor=row_count+self->cursor_current_col;
+  if(self->cursor_current_col==self->cursor_current_cols){
+    self->cursor-=2;
+  }
   //printf("cursor %d\n",self->cursor);
 }
 
@@ -695,13 +709,24 @@ void gl_edit_cursor_move_left(edit_t *self){
   if(self->cursor>0){
     //printf("current col=%d cols=%d\n",self->cursor_current_col,self->cursor_current_cols);
     if(self->cursor_current_col<=0) {
-      //printf("cursor_col row--\n");
+      //printf("cursor_col <0\n");
       self->cursor_current_row--;
       self->cursor_current_col=self->cursor_prev_cols-2;
-    }else if(self->cursor_current_col<(self->cursor_current_cols-1) ){
-      //printf("cursor_col --\n");
+    }else if(self->cursor_current_col==self->cursor_current_cols ){
+      //printf("cursor_col 3\n");
+      if(self->cursor_current_col<=2){
+	self->cursor_current_row--;
+	self->cursor_current_col=self->cursor_prev_cols-2;
+      }else{
+	self->cursor_current_col-=3;
+      }
+      
+    }else if(self->cursor_current_col<self->cursor_current_cols){
       self->cursor_current_col--;
-    }else if(self->cursor_current_cols<=2&&self->cursor_current_col==(self->cursor_current_cols-1)){
+    }
+    else{
+      //printf("cursor_col 4\n");
+      //self->cursor_current_col-=2;
       self->cursor_current_row--;
       self->cursor_current_col=self->cursor_prev_cols-2;
     }
@@ -728,8 +753,9 @@ void gl_edit_key_event(edit_t *self, int key, int scancode, int action, int mods
     } else if (key == 262) {//right
       gl_edit_cursor_move_right(self);
     }else if (key==257){ //enter
-      gl_add_edit_text(self, "\n");
+      gl_add_edit_text(self, "\r\n");
       self->cursor_current_row++;
+      self->cursor_current_col=0;
     }else if(key==265){//up
       if(self->cursor_current_row>0){
 	self->cursor_current_row--;

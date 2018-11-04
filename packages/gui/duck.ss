@@ -444,15 +444,22 @@
 
 	   (if (null? parent)
 	       (let ((gx (+ (vector-ref widget %x)))
-		     (gy (+ (vector-ref widget %y))))
+		     (gy (+ (vector-ref widget %y)))
+		     (background (widget-get-attrs  widget 'background ))
+		     )
 		 (vector-set! widget %gx gx)
 		 (vector-set! widget %gy gy)
 		 
 		 (graphic-sissor-begin gx gy w h)
+		 (if (equal? '() background)
+		     '()
+		     (draw-panel gx gy w h '() background))
 		 ;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h) 255.0 0.0 0.0 0.5)
 		 )
 	       (let ((gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
-		     (gy   (+ (vector-ref parent %gy) (vector-ref widget %y))))
+		     (gy   (+ (vector-ref parent %gy) (vector-ref widget %y)))
+		     (background (widget-get-attrs  widget 'background ))
+		     )
 		 (vector-set! widget %gx gx)
 		 (vector-set! widget %gy gy)
 
@@ -461,6 +468,11 @@
 		 ;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h) 0.0 255.0 0.0 0.5)
 		 
 		 (graphic-sissor-begin gx gy  w  h )
+
+		 (if (equal? '() background)
+		     '()
+		     (draw-panel gx gy w h '() background))
+		 
 		 (draw-scroll-bar (+ gx w -10.0 ) gy 10.0 h
 				  (vector-ref widget %scroll-y)
 				  (+ (vector-ref widget %scroll-height) -40.0)
@@ -558,9 +570,10 @@
 
 	 (if (equal? #t (widget-get-attrs ww 'syntax-on))
 	     (let ((syntax-cache (widget-get-attrs ww 'syntax-cache))
+		   (syn (widget-get-attrs widget 'syntax))
 		   )
 	       ;;(printf "re render syntax ~a\n" syntax-cache )
-	       (parse-syntax syntax-cache text)
+	       (parse-syntax syn syntax-cache text)
 	       ;;(gl-edit-set-highlight ed syntax-cache)
 	       )
 	     )
@@ -575,13 +588,29 @@
 
       (widget-set-attrs
        widget
+       "%event-font-hook"
+       (lambda (ww name value)
+	 (gl-edit-set-font (widget-get-attrs ww '%edit) value -1)
+	 ))
+
+       (widget-set-attrs
+       widget
+       "%event-font-size-hook"
+       (lambda (ww name value)
+	 (gl-edit-set-font (widget-get-attrs ww '%edit) 0 value)
+	 ))
+
+
+      (widget-set-attrs
+       widget
        "%event-syntax-on-hook"
        (lambda (ww name val)
 	 (if (equal? #t (widget-get-attrs widget 'syntax-on))
-	     (let ((syntax-cache (cffi-alloc (* 64 (string-length text)))))
-	       (init-syntax)
+	     (let ((syntax-cache (cffi-alloc (* 64 (string-length text))))
+		   (syn (widget-get-attrs widget 'syntax)) )
+	       (widget-set-attrs widget 'syntax syn)
 	       (widget-set-attrs widget 'syntax-cache syntax-cache)
-	       (parse-syntax syntax-cache text)		
+	       (parse-syntax syn syntax-cache text)		
 	       (gl-edit-set-highlight ed syntax-cache)
 	       ))))
       
@@ -592,9 +621,18 @@
        (lambda (widget parent);;draw
 	 
 	 (let ((gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
-	       (gy   (+ (vector-ref parent %gy) (vector-ref widget %y))))
+	       (gy   (+ (vector-ref parent %gy) (vector-ref widget %y)))
+	       (background (widget-get-attrs  widget 'background ))
+	       (ww  (vector-ref  widget %w))
+	       (hh  (vector-ref  widget %h))
+	       )
 	   (vector-set! widget %gx gx)
 	   (vector-set! widget %gy gy)
+
+	   (if (equal? '() background)
+	       '()
+	       (draw-panel gx gy ww hh '() background))
+	   
 	   (graphic-draw-edit ed gx gy)
 	   )))
       
@@ -613,10 +651,11 @@
 	       (if (equal? #t (widget-get-attrs widget 'syntax-on))
 		   (let ((syntax-cache (widget-get-attrs widget 'syntax-cache))
 			 (params '())
+			 (syn (widget-get-attrs widget 'syntax))
 			 )
 		     (set! params (gl-edit-get-text ed))
 		     ;;(printf "re render syntax ~a ~a\n" syntax-cache params)
-		     (parse-syntax syntax-cache params)
+		     (parse-syntax syn syntax-cache params)
 		     ;;(gl-edit-set-highlight ed syntax-cache)
 		     )
 		   )
@@ -631,10 +670,11 @@
 	       (if (equal? #t (widget-get-attrs widget 'syntax-on))
 		   (let ((syntax-cache (widget-get-attrs widget 'syntax-cache))
 			 (params '())
+			 (syn (widget-get-attrs widget 'syntax))
 			 )
 		     (set! params (gl-edit-get-text ed))
 		     ;;(printf "re render syntax ~a ~a\n" syntax-cache params)
-		     (parse-syntax syntax-cache params)
+		     (parse-syntax syn syntax-cache params)
 		     ;;(gl-edit-set-highlight ed syntax-cache)
 		     )
 		   )

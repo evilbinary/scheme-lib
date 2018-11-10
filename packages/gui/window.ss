@@ -128,10 +128,10 @@
       (glfw-make-context-current window);
       (glad-load-gles2-loader  (get-glfw-get-proc-address) )
       (glfw-get-framebuffer-size window fb-width fb-height)
-      (printf "~a ,~a\n" (cffi-get-int fb-width) (cffi-get-int fb-height))
+      (printf "~a ,~a ~a,~a\n" (cffi-get-int fb-width) (cffi-get-int fb-height) width height)
       (glfw-swap-interval 1)
       
-      (widget-init width height)
+      (widget-init width height (/  (cffi-get-int fb-width) width) )
       (window-event-init window)
       ;;(collect-thread)
       
@@ -167,7 +167,7 @@
 	   (window-run-loop)
 	   
 	   (glfw-swap-buffers window)
-	   ;;(collect)
+	   (collect)
 	   ))
   
   (define (window-destroy window)

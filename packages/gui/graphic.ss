@@ -27,6 +27,8 @@
      graphic-draw-string-end
      graphic-draw-string-colors
      graphic-edit-set-color
+     graphic-get-fps
+     graphic-set-ratio
      
      gl-markup-set-foreground
      gl-markup-set-background
@@ -36,11 +38,10 @@
      gl-edit-char-event
      gl-edit-get-text
      gl-edit-set-font
+     gl-edit-mouse-event
      gl-free-markup
-     
-     
-     graphic-get-fps
      gl-edit-key-event
+     
      )
     (import (scheme) (utils libutil) (cffi cffi) (gles gles2) )
 
@@ -79,7 +80,10 @@
     
     (def-function gl-edit-key-event "gl_edit_key_event" ( void* int int int int) void)
     (def-function gl-edit-char-event "gl_edit_char_event" ( void* int int) void)
+    (def-function gl-edit-mouse-event "gl_edit_mouse_event" ( void* int float float) void)
 
+    
+    
     (def-function graphic-get-fps "get_fps" (void) int)
 
     (def-function sth-create "sth_create" (int int) void*)
@@ -162,6 +166,7 @@
 
     (define my-width 0)
     (define my-height 0)
+    (define graphic-ratio 1.0)
 
     (define font-string-cache (make-hashtable equal-hash eqv?) )
 
@@ -211,7 +216,8 @@
     ;; color;\n
     ;; gl_TexCoord[0].xy = tex_coord;
     ;;      
-    
+    (define (graphic-set-ratio ratio)
+      (set! graphic-ratio ratio))
 
     (define (graphic-resize width height)
       (set! my-width width)
@@ -367,13 +373,13 @@
     (define (graphic-draw-string font size color x y text )
       (let ((ret '()))
 	;;(printf "font=~a\n" font)
-	(gl-render-string font size text x (- (* 2 my-height) y) cache-dx cache-dy color )
+	(gl-render-string font size text x (- (* graphic-ratio my-height) y) cache-dx cache-dy color )
 	(set! ret (list (cffi-get-float cache-dx) (cffi-get-float cache-dy)))
 	ret
 	))
 
     (define (graphic-draw-string-colors font size x y text colors width)
-      (gl-render-string-colors font size  x (- (* 2 my-height) y) text colors width) )
+      (gl-render-string-colors font size  x (- (* graphic-ratio my-height) y) text colors width) )
     
     (define graphic-draw-line
       (case-lambda
@@ -423,9 +429,9 @@
 
     (define (graphic-sissor-begin x y width height)
        (glEnable GL_SCISSOR_TEST)
-       (glScissor (* 2 (flonum->fixnum x ))  (* 2 (- my-height (flonum->fixnum height) (flonum->fixnum y ) ))
-          (* 2 (flonum->fixnum width ))
-          (* 2 (flonum->fixnum height) ))
+       (glScissor (flonum->fixnum  (* graphic-ratio x ))  (flonum->fixnum (* graphic-ratio (- my-height  height y) ) )
+          (flonum->fixnum (* graphic-ratio  width ))
+          (flonum->fixnum (* graphic-ratio  height) ))
       ;;(glScissor 660 240 800 600)
     )
     (define (graphic-sissor-end )

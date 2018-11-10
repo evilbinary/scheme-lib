@@ -8,6 +8,7 @@
    draw-dialog
    draw-text
    draw-line
+   draw-rect
    dialog
    button
    image
@@ -19,7 +20,7 @@
    tree
    view
    pop
-   
+   progress
    )
   (import (scheme)
 	  (utils libutil)
@@ -103,8 +104,12 @@
        ])
     )
 
-  (define (draw-rect x y w h)
-    (graphic-draw-solid-quad x y (+ x w) (+ y  h)  128.0 30.0 34.0 0.5))
+  (define draw-rect
+     (case-lambda
+      [( x y w h)
+       (graphic-draw-solid-quad x y (+ x w) (+ y  h)  128.0 30.0 34.0 0.5)]
+      [( x y w h color)
+       (graphic-draw-solid-quad x y (+ x w) (+ y  h)  color)]))
 
 
   (define (draw-item x y w h text)
@@ -142,6 +147,52 @@
     			      (+ x w) (+ y (/ (* pos h) scroll-h ) (/ scroll-h h 0.1 ))
 			      31.0 31.0 31.0 0.9)
     )
+
+
+   (define (progress w h percent)
+     (let ((widget (widget-new 0.0 0.0 w h "")))
+       (widget-set-attrs widget 'color #x44ff0000)
+       (widget-set-attrs widget 'background #x44484848)
+       (widget-set-attrs widget 'percent percent)
+
+      (widget-set-draw
+       widget
+       (lambda (widget parent);;draw
+	 (let ((gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
+	       (gy   (+ (vector-ref parent %gy) (vector-ref widget %y)))
+	       (background (widget-get-attrs  widget 'background ))
+	       (color (widget-get-attrs  widget 'color ))
+	       (percent (widget-get-attrs  widget 'percent ))
+	       )
+	   (vector-set! widget %gx gx)
+	   (vector-set! widget %gy gy)
+	   ;;(printf "percent ~a\n" percent)
+	   
+	   (draw-rect gx  gy
+		      w
+		      h background)
+	   (draw-rect (+ gx ) (+ gy)
+		      (* percent w)
+		      h color)
+	   )))
+      (widget-set-event
+       widget
+       (lambda (widget parent type data);;event	      	      		     
+	 (if (null? parent)
+	     (begin
+	       (if (= type %event-mouse-button)
+		   (draw-widget-child-rect parent widget ))) )
+	 (begin
+	   (if (= type %event-mouse-button)
+	       (begin
+		 (if (procedure? (widget-get-events widget 'click))
+		     ((widget-get-events widget 'click) widget parent type data)
+		     )
+		 ;;(printf "button click event ~a ~a ~a\n" type text data)
+		 ;;(draw-widget-child-rect parent widget )
+		 )))
+	 ))
+      widget))
 
   (define (pop  w h text)
     (let ((widget (widget-new 0.0 0.0 w h text)))
@@ -219,7 +270,7 @@
 	   (if (equal? #t (widget-get-attrs widget 'static))
 	       (widget-set-attr widget %status 1))
 	   
-	   (if  (= (widget-get-attr widget %status) 1)
+	   (if (= (widget-get-attr widget %status) 1)
 	       (widget-draw-child widget)
 	       )
 	   
@@ -239,8 +290,8 @@
 	       (begin
 		 ;;(printf "motion ~a\n" (widget-get-attr widget %text))
 		 (if (is-in widget data)
-		     (begin
-		       ;;(printf "motion ~a\n" (widget-get-attr widget %text))
+		     (begin  ;;(equal? '() (widget-get-attrs widget 'root))
+		       ;;(printf "motion ~a ~a\n" (widget-get-attr widget %text) (widget-get-attr widget %status) )
 		       (if (= 0 (widget-get-attr widget %status) )
 			   (begin 
 			     (if (not (null? (widget-get-attr widget %parent)))
@@ -253,21 +304,27 @@
 		       (if (= 0 (widget-get-attr widget %status))
 			   (widget-set-child-attr  widget  %status 0)
 			   )))
-		 (widget-child-rect-event-mouse-motion widget type data) ))
+
+		 (if (= (widget-get-attr widget %status) 1)
+		     (widget-child-rect-event-mouse-motion widget type data))
+		 ;;(printf "=>motion ~a ~a\n" (widget-get-attr widget %text) (widget-get-attr widget %status) )
+
+		 ))
 	   (if (and (= type %event-mouse-button) (= (vector-ref data 1) 1) )
 	       (begin
-		 ;;(printf "pop click event ~a\n"  text)
 		 ;;click widget
 		 (if (is-in-widget widget (vector-ref data 3) (vector-ref data 4))
 		     (let ()
-		      
+		       ;;(printf "pop click event ~a status ~a\n"  text (widget-get-attr widget %status))
 		       (if (= 0 (widget-get-attr widget %status) )
 			   (begin 
 			     (if (not (null? (widget-get-attr widget %parent)))
 				 (begin
 				   (widget-set-child-attr (widget-get-attr widget %parent) %status 0)
 				   ))
-			     (widget-set-attr widget %status 1)
+			     ;;(widget-set-attr widget %visible #t)
+			     ;;(widget-set-attr widget %status 1)
+			     ;;(widget-set-child-attr widget %status 1)
 			     )
 			   (begin ;;get root-pop hide
 			     (let ((proot (widget-get-parent-cond
@@ -284,20 +341,23 @@
 			       (widget-set-child-attr proot %status 0)
 
 			       ))
-			   )
+			   )  
 		       ;;(widget-set-child-attr widget %status (widget-get-attr widget %status))
 		       (widget-layout-update (widget-get-root widget))
 
-
-		       ;; (printf "click ->~a ~a visible=~a\n"
+		       ;; (printf "click ->~a ~a status=~a\n"
 		       ;; 	       (widget-get-events widget 'click)
 		       ;; 	       (widget-get-attr widget %text)
 		       ;; 	       (widget-get-attr widget %status)
 		       ;; 	       )
 		       (if (and (procedure? (widget-get-events widget 'click))
+				;;(equal? #t (widget-get-attr widget %visible))
 				(equal? %status-active (widget-get-attr widget %status) ))
-			   ((widget-get-events widget 'click) widget parent type data)
-			   )
+			   (begin 
+			     ((widget-get-events widget 'click) widget parent type data)
+			     (widget-set-attr widget %status 0)
+
+			     ))
 		       ;;(widget-child-rect-event-mouse-button widget type data)
 		       
 		       ;; (printf "### ~a status=~a  ~a\n\n" (widget-get-attr (widget-get-root widget ) %text)
@@ -679,17 +739,23 @@
 		     )
 		   )
 	       ))
-	 (if (null? parent)
+	 (if (= type %event-motion)
 	     (begin
-	       (if (= type 3)
-		   (draw-widget-child-rect parent widget )))
-	     )
-	 (begin
-	   (if (= type 3)
-	       (begin
-		 ;;(printf "button click event ~a ~a ~a\n" type text data)
-		 (draw-widget-child-rect parent widget )
-		 )))
+	       '()
+	       ;; (gl-edit-mouse-event ed
+	       ;; 			    1
+	       ;; 			    (vector-ref data 0)
+	       ;; 			    (vector-ref data 1))
+	       ))
+	 (if (= type %event-mouse-button )
+	     (begin
+	       (gl-edit-mouse-event ed
+				    (vector-ref data 1)
+				    (vector-ref data 3)
+				    (vector-ref data 4))
+	       ;;(printf "button click event ~a ~a ~a\n" type text data)
+	       (draw-widget-child-rect parent widget )
+	       ))
 	 ))
       
       widget

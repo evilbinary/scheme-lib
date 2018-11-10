@@ -9,6 +9,8 @@
    video-destroy
    video-get-fps
    video-set-pause
+   video-get-duration
+   video-get-current-duration
    )
 
   (import (scheme) (utils libutil) (cffi cffi) (gles gles2) )
@@ -19,6 +21,10 @@
   (def-function video-destroy "video_destroy" (void*) void)
   (def-function video-get-fps "video_get_fps" (void*) int)
   (def-function video-set-pause "video_set_pause" (void* int) void)
- 
+  (def-function video-get-duration "video_get_duration" (void*) double)
+  (def-function video-get-current-duration "video_get_current_duration" (void*) double)
+
+  
+
 
   )

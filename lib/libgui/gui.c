@@ -428,6 +428,103 @@ void get_line_col(edit_t *self,char* s,int * n,int *len,float *cursor_x,float * 
 
 }
 
+void calc_pos_cursor(edit_t * self,float x,float y){
+
+  float cursor_x = self->pen.x;
+  float cursor_y = self->pen.y;
+  int row=0;
+  int col=0;
+  int last_col=col;
+  struct sth_font *fnt = NULL;
+  char *s = self->input;
+  int count = 0;
+  short isize = (short) (self->font_size * 10.0f);
+  unsigned int codepoint;
+  unsigned int state = 0;
+  struct sth_glyph *glyph = NULL;
+  int last_count=0;
+  if (s == NULL)
+    return;
+  fnt = self->stash->fonts;
+  decutf8(&state, &codepoint, *(unsigned char *) self->cursor_text);
+  glyph = get_glyph(self->stash, fnt, codepoint, isize);
+
+  cursor_x -= +(glyph->xadv) / 2;
+  float sx = cursor_x;
+  float sy = cursor_y;
+  x=x*2.0-glyph->xadv;
+  y=y*2.0-self->stash->fonts->lineh * self->font_size;
+  
+  //printf("==> %f %f\n",cursor_x,cursor_y);
+  
+  //while(fnt != NULL && fnt->idx != idx2) fnt = fnt->next;
+  if (fnt == NULL) {
+    printf("calc cursor font is null\n");
+    return;
+  }
+  if (fnt->type != BMFONT && !fnt->data) {
+    return;
+  }
+  int is_in=0;
+  for (; *s; s++) {
+    if (decutf8(&state, &codepoint, *(unsigned char *) s)) {
+      continue;
+    }
+    
+    if(*s==0x0a ){
+      cursor_y -= self->stash->fonts->lineh * self->font_size;
+      cursor_x = sx;
+      col=0;
+      row++;
+      //count++;
+      if(is_in<=0){
+      continue;
+      }else{
+	break;
+      }
+    }
+    glyph = get_glyph(self->stash, fnt, codepoint, isize);
+    float advance=0.0;
+    if (!glyph) {
+      continue;
+    }else{
+      //advance=sth_get_advace(self->stash, fnt, glyph, isize);
+      advance=glyph->xadv;
+    }
+
+     if (y<= (self->pen.y-cursor_y) ) {
+       last_col=col;
+       is_in++;
+      if(x<= (cursor_x-self->pen.x)){
+	
+	break;
+      }
+    }
+    if (self->bound.width > 0 &&
+	cursor_x >= (self->bound.width + sx - advance)) {
+      cursor_y -= self->stash->fonts->lineh * self->font_size;
+      cursor_x = sx;
+      col=0;
+      row++;
+    }
+
+    //printf("calc_pos_cursor %f %f == %f %f\n",x,y,(cursor_x-self->pen.x),(self->pen.y-cursor_y));
+   
+    //printf("===>%d %d\n",self->cursor,count);
+  
+    col++;
+    count++;
+    cursor_x += advance;
+  }
+  //printf("===> %d %d\n",row,col);
+  self->cursor_current_col=col;
+  self->cursor_current_row=row;
+  self->cursor_x=cursor_x;
+  self->cursor_y=cursor_y;
+
+  //calc_cursor_pos(self);
+  
+}
 
 
 void calc_cursor_pos(edit_t *self){
@@ -745,7 +842,12 @@ void gl_edit_cursor_move_right(edit_t *self){
   }
 }
 
- 
+void gl_edit_mouse_event(edit_t * self,int action,float x,float y){
+  if(action==1){//press mouse button
+    calc_pos_cursor(self,x,y);
+  }
+}
+
 void gl_edit_key_event(edit_t *self, int key, int scancode, int action, int mods) {
   if (self != NULL && (action == 1 || action == 2)) {
     if (key == 263) {//left

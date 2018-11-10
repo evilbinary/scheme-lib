@@ -981,11 +981,19 @@
   (define (widget-disable-cursor)
     (set! cursor-arrow -1))
 
-  (define (widget-init w h)
-    (set! window-width w)
-    (set! window-height h)
-    (graphic-init w h)
-    )
+  (define widget-init
+    (case-lambda
+     [(w h)
+      (set! window-width w)
+      (set! window-height h)
+      (graphic-init w h)]
+     [(w h ratio)
+      (set! window-width w)
+      (set! window-height h)
+      (graphic-set-ratio ratio)
+      (graphic-init w h)]
+     ))
+  
   (define (widget-get-window-width)
     window-width)
 

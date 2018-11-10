@@ -74,6 +74,8 @@ typedef struct _edit_t {
   mat4 view;
   mat4 projection;
   int editable;
+  int mark_start;
+  int mark_end;
 
   struct sth_stash *stash;
   unsigned char *data;
@@ -117,5 +119,8 @@ void glShaderSource2(GLuint shader,
 void calc_cursor_pos(edit_t *self);
 void gl_edit_cursor_move_left(edit_t *self);
 void gl_edit_cursor_move_right(edit_t *self);
+
+void gl_edit_mouse_event(edit_t * self,int action,float x,float y);
+void gl_edit_key_event(edit_t *self, int key, int scancode, int action, int mods);
 
 #endif

@@ -89,11 +89,45 @@
 		       text)
     )
 
-  (define (draw-image x y w h src)
-    (graphic-draw-texture-quad
-     x y
-     (+ x w) (+ y h)
-     0.0 0.0 1.0 1.0 src))
+  (define draw-image
+    (case-lambda
+     [(x y w h src)
+      (graphic-draw-texture-quad
+       x y
+       (+ x w) (+ y h)
+       0.0 0.0 1.0 1.0 src)
+      ]
+     [(x y w h src attrs)
+      (if (equal? (hashtable-ref attrs 'mode '()) 'fix-xy)
+		  (graphic-draw-texture-quad
+		   x y
+		   (+ x w) (+ y h)
+		   0.0 0.0 1.0 1.0 src))
+      (if (equal? (hashtable-ref attrs 'mode '()) 'center-crop)
+	  (let ((h1 (hashtable-ref attrs 'height h))
+		(w1 (hashtable-ref attrs 'width w)))
+
+	    (if (> h1 w1)
+		(graphic-draw-texture-quad
+		 x y
+		 (+ x w) (+ y h)
+		 0.0
+		 (/ (/ (- h1 h) 2) h1)
+		 1.0
+		 1.0
+		 src)
+		(graphic-draw-texture-quad
+		 x y
+		 (+ x w) (+ y h)
+		 (/ (/ (- w1 w) 2) w1 )
+		 0.0
+		 1.0
+		 1.0
+		 src)
+	    )
+	    ))
+      ]
+     ))
 
   (define draw-text
      (case-lambda
@@ -971,26 +1005,38 @@
       ))
   
   (define (image w h src)
-    (let ((widget (widget-new 0.0 0.0 w h text))
-	  (id (load-texture src)))
-      
+    (let* ((widget (widget-new 0.0 0.0 w h text))
+	   (attrs (widget-attrs widget))
+	   (id (load-texture src attrs)))
+      (widget-set-attrs widget 'src src)
+      (widget-set-attrs widget 'src-id id)
+      (widget-set-attrs widget 'load #t)
+      (widget-set-attrs widget 'mode 'fix-xy)
       (widget-set-draw
        widget
        (lambda (widget parent);;draw
+	 (if (equal? #f (widget-get-attrs widget 'load ))
+	     (let ((res (load-texture (widget-get-attrs widget 'src) attrs)))
+	       ;;(printf "reload image ~a ~a\n" src res)
+	       (widget-set-attrs widget 'src-id res)
+	       (widget-set-attrs widget 'load #t)
+	       ))
 	 (if (null? parent)
 	     (let ((gx (+ (vector-ref widget %x)))
 		   (gy (+ (vector-ref widget %y))))
 	       (vector-set! widget %gx gx)
 	       (vector-set! widget %gy gy)
 	       (draw-image gx gy
-			   w h id))
+			   w h id attrs ))
 	     (let ((gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
-		   (gy   (+ (vector-ref parent %gy) (vector-ref widget %y))))
+		   (gy   (+ (vector-ref parent %gy) (vector-ref widget %y)))
+		   (id (widget-get-attrs widget 'src-id))
+		   )
 	       (vector-set! widget %gx gx)
 	       (vector-set! widget %gy gy)
 	       (draw-image gx
 			   gy
-			   w h id))) ))
+			   w h id attrs))) ))
       
       (widget-set-event
        widget
@@ -1003,6 +1049,9 @@
 	 (begin
 	   (if (= type %event-mouse-button)
 	       (begin
+		 (if (procedure? (widget-get-events widget 'click))
+		     ((widget-get-events widget 'click) widget parent type data)
+		     )
 		 ;;(printf "button click event ~a ~a ~a\n" type text data)
 		 (draw-widget-child-rect parent widget )
 		 )))
@@ -1162,7 +1211,9 @@
        widget
        (lambda (widget parent type data)
 	 (if (and (= type %event-mouse-button) (= (vector-ref data 1) 1) )
-	     (widget-active widget)
+	     (if (equal? #t (widget-get-attrs widget 'disable-active))
+		 '()
+		 (widget-active widget))
 	     #t
 	     )))
       

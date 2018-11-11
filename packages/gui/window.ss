@@ -167,7 +167,7 @@
 	   (window-run-loop)
 	   
 	   (glfw-swap-buffers window)
-	   (collect)
+	   ;;(collect)
 	   ))
   
   (define (window-destroy window)

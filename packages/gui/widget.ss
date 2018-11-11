@@ -62,6 +62,7 @@
    widget-child-rect-event-scroll
    widget-active
    widget-event
+   widget-attrs
    plus-child-y-offset
    is-in-widget
    widget-is-in-widget
@@ -479,6 +480,9 @@
     (let ((h (vector-ref widget %attrs )))
       (hashtable-ref h name '() )))
 
+  (define (widget-attrs widget)
+    (vector-ref widget %attrs))
+
   (define (widget-set-attrs widget name value)
     (let ((h (vector-ref widget %attrs )))
       (hashtable-set! h name value)
@@ -730,6 +734,7 @@
 		     (draw widget parent)
 		     (event widget  parent )
 		     ))))
+  
   ;;mouse motion key char
   (define (widget-event type data )
     (if (= type %event-motion)

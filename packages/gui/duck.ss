@@ -32,15 +32,6 @@
 	  (cffi cffi)
 	  (gui stb))
 
-
-  ;;private
-  (define %scroll-direction (+ %last-common-attr 0))
-  (define %scroll-rate (+ %last-common-attr 1))
-  (define %scroll-x (+ %last-common-attr 2))
-  (define %scroll-y (+ %last-common-attr 3))
-  (define %scroll-height (+ %last-common-attr 4))
-
-
   
   (define (draw-dialog  x y w h title)
     (graphic-draw-solid-quad  x y
@@ -511,21 +502,21 @@
   
   (define (scroll w h)
     (let ((widget (widget-new 0.0 0.0 w h "")))
-      (vector-set! widget %scroll-direction  1)
-      (vector-set! widget %scroll-rate  8.1)
-      (vector-set! widget %scroll-x  0.0)
-      (vector-set! widget %scroll-y  0.0)
-      (vector-set! widget %scroll-height  0.0)
+      (widget-set-attrs widget 'direction  1)
+      (widget-set-attrs widget 'rate  8.1)
+      (widget-set-attrs widget 'scroll-x  0.0)
+      (widget-set-attrs widget 'scroll-y  0.0)
+      (widget-set-attrs widget 'scroll-height  0.0)
       
       (widget-set-layout
        widget
        (lambda (widget . args)
 	 (flow-layout widget)
-	 (vector-set! widget %scroll-height
+	 (widget-set-attrs widget 'scroll-height
 		      (calc-child-height widget))
 	 ;;(printf "all child height ~a\n" (calc-child-height widget))
 	 ;;(printf "widget ~a,~a\n" (widget-get-attr widget %w)  (widget-get-attr widget %h))
-	 (vector-set! widget %scroll-y 0.0)
+	 (widget-set-attrs widget 'scroll-y 0.0)
 	 ))
       (widget-set-draw
        widget
@@ -568,12 +559,11 @@
 		     (draw-panel gx gy w h '() background))
 		 
 		 (draw-scroll-bar (+ gx w -10.0 ) gy 10.0 h
-				  (vector-ref widget %scroll-y)
-				  (+ (vector-ref widget %scroll-height) -40.0)
+				  (widget-get-attrs widget 'scroll-y)
+				  (+ (widget-get-attrs widget 'scroll-height) -40.0)
 				  )
 		 ))
 	   ;;(draw (vector-ref widget %draw))
-	   ;;(draw-widget-rect widget)
 	   (widget-draw-rect-child widget)
 	   
 	   (graphic-sissor-end)
@@ -589,28 +579,28 @@
 	   (if (= type %event-scroll)
 	       (begin
 		 ;;(printf "event scroll ~a\n" type)
-		 (vector-set! widget %scroll-height
+		 (widget-set-attrs widget 'scroll-height
 			      (calc-child-height widget))
 
-		 (let ((offsety (* -1.0 (vector-ref widget %scroll-rate)
+		 (let ((offsety (* -1.0 (widget-get-attrs widget 'rate)
 				   (vector-ref data 1))))
 
 		   ;;over top
-		   (if (< (+ (vector-ref widget %scroll-y) offsety) 0)
+		   (if (< (+ (widget-get-attrs widget 'scroll-y) offsety) 0)
 		       (begin
 			 (set! offsety 0.0)
 			 (widget-layout-update widget);;may change
-			 (vector-set! widget %scroll-y 0.0)
+			 (widget-set-attrs widget 'scroll-y 0.0)
 			 )
 		       ;;over height
-		       (if (> (+ (vector-ref widget %scroll-y) offsety) (vector-ref widget %scroll-height)  )
+		       (if (> (+ (widget-get-attrs widget 'scroll-y) offsety) (widget-get-attrs widget 'scroll-height)  )
 			   (begin
 			     (set! offsety 0.0)
-			     (vector-set! widget %scroll-y (vector-ref widget %scroll-height))
+			     (widget-set-attrs widget 'scroll-y (widget-get-attrs widget 'scroll-height))
 			     )
 			   (begin
-			     (vector-set! widget %scroll-y
-					  (+ (vector-ref widget %scroll-y)
+			     (widget-set-attrs widget 'scroll-y
+					  (+ (widget-get-attrs widget 'scroll-y)
 					     offsety ))
 			     (plus-child-y-offset widget offsety)
 			     )))

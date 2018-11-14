@@ -254,7 +254,6 @@
 		(process-match-parent (car c))
 		(vector-set! (car c) %x (+ sx (vector-ref (car c) %margin-left)))
 		(vector-set! (car c) %y (+ sy (vector-ref (car c) %margin-top)))
-		
 		(if (pair? (cdr c))
 		    (set! ww (vector-ref (car (cdr c)) %w)))
 		
@@ -277,7 +276,6 @@
 		    )
 		(if (procedure? (vector-ref (car c) %layout))
 		    ((vector-ref (car c) %layout) (car c)))
-		
 		(loop (cdr c) sx sy ww )
 		)
 	      ))

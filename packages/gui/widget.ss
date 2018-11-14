@@ -253,7 +253,7 @@
     (and (> mx x) (< mx (+ x w)) (> my y) (< my (+ y h))))
 
   (define (is-in-rect x1 y1 w1 h1 x2 y2 w2 h2)
-    (and  (< (abs (- x1 x2)) (/ (+ w1 w2) 2))  (< (abs (- y1 y2))  (/ (+ h1 h2) 2) )) )
+    (not (or (> x1 (+ x2 w2)) (< (+ x1 w1) x2) (< (+ y1 h1) y2) (> y1 (+ y2 h2)))))
 
   (define (is-in widget data)
     (let ((x  (vector-ref  widget %x))
@@ -283,22 +283,29 @@
 	  (y2  (vector-ref widget2 %y))
 	  (w2  (vector-ref  widget2 %w))
 	  (h2  (vector-ref  widget2 %h))
-	  (parent (vector-ref widget %parent))
+
+	  (gx2  (vector-ref  widget2 %gx))
+	  (gy2  (vector-ref widget2 %gy))
+	  (parent (vector-ref widget2 %parent))
 	  )
 
-      ;;(graphic-draw-solid-quad x1 y1 (+ x1 w1 ) (+ y1 h1)  0.0 255.0 0.0 0.1)
-      ;;(graphic-draw-solid-quad x2 y2 (+ x2 w2 ) (+ y2 h2)  0.0  0.0 255.0 0.5)
+      ;;(graphic-draw-solid-quad x1 y1 (+ x1 w1 ) (+ y1 h1)  0.0 255.0 0.0 0.2)
+      ;;(graphic-draw-solid-quad gx2 gy2 (+ gx2 w2 ) (+ gy2 h2)  0.0  0.0 255.0 0.8)
       
       (if (null? parent)
 	  (is-in-rect 0  0
 		      w1  h1
 		      x2 y2 w2 h2 )
-	  (is-in-rect (+ x1 (vector-ref parent %left))
-		      (+ y1 (vector-ref parent %top))
-		      (- w1 (vector-ref parent %right))
-		      (- h1 (vector-ref parent %bottom))
-		      x2 y2 w2 h2 )
-	  )
+	  (begin
+	    (is-in-rect
+	     (+ x1 (vector-ref widget %left))
+	     (+ y1 (vector-ref widget %top))
+	     (- w1 (vector-ref widget %right) (vector-ref widget %left))
+	     (- h1 (vector-ref widget %bottom) (vector-ref widget %top))
+	     (+ x2 (vector-ref parent %x))
+	     (+ y2  (vector-ref parent %y))
+	     w2 h2 )
+	  ))
       ;;(printf "~a == ~a\n" (list x y w h) data)
       ))
 

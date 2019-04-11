@@ -22,6 +22,11 @@ QQ群：Lisp兴趣小组239401374
 # windows
 1. 下载已经去除了，因为有人说抱怨运行报错，这下你只能自己编译。真需要的话，加群下载。
 
+# 在使用scheme lib的项目
+scheme lib官方网站：[http://scheme-lib.evilbinary.org/](http://scheme-lib.evilbinary.org/)  
+letsgo 莱茨狗抢狗软件：[https://github.com/scheme-lib/letsgo](https://github.com/scheme-lib/letsgo)  
+
+
 ### 截图
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/editor.jpg" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/editor2.png" width="400px" />

@@ -25,7 +25,7 @@ QQ群：Lisp兴趣小组239401374
 # 使用scheme lib的项目
 scheme lib官方网站：[http://scheme-lib.evilbinary.org/](http://scheme-lib.evilbinary.org/)  
 letsgo 莱茨狗抢狗软件：[https://github.com/scheme-lib/letsgo](https://github.com/scheme-lib/letsgo)  
-
+duck-editor 鸭子编辑器：[https://github.com/evilbinary/duck-editor](https://github.com/evilbinary/duck-editor)
 
 ### 截图
 

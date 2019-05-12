@@ -15,11 +15,11 @@
      graphic-destroy
      graphic-sissor-begin
      graphic-sissor-end
+     graphic-draw-round-rect
 
      graphic-new-edit
      graphic-draw-edit
      graphic-edit-add-text
-     graphic-new-markup
      graphic-edit-set-text
      graphic-draw-string
      graphic-get-font
@@ -29,18 +29,29 @@
      graphic-edit-set-color
      graphic-get-fps
      graphic-set-ratio
+
+     load-shader
      
-     gl-markup-set-foreground
-     gl-markup-set-background
-     gl-markup-set-font-size
-     gl-edit-set-markup
+     gl-edit-set-foreground
+     gl-edit-set-background
+     gl-edit-set-font-size
+     gl-edit-set-font-name
+     gl-edit-set-font
+     gl-edit-get-height
+
      gl-edit-set-highlight
+     gl-edit-get-highlight
+     gl-edit-update-highlight
      gl-edit-char-event
      gl-edit-get-text
      gl-edit-set-font
      gl-edit-mouse-event
-     gl-free-markup
      gl-edit-key-event
+     gl-edit-set-scroll
+     gl-edit-mouse-motion-event
+     gl-edit-set-select-color
+     gl-edit-set-cursor-color
+     gl-edit-set-font-line-height
      
      )
     (import (scheme) (utils libutil) (cffi cffi) (gles gles2) )
@@ -54,23 +65,23 @@
    
    
     (def-function gl-resize-edit-window "gl_resize_edit_window" (void* float float ) void)
-    (def-function gl-free-markup "gl_free_markup" (void*) void)
-    (def-function gl-new-markup "gl_new_markup" (string float) void*)
-    (def-function gl-markup-set-foreground "gl_markup_set_foreground" (void* float float float float) void)
-    (def-function gl-markup-set-background "gl_markup_set_background" (void* float float float float) void)
-    (def-function gl-markup-set-font-size "gl_markup_set_font_size" (void* float) void)
-
+    (def-function gl-edit-set-foreground "gl_edit_set_foreground" (void* int) void)
+    (def-function gl-edit-set-background "gl_edit_set_background" (void* int) void)
+    (def-function gl-edit-set-font-size "gl_edit_set_font_size" (void* float) void)
+    (def-function gl-edit-set-font-name "gl_edit_set_font_name" (void* string) void)
+    (def-function gl-edit-set-color "gl_edit_set_color" (void*  int) void)
+    (def-function gl-edit-set-font "gl_edit_set_font" (void* string float) void)
+    (def-function gl-edit-set-font-line-height "gl_edit_set_font_line_height" (void* float) void)
 
     (def-function gl-edit-set-editable "gl_edit_set_editable" (void*  int) void)
 
-    (def-function gl-edit-set-color "gl_edit_set_color" (void*  int) void)
-    (def-function gl-edit-set-font "gl_edit_set_font" (void* string float) void)
 
-    (def-function gl-edit-set-markup "gl_edit_set_markup" (void* void* int) void)
     (def-function gl-new-edit "gl_new_edit" (int float float float float) void*)
     (def-function gl-edit-add-text "gl_add_edit_text" (void*  string ) void)
     (def-function gl-edit-set-text  "gl_set_edit_text" (void*  string ) void)
     (def-function gl-edit-get-text  "gl_get_edit_text" (void* ) string)
+    (def-function gl-edit-get-height  "gl_get_edit_height" (void* ) float)
+
 
     
     
@@ -81,8 +92,14 @@
     (def-function gl-edit-key-event "gl_edit_key_event" ( void* int int int int) void)
     (def-function gl-edit-char-event "gl_edit_char_event" ( void* int int) void)
     (def-function gl-edit-mouse-event "gl_edit_mouse_event" ( void* int float float) void)
-
+    (def-function gl-edit-set-scroll "gl_edit_set_scroll" ( void*  float float) void)
+    (def-function gl-edit-mouse-motion-event "gl_edit_mouse_motion_event" ( void* float float) void)
     
+    (def-function gl-edit-set-select-color "gl_edit_set_select_color" ( void* int) void)
+    (def-function gl-edit-set-cursor-color "gl_edit_set_cursor_color" ( void* int) void)
+
+
+   
     
     (def-function graphic-get-fps "get_fps" (void) int)
 
@@ -104,13 +121,39 @@
     
     (def-function gl-render-prepare-string "gl_render_prepare_string" (void* void*) void)
     (def-function gl-render-end-string "gl_render_end_string" (void*) void)
-
     (def-function gl-edit-set-highlight "gl_edit_set_highlight" (void* void*) void)
-    
-    (define texture-vert-shader 0)
-    (define texture-frag-shader 0)
-
+    (def-function gl-edit-get-highlight "gl_edit_get_highlight" (void*) void*)
+    (def-function gl-edit-update-highlight "gl_edit_update_highlight" (void*) void)
    
+    
+    (define texture-program 0)
+    (define solid-program 0)
+    (define font-program 0)
+    (define round-program 0)
+
+    
+    (define uniform-screen-size 0)
+    (define uniform-texture 0)
+    (define uniform-solid-color 0)
+    (define uniform-solid-screen-size 0)
+    (define uniform-font-texture 0)
+    (define uniform-font-model 0)
+    (define uniform-font-view 0)
+    (define uniform-font-projection 0)
+    (define uniform-round-color 0)
+    (define uniform-round-screen-size 0)
+
+    (define my-width 0)
+    (define my-height 0)
+    (define graphic-ratio 1.0)
+
+    (define font-string-cache (make-hashtable equal-hash eqv?) )
+    (define gtext 0)
+    (define all-edit-cache (make-hashtable equal-hash eqv?) )
+    (define all-font-cache (make-hashtable equal-hash eqv?))
+    (define default-mvp 0)
+
+    
     (define v-shader-str
       "attribute vec2 vPosition;   \n
       attribute vec2 vTexCoord;   \n
@@ -124,7 +167,7 @@
       \n"
       )
 
-    (define f-shader-str
+       (define f-shader-str
       "                  \n
        uniform sampler2D u_Texture;               \n
        varying vec2 v_TexCoordinate;              \n
@@ -133,17 +176,18 @@
              gl_FragColor = texture2D(u_Texture, v_TexCoordinate); \n
        }                                          \n")
 
+    
     (define v-solid-shader-str
       "attribute vec2 vPosition;   \n
            uniform vec2 screenSize;    \n
            void main()                 \n
            {                           \n
-              gl_Position = vec4(vPosition.x * 2.0 / screenSize.x - 1.0, ( screenSize.y - vPosition.y) * 2.0 / screenSize.y - 1.0, 0.0, 1.0); \n
+gl_Position = vec4(vPosition.x * 2.0 / screenSize.x - 1.0, ( screenSize.y - vPosition.y) * 2.0 / screenSize.y - 1.0, 0.0, 1.0); \n
            }                           \n"
 	   )
 
-    (define f-solid-shader-str
-       "                  \n
+ 
+    (define f-solid-shader-str "
         uniform vec4 color;                        \n
         void main()                                \n
         {                                          \n
@@ -151,45 +195,18 @@
         }                                          \n")
 
     
-    (define texture-program 0)
-
-    (define uniform-screen-size 0)
-    (define uniform-texture 0)
-
-    (define uniform-solid-color 0)
-    (define uniform-solid-screen-size 0)
-
-    (define solid-program 0)
-
-    (define solid-vert-shader 0)
-    (define solid-frag-shader 0)
-
-    (define my-width 0)
-    (define my-height 0)
-    (define graphic-ratio 1.0)
-
-    (define font-string-cache (make-hashtable equal-hash eqv?) )
-
-    (define font-program 0)
-    
-    (define font-vert-shader 0)
-    (define font-frag-shader 0)
-    (define uniform-font-texture 0)
-    (define  uniform-font-model 0)
-    (define uniform-font-view 0)
-    (define uniform-font-projection 0)
-    (define gtext 0)
-    (define all-edit-cache (make-hashtable equal-hash eqv?) )
-    (define all-font-cache (make-hashtable equal-hash eqv?))
-    (define default-mvp 0)
-    
     (define f-font-shader-str
       "uniform sampler2D texture;
        varying vec2 v_TexCoordinate; 
        varying vec4 v_color;
+       uniform int type;
        void main()
       {
-         gl_FragColor =vec4(v_color.rgb,texture2D(texture,v_TexCoordinate).a*v_color.a );
+        if( type==1 ){ 
+           gl_FragColor = v_color;
+        }else{
+          gl_FragColor =vec4(v_color.rgb,texture2D(texture, v_TexCoordinate ).a*v_color.a );
+        }
 
     }")
     ;;float a = texture2D(texture,v_TexCoordinate.xy).r;
@@ -210,12 +227,50 @@
 
        v_TexCoordinate=tex_coord;
        v_color=color;
-       gl_Position =projection*(view*(model*vec4(vertex,1.0)));\n
+       gl_Position =projection*view*model*vec4(vertex,1.0);\n
+
        }"
       )
-    ;; color;\n
-    ;; gl_TexCoord[0].xy = tex_coord;
-    ;;      
+
+
+      (define v-round-shader-str
+      "attribute vec2 vPosition;   \n
+      attribute vec2 vTexCoord;   \n
+      varying vec2 v_TexCoordinate; \n
+      uniform vec2 screenSize;    \n
+      void main()                 \n
+      {                           \n
+        v_TexCoordinate = vTexCoord; \n
+        gl_Position = vec4(vPosition.x * 2.0 / screenSize.x - 1.0, ( screenSize.y - vPosition.y) * 2.0 / screenSize.y - 1.0, 0.0, 1.0); \n
+           }                       \n
+      \n"
+      )
+
+       (define f-round-shader-str "
+uniform vec4 color; 
+
+float smoothedge(float v) {
+    return smoothstep(0.0, 1.0 / 800.0, v);
+}
+
+float roundRect(vec2 p, vec2 size, float radius) {
+  vec2 d = abs(p) - size;
+  return min(max(d.x, d.y), 0.0) + length(max(d,0.0))- radius;
+}
+  void main()                              
+  {
+     vec2 st=gl_FragCoord.xy/vec2(1600.0,1400.0);
+     st -= vec2(0.5, 0.5);
+     vec4 color2=vec4(0.0,0.0,0.0,0.0);
+//color.a=0.0;
+     //color2=mix(color2 ,color,smoothedge(roundRect(st, vec2(0.2, 0.1), 0.01)) );
+     color2=color2*smoothedge(roundRect(st, vec2(0.2, 0.1), 0.01));
+     //gl_FragColor=color2;
+     color=vec4(mix(color.rgb,color2.rgb,0.0),0.8);
+     gl_FragColor = vec4(color2.rgb,0.8);
+  }")
+
+       
     (define (graphic-set-ratio ratio)
       (set! graphic-ratio ratio))
 
@@ -235,88 +290,113 @@
       (set! my-width width)
       (set! my-height height)
       
-      (set! texture-vert-shader (glCreateShader GL_VERTEX_SHADER))
-            
-      (glShaderSource2 texture-vert-shader 1 v-shader-str 0 )
-      (glCompileShader texture-vert-shader)
-
-
-      (set! texture-frag-shader (glCreateShader GL_FRAGMENT_SHADER))
-      (glShaderSource2 texture-frag-shader 1 f-shader-str 0 )
-      (glCompileShader texture-frag-shader)
-
-      
-      (set! texture-program (glCreateProgram ))
-      (glAttachShader texture-program texture-vert-shader)
-      (glAttachShader texture-program texture-frag-shader)
-
-      (glBindAttribLocation texture-program 0 "vPosition")
-      (glBindAttribLocation texture-program 1 "vTexCoord")
-      
-      (glLinkProgram texture-program)
-      (glUseProgram texture-program)
-
+      ;;texture shader
+      (set! texture-program (load-shader v-shader-str f-shader-str '()))
       (set! uniform-screen-size (glGetUniformLocation texture-program "screenSize"))
       (set! uniform-texture (glGetUniformLocation texture-program "u_Texture"))
 
-
       ;;solid shader
-      (set! solid-vert-shader (glCreateShader GL_VERTEX_SHADER))
-      (glShaderSource2  solid-vert-shader 1 v-solid-shader-str  0 )
-      (glCompileShader solid-vert-shader)
-      (set! solid-frag-shader (glCreateShader GL_FRAGMENT_SHADER))
-      
-      (glShaderSource2  solid-frag-shader 1 f-solid-shader-str  0 )
-      (glCompileShader solid-frag-shader)
-      
-      (set! solid-program (glCreateProgram))
-      (glAttachShader solid-program solid-vert-shader)
-      (glAttachShader solid-program solid-frag-shader)
-      (glBindAttribLocation solid-program 0 "vPosition")
-      (glLinkProgram solid-program)
-      (glUseProgram solid-program)
-
+      (set! solid-program (load-shader v-solid-shader-str f-solid-shader-str '()))
       (set! uniform-solid-color (glGetUniformLocation solid-program "color"))
       (set! uniform-solid-screen-size (glGetUniformLocation solid-program "screenSize"))
 
-      ;;(draw-line solid-program uniform-solid-screen-size uniform-solid-color  0.0 0.0 200.0 200.0 255.0 0.0 0.0 0.0 )
-      ;;(graphic-draw-line 0.0 12.0 34.0 56.0 255.0 0.0 0.0 0.0 )
-
       ;;font shader
-      (set! font-vert-shader (glCreateShader GL_VERTEX_SHADER))
-      (glShaderSource2  font-vert-shader 1 v-font-shader-str  0 )
-      (glCompileShader font-vert-shader)
-      (set! font-frag-shader (glCreateShader GL_FRAGMENT_SHADER))
-      
-      (glShaderSource2  font-frag-shader 1 f-font-shader-str  0 )
-      (glCompileShader font-frag-shader)
-      
-      (set! font-program (glCreateProgram))
-      (glAttachShader font-program font-vert-shader)
-      (glAttachShader font-program font-frag-shader)
-      
-      (glBindAttribLocation font-program 0 "vertex")
-      (glBindAttribLocation font-program 1 "tex_coord")
-      (glBindAttribLocation font-program 2 "color")
-      (glLinkProgram font-program)
-      (glUseProgram font-program)
-
+      (set! font-program (load-shader
+			  v-font-shader-str
+			  f-font-shader-str
+			  (lambda (program)
+			    (glBindAttribLocation program 0 "vertex")
+			    (glBindAttribLocation program 1 "tex_coord")
+			    (glBindAttribLocation program 2 "color")
+			    )
+			  ))
       ;;(set! font-program (shader-load-from-string v-font-shader-str f-font-shader-str))
       ;;(set! font-program (shader-load  "shaders/v3f-t2f-c4f.vert" "shaders/v3f-t2f-c4f.frag"))
-      
       (set! uniform-font-texture (glGetUniformLocation font-program "texture"))
       (set! uniform-font-model (glGetUniformLocation font-program "model"))
       (set! uniform-font-view (glGetUniformLocation font-program "view"))
       (set! uniform-font-projection (glGetUniformLocation font-program "projection"))
 
+      ;;round here
+      (set! round-program (load-shader v-round-shader-str f-round-shader-str '()))
+      (set! uniform-round-color (glGetUniformLocation round-program "color"))
+      (set! uniform-round-screen-size (glGetUniformLocation round-program "screenSize"))
       
+      ;;editor
       (set! gtext (gl-new-edit font-program my-width my-height my-width my-height))
       (gl-edit-set-editable gtext 0)
-      ;;(printf "gtext ~x\n" gtext)
       (set! default-mvp (grpahic-new-mvp))
       
       )
 
+    
+    (define (load-shader v-str f-str bind)
+      (let ((vert-shader -1)
+	    (program -1)
+	    (frag-shader -1)
+	    )
+	(set! vert-shader (glCreateShader GL_VERTEX_SHADER))
+	(glShaderSource2  vert-shader 1 v-str  0 )
+	(glCompileShader vert-shader)
+	(set! frag-shader (glCreateShader GL_FRAGMENT_SHADER))
+	(glShaderSource2  frag-shader 1 f-str  0 )
+	(glCompileShader frag-shader)
+	(set! program (glCreateProgram))
+	(glAttachShader program vert-shader)
+	(glAttachShader program frag-shader)
+	(if (procedure? bind)
+	    (bind program)
+	    (begin 
+	      (glBindAttribLocation program 0 "vPosition")
+	      (glBindAttribLocation program 1 "vTexCoord")))
+
+	(glLinkProgram program)
+	(glUseProgram program)
+	;;(set! uniform-round-color (glGetUniformLocation round-program "color"))
+	;;(set! uniform-round-screen-size (glGetUniformLocation round-program "screenSize"))
+	program)
+      )
+
+
+    (define graphic-draw-round-rect
+      (case-lambda
+       [(x1 y1 x2 y2  r g b a)
+	(let ((vertices (v 'float (list x1 y2
+					x1 y1
+					x2 y2 x2 y1))))
+	  (glUseProgram round-program)
+	  (glUniform2f uniform-round-screen-size (* 1.0 my-width) (* 1.0 my-height))
+	  (glUniform4f uniform-round-color (/ r 255.0) (/ g 255.0) (/ b 255.0) (* a 1.0))
+	  (glVertexAttribPointer 0 2 GL_FLOAT GL_FALSE 0 vertices)
+	  (glEnableVertexAttribArray 0)
+	  (glDrawArrays GL_TRIANGLE_STRIP 0 4)
+	  (glUseProgram 0)
+	  (uv vertices)
+	  )]
+       [(x1 y1 x2 y2  color)
+	(let ((vertices (v 'float (list x1 y2
+					x1 y1
+					x2 y2 x2 y1)))
+	      (r (fixnum->flonum  (bitwise-bit-field color 16 24)))
+	      (g (fixnum->flonum  (bitwise-bit-field color 8 16)))
+	      (b (fixnum->flonum  (bitwise-bit-field color 0 8)))
+	      (a  (/ (fixnum->flonum  (if (= 0 (bitwise-bit-field color 24 32))
+					  255
+					  (bitwise-bit-field color 24 32)
+					  )) 255.0)) )
+	  
+	  (glUseProgram round-program)
+	  (glUniform2f uniform-round-screen-size (* 1.0 my-width) (* 1.0 my-height))
+	  (glUniform4f uniform-round-color (/ r 255.0) (/ g 255.0) (/ b 255.0) (* a 1.0))
+	  (glVertexAttribPointer 0 2 GL_FLOAT GL_FALSE 0 vertices)
+	  (glEnableVertexAttribArray 0)
+	  (glDrawArrays GL_TRIANGLE_STRIP 0 4)
+	  (glUseProgram 0)
+	  (uv vertices)
+	  )]
+       ))
+
+     
     (define (graphic-new-edit w h)
       (let ((ed (gl-new-edit font-program w h my-width my-height) ))
 	(hashtable-set! all-edit-cache ed  ed)
@@ -324,7 +404,7 @@
 	))
 
     (define (graphic-draw-edit edit x y)
-      (gl-render-edit edit x  (-  my-height y)))
+      (gl-render-edit edit x   y))
 
     (define (graphic-edit-add-text edit text)
       (gl-edit-add-text edit text))
@@ -334,16 +414,13 @@
 
     (define (graphic-edit-set-color edit color)
       (gl-edit-set-color edit color))
-    
-    (define (graphic-new-markup name size)
-      (gl-new-markup name size))
 
     (define graphic-draw-text
       (case-lambda
        [(x y  text)
-	(gl-render-edit-once gtext x (- my-height y) text #xffffff)]
+	(gl-render-edit-once gtext x  y text #xffffffff)]
        [(x y text color)
-	(gl-render-edit-once gtext x (- my-height y) text color)]
+	(gl-render-edit-once gtext x  y text color)]
       ))
 
     (define (graphic-get-font name)
@@ -373,13 +450,13 @@
     (define (graphic-draw-string font size color x y text )
       (let ((ret '()))
 	;;(printf "font=~a\n" font)
-	(gl-render-string font size text x (- (* graphic-ratio my-height) y) cache-dx cache-dy color )
+	(gl-render-string font size text x y cache-dx cache-dy color ) ;;(- (* graphic-ratio my-height) y)
 	(set! ret (list (cffi-get-float cache-dx) (cffi-get-float cache-dy)))
 	ret
 	))
 
     (define (graphic-draw-string-colors font size x y text colors width)
-      (gl-render-string-colors font size  x (- (* graphic-ratio my-height) y) text colors width) )
+      (gl-render-string-colors font size  x y text colors width) ) ;;(- (* graphic-ratio my-height) y)
     
     (define graphic-draw-line
       (case-lambda

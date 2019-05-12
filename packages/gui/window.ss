@@ -14,6 +14,10 @@
    window-post-empty-event
    window-set-fps-pos
    window-add-loop
+   window-loop-one
+   window-set-wait-mode
+   window-set-size
+   window-set-title
    )
 
   (import (scheme)
@@ -31,7 +35,7 @@
   (define fps-x 0.0)
   (define fps-y 0.0)
   (define all-loops (list))
-  
+  (define event-wait-mode #t)
 
   (define fb-width  (cffi-alloc 8) )
   (define fb-height (cffi-alloc 8))
@@ -39,6 +43,12 @@
   (define (window-post-empty-event)
     (glfw-post-empty-event)
     )
+
+  (define (window-set-title window title)
+    (glfw-set-window-title window title))
+  
+  (define (window-set-size window w h)
+    (glfw-set-window-size window w h))
 
   (define (window-set-fps-pos x y)
     (set! fps-x x)
@@ -50,9 +60,12 @@
 
   (define (window-get-mouse-x window)
     mouse-x)
-  
+
   (define (window-get-mouse-y window)
     mouse-y)
+
+  (define (window-set-wait-mode t)
+    (set! event-wait-mode t))
   
   (define (window-get-mouse-pos window)
     (list mouse-x mouse-y))
@@ -110,13 +123,13 @@
 
   (define (collect-thread)
     (if (threaded?)
-	(fork-thread
-	 (lambda ()
-	   (let loop ()
-	     (collect)
-	     (printf "tid=~a\n" (get-thread-id))
-	     (sleep (make-time 'time-duration 0 1))
-	     (loop))))))
+      (fork-thread
+      (lambda ()
+        (let loop ()
+          (collect)
+          (printf "tid=~a\n" (get-thread-id))
+          (sleep (make-time 'time-duration 0 1))
+          (loop))))))
   
   (define (window-create width height title)
     (let ((window '()))
@@ -134,6 +147,9 @@
       (widget-init width height (/  (cffi-get-int fb-width) width) )
       (window-event-init window)
       ;;(collect-thread)
+
+      (glEnable GL_BLEND)
+      (glBlendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA)
       
       window
       ))
@@ -151,6 +167,18 @@
 	    )))
     )
 
+  (define (window-loop-one window)
+    (glClearColor 0.3 0.3 0.32 1.0 )
+    (glClear (+   GL_COLOR_BUFFER_BIT ))
+    (if is-show-fps
+	(graphic-draw-text fps-x fps-y (format "fps=~a\n" (graphic-get-fps) )))
+    (if event-wait-mode
+	(glfw-wait-events)
+	(glfw-poll-events))
+    (widget-render)
+    (window-run-loop)
+    (glfw-swap-buffers window))
+
   (define (window-loop window)
     (glEnable GL_BLEND)
     (glBlendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA)
@@ -161,8 +189,11 @@
 	   (glClear (+   GL_COLOR_BUFFER_BIT ))
 	   (if is-show-fps
 	       (graphic-draw-text fps-x fps-y (format "fps=~a\n" (graphic-get-fps) )))
-	   (glfw-wait-events)
-	   ;;(glfw-poll-events)
+
+	   (if event-wait-mode
+	       (glfw-wait-events)
+	       (glfw-poll-events))
+	   
 	   (widget-render)
 	   (window-run-loop)
 	   
@@ -174,6 +205,4 @@
     (widget-destroy)
     (glfw-destroy-window window);
     (glfw-terminate))
-   
-
   )

@@ -13,22 +13,22 @@
    add-color
    )
   
-  (import (scheme) (utils libutil) (cffi cffi) )
-
+  (import (scheme) (utils libutil) (cffi cffi) (utils macro) )
 
   (define (is-operator c)
     (or (char=? c #\()
-	(char=? c #\))
-	(char=? c #\])
-	(char=? c #\])
-	(char=? c #\()
-	(char=? c #\=)
-	(char=? c #\*)
-	(char=? c #\+)
-	(char=? c #\/)
-	(char=? c #\<)
-	(char=? c #\>)
-	))
+		(char=? c #\))
+		(char=? c #\])
+		(char=? c #\])
+		(char=? c #\()
+		(char=? c #\=)
+		(char=? c #\*)
+		(char=? c #\+)
+		(char=? c #\/)
+		(char=? c #\<)
+		(char=? c #\>)
+		))
+
   (define (is-comment c)
     (char=? c #\;))
 
@@ -37,12 +37,11 @@
 	(= (char->integer c) #x0a)))
 
   (define (is-delimiter c)
-    (or (is-operator c)
-	(is-comment c)
-	(is-nl c)
-	(char=? c #\space)
-	(char=? c #\")
-
+			(or (is-operator c)
+		(is-comment c)
+		(is-nl c)
+		(char=? c #\space)
+		(char=? c #\")
 	))
 
   (define (get-next-token text i)
@@ -50,30 +49,31 @@
 	       (s i)
 	       (c (string-ref text i)))
       (if (< s len)
-	  (if (is-delimiter  c);;end
-	      s
-	      (begin
-		(set! s (+ s 1))
-		(loop len s (string-ref text s) ) ) )
-	  s )
+				(if (is-delimiter  c);;end
+						s
+						(begin
+							(set! s (+ s 1))
+							(loop len s (string-ref text s) ) ) )
+	  	s)
       )
     )
 
   (define (eat-nl text i)
-    (let loop ((len (- (string-length text) 1))
-	       (s i)
-	       (c (string-ref text i))
-	       )
-      (if (< s len)
-	  (if (is-nl c)
-	      (begin
-		(set! s (+ s 1))
-		(loop len s (string-ref text s)))
-	      (begin
-		s)
-	      )
-	  s
-	  )))
+		(if (< i (string-length text) )
+			(let ((ii i)
+						(c (string-ref text i) ))
+				(if (= (char->integer c) #x0d)
+					(begin 
+						(set! ii (+ ii 1))
+						(set! c (string-ref text ii) )
+						(if (and (< ii (string-length text)) (= (char->integer c) #x0a) )
+								(set! ii (+ ii 1)))
+					)
+				)
+				ii
+			)
+			i)
+	)
 
   (define (eat-space text i)
     (let loop ((len (string-length text))
@@ -81,29 +81,29 @@
 	       (c (string-ref text i))
 	       )
       (if (< s len)
-	  (if (equal? #\space c )
-	      (begin
-		(set! s (+ s 1))
-		(loop len s (string-ref text s)))
-	      (begin
-		s)
-	      )
+				(if (equal? #\space c )
+						(begin
+				(set! s (+ s 1))
+				(loop len s (string-ref text s)))
+						(begin
+				s)
+						)
 	  s
 	  )))
   
 
   (define (parse-string text i)
-	(let loop ((len  (string-length text))
-		   (s i)
-		   (c (string-ref text i)))
-	  (if (< s len)
-	      (if (or (equal? #\" c) (equal? #\newline c)  );;end char "
-		  (begin
-		    (+ s   1)
-		    )
-		  (begin
-		    (set! s (+ s 1))
-		    (loop len s (string-ref text s) ) ) )   s ))
+		(let loop ((len  (string-length text))
+				(s i)
+				(c (string-ref text i)))
+			(if (< s len)
+					(if (or (equal? #\" c) (equal? #\newline c)  );;end char "
+				(begin
+					(+ s   1)
+					)
+				(begin
+					(set! s (+ s 1))
+					(loop len s (string-ref text s) ) ) )   s ))
     )
 
   (define (is-number str)
@@ -200,88 +200,107 @@
 
   (define (parse-syntax syntax colored text)
     ;;(cffi-set colored  #xffffffff (string-length text))
+	(try 
+		(if (> (string-length text) 0)
     (let ((keywords (vector-ref syntax 0))
-	  (identifies (vector-ref syntax 1))
-	  (comment-color (get-color syntax 'comment))
-	  (string-color (get-color syntax 'string))
-	  (operator-color (get-color syntax 'operator))
-	  (normal-color (get-color syntax 'normal))
-	  (number-color (get-color syntax 'number))
-	  (keyword-color (get-color syntax 'keyword))
-	  (identify-color (get-color syntax 'identify))
-
-	  )
-      (let loop ((i 0) (len (- (string-length text) 2) ) (c (string-ref text 0)) )
-	(if (< i len)
-	    (begin
-	      (cond
-	       [(is-delimiter c)
-		(cond
-		 [(equal? #\space c)
-		  (let ((ni (eat-space text (+ i 1) )))
-		    (set-color colored i (- ni i) normal-color text)
-		    (set! i ni)
-		    )]
-		 [(equal? #\" c)
-		  (let ((ni (parse-string text (+ i 1)) ))
-		    ;;(printf "string=> ~a\n" (substring text i (parse-string text (+ i 1))))
-		    (set-color colored i (- ni i) string-color text)
-
-		    (set! i ni ))]
-		 [(is-operator c)
-		  (begin
-		    ;;(printf "operator=> ~a\n" c)
-		    (set-color colored i 1 operator-color text) ;;F8F8F2
-		    (set! i (+  i 1))
-		    )]
-		 [(is-comment c)
-		  (let ((ni (parse-comment text (+ i 1))))
-		    ;;(printf "comment=> ~a\n" (substring text i (parse-comment text (+ i 1) )))
-		    (set-color colored  i (- ni i) comment-color text)
-		    (set! i ni)
-		    )]
-		 [(is-nl c);;\n\r
-		  (begin
-		    (set-color colored i 1 normal-color text)
-		    (set! i (eat-nl text (+ i 1)))
-		    )]
-		 [else
-		  ;;(printf "=============================\n")
-		  (set! i (+ i 1))
-		  ]
-		 )
-		]
-	       [else
-		(let* ((ni (get-next-token text i ))
-		       (token (substring text i ni)))
-		  ;;(printf "token=> ~a\n" token)
-		  (cond 
-		   [(is-number token)
-		    ;;(printf "number=> ~a\n" (string->number token))
-		    (set-color colored i (- ni i) number-color text)
-		    ]
-		   [(is-keyword keywords token)
-		    ;;(printf "keyword=> ~a\n"  token)
-		    (set-color colored i (- ni i) keyword-color text)
-		    ]
-		   [(is-identifier identifies token)
-		    ;;(printf "identifier=> ~a\n"  token)
-		    (set-color colored i (- ni i) identify-color text)
-		    ]
-		   [else
-		    ;;(printf "token=> ~a\n" token)
-		    (set-color colored i (- ni i)  normal-color text)
-		    ]
-		   )
-		  (set! i ni ))]
-	       )
-	      ;;(printf "colored ~a\n" colored)
-	      
-	      (if (< i len)
-		  (loop i len (string-ref text i) ))
-	      ))
+				(identifies (vector-ref syntax 1))
+				(comment-color (get-color syntax 'comment))
+				(string-color (get-color syntax 'string))
+				(operator-color (get-color syntax 'operator))
+				(normal-color (get-color syntax 'normal))
+				(number-color (get-color syntax 'number))
+				(keyword-color (get-color syntax 'keyword))
+				(identify-color (get-color syntax 'identify)))
+			(let loop ((i 0) ( index 0) (len (-  (string-length text) 2) ) (c (string-ref text 0)) )
+			(if (< i len)
+				(let ((token-len 0)
+							(text-color '() ))
+					(cond
+					[(is-delimiter c)
+							(cond
+							[(equal? #\space c)
+								(let ((ni (eat-space text (+ i 1) )))
+									(set! token-len (- ni i))
+									(set! text-color  normal-color)
+									)]
+							[(equal? #\" c)
+								(let ((ni (parse-string text (+ i 1)) ))
+									;;(printf "string=> ~a\n" (substring text i (parse-string text (+ i 1))))
+									(set! token-len (- ni i))
+									(set! text-color  string-color)
+								)]
+							[(is-operator c)
+								(begin
+									;;(printf "operator=> ~a\n" c)
+									(set! token-len 1)
+									(set! text-color  operator-color)
+									)]
+							[(is-comment c)
+								(let ((ni (parse-comment text (+ i 1))))
+									;;(printf "comment=> ~a\n" (substring text i (parse-comment text (+ i 1) )))
+									(set! token-len (- ni i) )
+									(set! text-color  comment-color)
+									)]
+							[(is-nl c);;\n\r ignore \n\r
+								(let ((ni (eat-nl text (+ i 1))))
+									;;(printf "newline ~a" c)
+									(set! token-len (- ni i) )
+									)]
+							[else
+								;;(printf "=============================\n")
+								;;(set! index (+ index 1))
+								;;(set! i (+ i 1))
+								(set! token-len 1)
+								(set! text-color  normal-color)
+								]
+							)
+						]
+					[else
+						(let* ((ni (get-next-token text i ))
+									(token (substring text i ni)))
+							;;(printf "token=> ~a\n" token)
+							(cond 
+							[(is-number token)
+								;;(printf "number=> ~a\n" (string->number token))
+								(set! text-color  number-color)
+								]
+							[(is-keyword keywords token)
+								;;(printf "keyword=> ~a\n"  token)
+								(set! text-color  keyword-color)
+								]
+							[(is-identifier identifies token)
+								;;(printf "identifier=> ~a\n"  token)
+								(set! text-color  identify-color)
+								]
+							[else
+								;;(printf "token=> ~a\n" token)
+								(set! text-color  normal-color)
+								]
+							)
+							(set! token-len (- ni i)))
+							]
+					)
+					(if (< i 220)
+						'()
+						;;(printf "index=~a token-len=~a i=~a len=~a ~a color=~x\n" index token-len i len (substring text i (+ i token-len)) text-color)
+						)
+					(if (not (null? text-color))
+						(begin 
+							(set-color colored index token-len text-color text)
+							(set! index (+ index token-len )) 
+							))
+					(set! i (+ i token-len))
+					;;(printf "colored ~a\n" colored)
+					;;(printf "index ~s ~s\n" i index   )
+					(if (< i len)
+						(loop  i index len (string-ref text i) ))
+					))
 	colored
-	)))
+	)
+	))
+	(catch (lambda (x)
+	     (display-condition x) )))
+	)
 
 
   (define (parse-syntax2 syntax text)

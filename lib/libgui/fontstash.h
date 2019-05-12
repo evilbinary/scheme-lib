@@ -18,7 +18,7 @@
 //
 
 #ifdef GLAD
-  #include "glad/glad.h"
+#include "glad/glad.h"
 #else
 
 #include <GLES/gl.h>
@@ -28,7 +28,6 @@
 #include <GLES2/gl2ext.h>
 
 #endif
-
 
 /* @rlyeh: removed STB_TRUETYPE_IMPLENTATION. We link it externally */
 #include "stb_truetype.h"
@@ -46,40 +45,39 @@
 // not enough memory
 #define STH_ENOMEM -4
 
-
 #define HASH_LUT_SIZE 256
 #define MAX_ROWS 128
-#define VERT_COUNT (6*128)
-#define VERT_STRIDE (sizeof(float)*4)
+#define VERT_COUNT (6 * 128)
+#define VERT_STRIDE (sizeof(float) * 4)
 
 #define TTFONT_FILE 1
-#define TTFONT_MEM  2
-#define BMFONT      3
+#define TTFONT_MEM 2
+#define BMFONT 3
 
-
-struct sth_quad
-{
-	float x0,y0,s0,t0;
-	float x1,y1,s1,t1;
+enum sth_flags {
+  FONS_ZERO_TOPLEFT = 1,
+  FONS_ZERO_BOTTOMLEFT = 2,
 };
 
-struct sth_row
-{
-	short x,y,h;
+struct sth_quad {
+  float x0, y0, s0, t0;
+  float x1, y1, s1, t1;
 };
 
-struct sth_glyph
-{
+struct sth_row {
+  short x, y, h;
+};
+
+struct sth_glyph {
   unsigned int codepoint;
   short size;
   struct sth_texture* texture;
-  int x0,y0,x1,y1;
-  float xadv,xoff,yoff;
+  int x0, y0, x1, y1;
+  float xadv, xoff, yoff;
   int next;
 };
 
-struct sth_font
-{
+struct sth_font {
   int idx;
   int type;
   stbtt_fontinfo font;
@@ -93,30 +91,27 @@ struct sth_font
   struct sth_font* next;
 };
 
-struct sth_texture
-{
+struct sth_texture {
   GLuint id;
   // TODO: replace rows with pointer
   struct sth_row rows[MAX_ROWS];
   int nrows;
-  float verts[4*VERT_COUNT];
+  float verts[4 * VERT_COUNT];
   int nverts;
-  float colors[4*VERT_COUNT];
+  float colors[4 * VERT_COUNT];
   struct sth_texture* next;
 };
 
-struct sth_stash
-{
-  int tw,th;
-  float itw,ith;
-  GLubyte *empty_data;
+struct sth_stash {
+  int tw, th;
+  float itw, ith;
+  GLubyte* empty_data;
   struct sth_texture* tt_textures;
   struct sth_texture* bm_textures;
   struct sth_font* fonts;
   int drawing;
+  int flags;
 };
-
-
 
 // Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 // See http://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
@@ -124,55 +119,59 @@ struct sth_stash
 #define UTF8_ACCEPT 0
 #define UTF8_REJECT 1
 
-
 struct sth_stash* sth_create(int cachew, int cacheh);
 
 int sth_add_font(struct sth_stash* stash, const char* path);
 int sth_add_font_from_memory(struct sth_stash* stash, unsigned char* buffer);
 
-int sth_add_bitmap_font(struct sth_stash* stash, int ascent, int descent, int line_gap);
-int sth_add_glyph_for_codepoint(struct sth_stash* stash, int idx, GLuint id, unsigned int codepoint,
-                                short size, short base, int x, int y, int w, int h,
-                                float xoffset, float yoffset, float xadvance);
-int sth_add_glyph_for_char(struct sth_stash* stash, int idx, GLuint id, const char* s,
-                           short size, short base, int x, int y, int w, int h,
-                           float xoffset, float yoffset, float xadvance);
+int sth_add_bitmap_font(struct sth_stash* stash, int ascent, int descent,
+                        int line_gap);
+int sth_add_glyph_for_codepoint(struct sth_stash* stash, int idx, GLuint id,
+                                unsigned int codepoint, short size, short base,
+                                int x, int y, int w, int h, float xoffset,
+                                float yoffset, float xadvance);
+int sth_add_glyph_for_char(struct sth_stash* stash, int idx, GLuint id,
+                           const char* s, short size, short base, int x, int y,
+                           int w, int h, float xoffset, float yoffset,
+                           float xadvance);
 
 void sth_begin_draw(struct sth_stash* stash);
 void sth_end_draw(struct sth_stash* stash);
 
-void sth_draw_text_colors(struct sth_stash* stash,
-			  int idx,
-			  float size,
-			  float x, float y,
-			  float width,float height,
-			  const char* s,
-			  int * colors,
-			  float* dx,float *dy);
+void sth_draw_text_colors(struct sth_stash* stash, int idx, float size, float x,
+                          float y, float width, float height, const char* s,
+                          int* colors, float* dx, float* dy);
 
-void sth_draw_text(struct sth_stash* stash,
-		   int idx, float size,
-		   float x, float y,
-		   float width,
-		   float height,
-		   const char* s,
-		   float r,float g ,float b,float a,
-		   float* dx,float *dy);
+void sth_draw_text(struct sth_stash* stash, int idx, float size, float x,
+                   float y, float width, float height, const char* s, float r,
+                   float g, float b, float a, float* dx, float* dy);
 
-void sth_dim_text(struct sth_stash* stash, int idx, float size, const char* string,
-				  float* minx, float* miny, float* maxx, float* maxy);
+void sth_dim_text(struct sth_stash* stash, int idx, float size,
+                  const char* string, float* minx, float* miny, float* maxx,
+                  float* maxy);
 
-void sth_vmetrics(struct sth_stash* stash,
-				  int idx, float size,
-				  float* ascender, float* descender, float * lineh);
+void sth_vmetrics(struct sth_stash* stash, int idx, float size, float* ascender,
+                  float* descender, float* lineh);
 
 void sth_delete(struct sth_stash* stash);
 
+float sth_get_advace(struct sth_stash* stash, struct sth_font* fnt,
+                     struct sth_glyph* glyph, short isize);
 
-float sth_get_advace(struct sth_stash* stash,struct sth_font* fnt, struct sth_glyph* glyph,short isize);
+unsigned int decutf8(unsigned int* state, unsigned int* codep,
+                     unsigned int byte);
 
-unsigned int decutf8(unsigned int* state, unsigned int* codep, unsigned int byte);
-
-struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt, unsigned int codepoint, short isize);
-
-#endif // FONTSTASH_H
+struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt,
+                            unsigned int codepoint, short isize);
+void flush_draw(struct sth_stash* stash);
+int get_quad(struct sth_stash* stash, struct sth_font* fnt,
+             struct sth_glyph* glyph, short isize, float* x, float* y,
+             struct sth_quad* q);
+float* setv(float* v, float x, float y, float s, float t);
+float* setc(float* v, float r, float g, float b, float a);
+void sth_measure(struct sth_stash* stash, int idx, float size, float width,
+                 char* s, int len, float* dx, float* dy);
+int sth_pos(struct sth_stash* stash, int idx, float size, float width, char* s,
+            int count);
+            
+#endif  // FONTSTASH_H

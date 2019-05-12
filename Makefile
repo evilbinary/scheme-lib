@@ -21,7 +21,6 @@ SOFILES= lib/libscm/libscm$(EXT) \
 		 lib/libnanovg/libnanovg$(EXT)  \
 		 lib/libgui/libgui$(EXT)  \
 		 lib/libvideo/libvideo$(EXT)  \
-		 lib/libfreetype-gl/libfreetype-gl$(EXT)  \
 		 lib/libalut/libalut$(EXT)  \
 		 lib/libsocket/libsocket$(EXT)  \
 		 lib/libc/libc$(EXT) \
@@ -38,7 +37,6 @@ BINFILES=bin/libscm$(EXT) \
 		 bin/libnanovg$(EXT)  \
 		 bin/libgui$(EXT)  \
 		 bin/libvideo$(EXT)  \
-		 bin/libfreetype-gl$(EXT)  \
 		 bin/libsocket$(EXT)  \
 		 bin/libalut$(EXT)  \
 		 bin/libc/libc$(EXT)

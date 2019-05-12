@@ -17,10 +17,10 @@ CXXFLAGS= -Wall -Wformat
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
-	LIBS += 
+	LIBS += -lm -lrt
 	CXXFLAGS += 
 	CXXFLAGS += 
-	CFLAGS += -lm -lrt
+	CFLAGS += 
 	ifeq ($(BITS), 32)
 		PLATFORM=i3le
 	else

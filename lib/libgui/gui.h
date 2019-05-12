@@ -1,14 +1,14 @@
 /**
  * 作者:evilbinary on 12/24/16.
- * 邮箱:rootdebug@163.com 
+ * 邮箱:rootdebug@163.com
  */
 
 #ifndef __DUCK_GUI_H__
 #define __DUCK_GUI_H__
 
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 
 #ifdef GLAD
 #include "glad/glad.h"
@@ -22,105 +22,38 @@
 
 #endif
 
-#include "vec234.h"
 #include "mat4.h"
 #include "utf8-utils.h"
-
+#include "vec234.h"
 
 #include <stdio.h>
-#include <time.h>
 #include <sys/time.h>
+#include <time.h>
 
+#ifndef FONTSTASH_IMPLEMENTATION
 #define FONTSTASH_IMPLEMENTATION
-
 #include "fontstash.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-
-#include "stb_image.h"
-
-
-
-//editor here
+#endif
 
 typedef struct {
-    float x, y, z;
-    float s, t;
-    float r, g, b, a;
-} vertex_t;
-
-
-
-typedef struct _edit_t {
-  char *prompt;
-  char *input;
-  size_t max_input;
-  size_t cursor;
-  size_t cursor_total;
-  size_t cursor_current_row;
-  size_t cursor_current_col;
-  size_t cursor_total_row;
-  float cursor_x;
-  float cursor_y;
-  char* cursor_text;
-  size_t cursor_current_cols;
-  size_t cursor_prev_cols;
-  
-  vec4 bound;
-  vec2 pen;
-  vec2 old_pen;
   int shader;
   mat4 model;
   mat4 view;
   mat4 projection;
-  int editable;
-  int mark_start;
-  int mark_end;
+} mvp_t;
 
+typedef struct {
+  float size;
   struct sth_stash *stash;
+  int id;
+  char *name;
   unsigned char *data;
-  int font;
-  float font_size;
-  int color;
+} font_t;
 
-  float window_width;
-  float window_height;
-
-  void *colors;
-
-} edit_t;
-
-
-typedef struct mvp_t{
-  int shader;
-  mat4 model;
-  mat4 view;
-  mat4 projection;
-}mvp;
-
-typedef struct font_t{
-  int font;
-  struct sth_stash *stash;
-}font;
-
-
-edit_t *gl_new_edit(int shader, float w, float h, float width, float height);
-void gl_resize_edit_window(edit_t *self, float width, float height);
-void gl_edit_set_highlight(edit_t *self,void* colors) ;
-
-font* font_create(char* font_name);
-void calc_cursor(edit_t *self);
-
-void glShaderSource2(GLuint shader,
-                     GLsizei count,
-                     const GLchar *string,
+font_t *font_create(char *font_name);
+void glShaderSource2(GLuint shader, GLsizei count, const GLchar *string,
                      const GLint *length);
 
-void calc_cursor_pos(edit_t *self);
-void gl_edit_cursor_move_left(edit_t *self);
-void gl_edit_cursor_move_right(edit_t *self);
-
-void gl_edit_mouse_event(edit_t * self,int action,float x,float y);
-void gl_edit_key_event(edit_t *self, int key, int scancode, int action, int mods);
-
+void draw_solid_quad(mvp_t *mvp, float x1, float y1, float x2, float y2,
+                     float r, float g, float b, float a);
 #endif

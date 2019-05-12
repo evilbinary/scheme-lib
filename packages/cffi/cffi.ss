@@ -15,7 +15,8 @@
    cffi-set-int
    cffi-set-float
    cffi-set-double
-   
+   cffi-set-long
+
    cffi-get-uchar
    cffi-get-uint
    cffi-get-ulong
@@ -207,7 +208,6 @@
   (define ffi-type-longdouble (ffi-type-longdouble-ptr))
 
 
-
   (define ffi-set-char (foreign-procedure "ffi_set_char" (void* char) void))
   (define ffi-set-int (foreign-procedure "ffi_set_int" (void* int) void))
   (define ffi-set-short (foreign-procedure "ffi_set_short" (void* short) void))
@@ -280,11 +280,11 @@
   (define cffi-free $ffi-free)
   (define cffi-set $ffi-set)
 
-
   (define cffi-set-char ffi-set-char)
   (define cffi-set-int ffi-set-int)
   (define cffi-set-float ffi-set-float)
   (define cffi-set-double ffi-set-double)
+  (define cffi-set-long ffi-set-long)
 
   (define cffi-get-char ffi-get-char)
   (define cffi-get-int ffi-get-int)
@@ -734,14 +734,18 @@
                     ; (set! alloc (ffi-alloc 32) ) 
                     ; (ffi-set-int alloc (car arg) )
                     ; (ffi-values-set cargs i alloc)
-                    1
+                    (void)
                      ]
                   [(string )
+		   ;;(printf "string==>~a ~a\n" (car arg) (eq? (void)  (car arg) ))
 		   (set! alloc (ffi-alloc alloc-list 8) )
+		   ;;(if (eq? (void) (car arg))
+		   ;;   (ffi-set-pointer alloc 0)
 		   (if (string? (car arg))
 		       (ffi-set-string alloc  (car arg))
-			   (ffi-set-pointer alloc  (car arg)))
-                    (ffi-values-set cargs i alloc) ]
+		       (ffi-set-pointer alloc  (car arg)))
+		   (ffi-values-set cargs i alloc)
+		   ]
                   [(void* )
 		   (set! alloc (ffi-alloc alloc-list 8) )
 		   (if (string? (car arg))
@@ -770,17 +774,6 @@
     )
 
 
- 
-   (define-syntax try 
-    (syntax-rules (catch) 
-      ((_ body (catch catcher)) 
-       (call-with-current-continuation 
-	(lambda (exit) 
-	  (with-exception-handler 
-	   (lambda (condition) 
-	     (catcher condition) 
-	     (exit condition)) 
-	   (lambda () body)))))))
 
   ;;ffi call
    (define (cffi-call sym fptr arg-type ret-type args )

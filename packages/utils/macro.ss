@@ -10,7 +10,7 @@
         for
         dotimes
         defun
-        
+        try
          	)
  (import  (scheme))
 
@@ -69,4 +69,15 @@
      (define proc
        (lambda args ...)))))
 
+(define-syntax try 
+  (syntax-rules (catch) 
+    ((_ body (catch catcher)) 
+     (call-with-current-continuation 
+      (lambda (exit) 
+	(with-exception-handler 
+	 (lambda (condition) 
+	   (catcher condition) 
+	   (exit condition)) 
+	 (lambda () body)))))))
+   
 )

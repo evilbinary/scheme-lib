@@ -6,7 +6,7 @@
 
 
 TARGET = libgui.so 
-OBJS = gui.o shader.o mat4.o fontstash.o stb_truetype.o utf8-utils.o
+OBJS = gui.o edit.o shader.o mat4.o fontstash.o stb_truetype.o utf8-utils.o
 PLATFORM=
 BITS =$(shell getconf LONG_BIT)
 

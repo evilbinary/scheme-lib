@@ -503,7 +503,7 @@
   (define (scroll w h)
     (let ((widget (widget-new 0.0 0.0 w h "")))
       (widget-set-attrs widget 'direction  1)
-      (widget-set-attrs widget 'rate  8.1)
+      (widget-set-attrs widget 'rate  50.0)
       (widget-set-attrs widget 'scroll-x  0.0)
       (widget-set-attrs widget 'scroll-y  0.0)
       (widget-set-attrs widget 'scroll-height  0.0)
@@ -604,7 +604,7 @@
 					     offsety ))
 			     (plus-child-y-offset widget offsety)
 			     )))
-		   
+		   (widget-child-rect-event-scroll widget type data)
 		   ;;(printf "(set! offsety 0)=>~a\n" offsety)
 		   ;; (printf "(calc-height widget)=>~a scroll-y=~a offsety=~a\n"
 		   ;; 	   (calc-child-height widget)
@@ -644,30 +644,51 @@
     (let ((widget (widget-new 0.0 0.0 w h text))
 	  (ed (graphic-new-edit w h))
 	  )
-      
       (widget-set-attrs widget '%edit ed)
       (widget-set-attrs
        widget
        (format "%event-~a" %text)
        (lambda (ww text)
-	 (graphic-edit-set-text  (widget-get-attrs ww '%edit) text)
-
-	 (if (equal? #t (widget-get-attrs ww 'syntax-on))
-	     (let ((syntax-cache (widget-get-attrs ww 'syntax-cache))
-		   (syn (widget-get-attrs widget 'syntax))
-		   )
-	       ;;(printf "re render syntax ~a\n" syntax-cache )
-	       (parse-syntax syn syntax-cache text)
-	       ;;(gl-edit-set-highlight ed syntax-cache)
-	       )
-	     )
-	 ))
+	 			(graphic-edit-set-text  (widget-get-attrs ww '%edit) text)
+				(widget-set-attr widget %h (gl-edit-get-height ed))
+				(if (equal? #t (widget-get-attrs ww 'syntax-on))
+						(let ((syntax-cache (gl-edit-get-highlight ed))
+									(syn (widget-get-attrs widget 'syntax))
+						)
+							(printf "re render syntax ~a\n" syntax-cache )
+							(parse-syntax syn syntax-cache (gl-edit-get-text ed))
+							(gl-edit-update-highlight ed)
+							)
+						)
+				))
       
       (widget-set-attrs
        widget
        "%event-color-hook"
        (lambda (ww name color)
 	 (graphic-edit-set-color (widget-get-attrs ww '%edit) color)
+	 ))
+
+	   (widget-set-attrs
+       widget
+       "%event-cursor-color-hook"
+       (lambda (ww name color)
+	 		(gl-edit-set-cursor-color (widget-get-attrs ww '%edit) color)
+	 ))
+
+	(widget-set-attrs
+				widget
+				"%event-font-line-height-hook"
+				(lambda (ww name val)
+				( gl-edit-set-font-line-height (widget-get-attrs ww '%edit) val)
+		))
+	
+
+	  (widget-set-attrs
+       widget
+       "%event-select-color-hook"
+       (lambda (ww name color)
+	 		(gl-edit-set-select-color (widget-get-attrs ww '%edit) color)
 	 ))
 
       (widget-set-attrs
@@ -689,16 +710,24 @@
        widget
        "%event-syntax-on-hook"
        (lambda (ww name val)
-	 (if (equal? #t (widget-get-attrs widget 'syntax-on))
-	     (let ((syntax-cache (cffi-alloc (* 64 (string-length text))))
-		   (syn (widget-get-attrs widget 'syntax)) )
-	       (widget-set-attrs widget 'syntax syn)
-	       (widget-set-attrs widget 'syntax-cache syntax-cache)
-	       (parse-syntax syn syntax-cache text)		
-	       (gl-edit-set-highlight ed syntax-cache)
-	       ))))
+				(if (equal? #t (widget-get-attrs widget 'syntax-on))
+						(let ((syntax-cache (gl-edit-get-highlight ed))
+						(syn (widget-get-attrs widget 'syntax)) )
+							(widget-set-attrs widget 'syntax syn)
+							(widget-set-attrs widget 'syntax-cache syntax-cache)
+							(parse-syntax syn syntax-cache (gl-edit-get-text ed))		
+							(gl-edit-update-highlight ed)
+							))))
+
+			; (widget-set-attrs
+      ;  (widget-get-attr widget %parent)
+      ;  "%event-offsety-hook"
+      ;  (lambda (ww name val)
+			;  		;;(printf "offsety=~a ~a\n" val   (widget-get-attr ww %y ) )
+			; 		(gl-edit-set-scroll ed (widget-get-attr ww %x ) (widget-get-attr ww %y) )
+			; 	))		
       
-      (graphic-edit-add-text ed text)
+      (graphic-edit-set-text ed text)
 
       (widget-set-draw
        widget
@@ -732,17 +761,16 @@
 				  (vector-ref data 1)
 				  (vector-ref data 2)
 				  (vector-ref data 3) )
-	       (if (equal? #t (widget-get-attrs widget 'syntax-on))
-		   (let ((syntax-cache (widget-get-attrs widget 'syntax-cache))
-			 (params '())
-			 (syn (widget-get-attrs widget 'syntax))
-			 )
-		     (set! params (gl-edit-get-text ed))
-		     ;;(printf "re render syntax ~a ~a\n" syntax-cache params)
-		     (parse-syntax syn syntax-cache params)
-		     ;;(gl-edit-set-highlight ed syntax-cache)
-		     )
-		   )
+	      (if (equal? #t (widget-get-attrs widget 'syntax-on))
+					(let ((syntax-cache (gl-edit-get-highlight ed) )
+								(params '())
+								(syn (widget-get-attrs widget 'syntax)) )
+								'()
+								(set! params (gl-edit-get-text ed))
+								;;(printf "re render syntax ~a ~a\n" syntax-cache params)
+								(parse-syntax syn syntax-cache params)
+								(gl-edit-update-highlight ed)
+						))
 	       ))
 	 (if (= type %event-char)
 	     (begin
@@ -752,24 +780,33 @@
 				   (vector-ref data 1)
 				   )
 	       (if (equal? #t (widget-get-attrs widget 'syntax-on))
-		   (let ((syntax-cache (widget-get-attrs widget 'syntax-cache))
+		   (let ((syntax-cache (gl-edit-get-highlight ed) )
 			 (params '())
 			 (syn (widget-get-attrs widget 'syntax))
 			 )
 		     (set! params (gl-edit-get-text ed))
 		     ;;(printf "re render syntax ~a ~a\n" syntax-cache params)
-		     (parse-syntax syn syntax-cache params)
-		     ;;(gl-edit-set-highlight ed syntax-cache)
+		     ;;(parse-syntax syn syntax-cache params)
+		     ;;(gl-edit-update-highlight ed)
 		     )
 		   )
 	       ))
 	 (if (= type %event-motion)
 	     (begin
 	       '()
-	       ;; (gl-edit-mouse-event ed
-	       ;; 			    1
-	       ;; 			    (vector-ref data 0)
-	       ;; 			    (vector-ref data 1))
+	       (gl-edit-mouse-motion-event ed
+	       			    (vector-ref data 0)
+	       			    (vector-ref data 1))
+	       ))
+		(if (= type %event-layout)
+	     (begin
+	       '()
+					;;(printf "event layout\n")
+	       ))
+		(if (= type %event-scroll)
+	     (begin
+	       	;;(printf "event scroll ~a ~a\n" (widget-get-attr widget %x ) (widget-get-attr widget %y))
+					(gl-edit-set-scroll ed (widget-get-attr widget %x ) (widget-get-attr widget %y) )
 	       ))
 	 (if (= type %event-mouse-button )
 	     (begin
@@ -778,7 +815,7 @@
 				    (vector-ref data 3)
 				    (vector-ref data 4))
 	       ;;(printf "button click event ~a ~a ~a\n" type text data)
-	       (draw-widget-child-rect parent widget )
+	       ;;(draw-widget-child-rect parent widget )
 	       ))
 	 ))
       

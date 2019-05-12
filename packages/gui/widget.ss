@@ -54,6 +54,7 @@
    is-in-child-widget
    widget-child-rect-event-mouse-button
    widget-child-rect-event-mouse-motion
+	 widget-child-rect-key-event
    widget-child-key-event
    widget-get-parent-cond
    in-rect
@@ -71,6 +72,7 @@
    %event
    %event-char
    %event-scroll
+	 %event-layout
    %child
    %status
    %visible
@@ -146,7 +148,7 @@
   (define %event-mouse-button 3)
   (define %event-motion 1)
   (define %event-resize 6)
-
+ 	(define %event-layout 7)
 
   (define cursor-x 0)
   (define cursor-y 0)
@@ -163,7 +165,6 @@
 			 %y
 			 (- (vector-ref (car child) %y)
 			    offsety))
-	    
 	    (loop (cdr child)))
 	  )))
   
@@ -317,6 +318,10 @@
 	    ((vector-ref (car child) %event) (car child) widget  type data)
 	    (loop (cdr child)))
 	  )))
+
+	(define (widget-child-rect-key-event widget type data)
+		'()
+	)
   
   (define (widget-child-rect-event widget type data)
     (let* ((lmx (vector-ref data 3))
@@ -354,34 +359,20 @@
   (define widget-set-edit-font
     (case-lambda
      [(widget name size)
-      (let ((ed (widget-get-attrs widget '%edit))
-	    (markup  (graphic-new-markup name size)))
-	(gl-edit-set-markup ed markup 0)
-	(gl-free-markup markup))
+      (let ((ed (widget-get-attrs widget '%edit)))
+			(gl-edit-set-font-name ed name)
+			(gl-edit-set-font-size ed size))
       ]
      [(widget size)
-      (let ((ed (widget-get-attrs widget '%edit) )
-	    (markup  (graphic-new-markup "Roboto-Regular.ttf" size)))
-	(gl-edit-set-markup ed markup 0)
-	(gl-free-markup markup))
+      (let ((ed (widget-get-attrs widget '%edit) ))
+				(gl-edit-set-font-size ed size))
       ]
-     [(widget size r g b a)
-      (let ((ed (widget-get-attrs widget '%edit) )
-	    (markup  (graphic-new-markup "Roboto-Regular.ttf" size)))
-	(gl-markup-set-foreground markup r g b a)
-	(gl-edit-set-markup ed markup 0)
-	;;(graphic-edit-add-text ed "hahah")
-	(gl-free-markup markup)
-	)
+     [(widget name size color)
+      (let ((ed (widget-get-attrs widget '%edit) ))
+				(gl-edit-set-font-name ed name)
+				(gl-edit-set-foreground ed color)
+				(gl-edit-set-font-size ed size))
       ]
-     [(widget name size r g b a)
-      (let ((ed (widget-get-attrs widget '%edit) )
-	    (markup  (graphic-new-markup name size)))
-	(gl-markup-set-foreground markup r g b a)
-	(gl-edit-set-markup ed markup 0)
-	(gl-free-markup markup))
-      ]
-
      ))
 
   (define (widget-child-rect-event-scroll widget type data)
@@ -612,7 +603,11 @@
 			       ;;(printf "event scroll\n")
 			       (widget-child-rect-event-scroll widget type data)
 			       ))
-			 
+			 (if (= type %event-layout)
+			     (begin
+			       ;;(printf "event layout\n")
+			       (widget-child-rect-event-layout widget type data)
+			       ))
 			 (if (and (or (= type %event-char) (= type %event-key)) ;;key press
 				  (=  (vector-ref widget %status) %status-active) ) ;;widget is active
 			     (begin
@@ -775,7 +770,7 @@
 		(loop  (- len 1))))
 	  )))
 
-    (define (widget-mouse-button-event data )
+  (define (widget-mouse-button-event data )
     (let l ((w $widgets))
       (if (pair? w)
 	  (begin
@@ -1042,21 +1037,40 @@
 	  last
 	  )))
 
+	(define (widget-layout-event widget)
+		((vector-ref widget %event) widget '() %event-layout 'end ))
+
+  (define (widget-child-rect-event-layout widget type data)
+   (let loop ((child (vector-ref widget %child)))
+		(if (pair? child)
+	    (begin
+	      (if (and (widget-is-in-widget widget (car child));;在父亲矩形内
+		       )
+		  	(begin
+		    ;;(printf "is in-widget laoyt ~a\n" data)
+		    ((vector-ref (car child) %event) (car child)  widget type data )))
+	      (loop (cdr child)))
+	    )))
+			
   (define (widget-layout-update widget)
     (if (not (null? widget))
 	(let ((layout (widget-get-attr widget %layout)))
 	  (if (procedure? layout)
-	      (layout widget))))
+				(begin 
+	      	(layout widget)
+					(widget-layout-event widget)
+					 ))))
     )
-
-
 
   (define (widget-layout)
     (let loop ((w $widgets))
       (if (pair? w)
 	  (let ((layout (vector-ref (car w) %layout)))
 	    (if (procedure? layout)
-		(layout (car w) ))
+				(begin 
+					(layout (car w) )
+					(widget-layout-event (car w))
+					))
 	    (loop (cdr w))))))
 
   (define (widget-destroy)

@@ -15,6 +15,7 @@
    
    %match-parent
    %wrap-conent
+	 %fill-rest
    )
   (import (scheme)
 	  (utils libutil)
@@ -23,7 +24,7 @@
 
   (define %match-parent -1.0)
   (define %wrap-conent 0)
-
+	(define %fill-rest -2.0)
   ;;layout
   (define (grid-layout row col )
     (lambda (widget row col)
@@ -254,26 +255,52 @@
 		(process-match-parent (car c))
 		(vector-set! (car c) %x (+ sx (vector-ref (car c) %margin-left)))
 		(vector-set! (car c) %y (+ sy (vector-ref (car c) %margin-top)))
+
+		;;(printf "\n~a width=~a sx=~a\n"  (substring  (vector-ref (car c) %text)  0  2)   (vector-ref (car c) %w)  sx)
+		(if (= %fill-rest (widget-get-attrs  (car c) '%w ))
+					(begin
+						;;(printf "fill rest sx=~a  ~a,~a  ~a\n"  sx (vector-ref (car c)  %x) (vector-ref (car c)  %y) (- w sx right ) )
+						(vector-set! (car c) %w (- w sx right
+													(vector-ref (car c) %margin-right)
+													(vector-ref (car c) %margin-left) ))
+													))
+
 		(if (pair? (cdr c))
-		    (set! ww (vector-ref (car (cdr c)) %w)))
-		
- 		(if (> (+ sx (vector-ref (car c) %w) ww ) (- w right
-							     (vector-ref (car c) %margin-right)
-							     (vector-ref (car c) %margin-left) ) )
-		    (begin
-		      (set! sx left)
-		      (set! sy (+ sy (vector-ref (car c) %h)
-				  ;;(vector-ref (car c) %margin-top)
-				  (vector-ref (car c) %margin-bottom)
-				  ))
-		      )
-		    (begin
-		      (set! sx (+ sx (vector-ref (car c) %w)
-				  (vector-ref (car c) %margin-left)
-				  (vector-ref (car c) %margin-right)
-				  ))
-		      )
-		    )
+			(begin 
+					(if (= %fill-rest (widget-get-attrs  (car (cdr c)) '%w ))
+						(begin
+									; (vector-set! (car (cdr c)) %w (- w sx right
+									; 							(vector-ref (car (cdr c)) %margin-right)
+									; 							(vector-ref (car (cdr c)) %margin-left) ))
+									;;(set! sx (+ sx (vector-ref (car c) %w)))
+									;;(printf "sx========>~a\n" sx )
+									(set! ww 0)
+													)					
+				(set! ww (vector-ref (car (cdr c)) %w)) )
+				))
+									
+		(if (> (+ sx (vector-ref (car c) %w) ww ) (- w right
+									(vector-ref (car c) %margin-right)
+									(vector-ref (car c) %margin-left) ) )
+				(begin
+					;;(printf ">>>>>>>>>>>>>>>>> ~a\n" sx )
+					(set! sx left)
+					(set! sy (+ sy (vector-ref (car c) %h)
+					;;(vector-ref (car c) %margin-top)
+					(vector-ref (car c) %margin-bottom)
+					))
+					)
+				(begin
+					;;(printf "<<<<<<<<<<<<<< ~a\n" sx )
+					(set! sx (+ sx (vector-ref (car c) %w)
+					(vector-ref (car c) %margin-left)
+					(vector-ref (car c) %margin-right)
+					))
+					)
+				)	
+
+			
+
 		(if (procedure? (vector-ref (car c) %layout))
 		    ((vector-ref (car c) %layout) (car c)))
 		(loop (cdr c) sx sy ww )

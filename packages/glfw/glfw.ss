@@ -582,6 +582,8 @@
  glad-load-gl-loader
  glad-load-gles2-loader
  glad-load-gles1-loader
+ glfw-set-window-size
+ glfw-set-window-title
 
  )	
 
@@ -1131,11 +1133,17 @@
   (define glfw-window-hint 
     (foreign-procedure "glfwWindowHint" (int int) void ))
 
+  (define glfw-set-window-size
+    (foreign-procedure "glfwSetWindowSize" (void* int int) void))
+  (define glfw-set-window-title
+    (foreign-procedure "glfwSetWindowTitle" (void* string) void))
+   
   (define glfw-create-window 
     (foreign-procedure "glfwCreateWindow" (int int string void* void* ) void* ))
   (define glfw-terminate 
     (foreign-procedure "glfwTerminate" () void ))
 
+  
   (define $glfw-set-key-callback
     (foreign-procedure "glfwSetKeyCallback" (void* void*) void* ))
 

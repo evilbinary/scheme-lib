@@ -14,7 +14,7 @@
    calc-all-child-line-height
    
    %match-parent
-   %wrap-conent
+   %wrap-content
 	 %fill-rest
    )
   (import (scheme)
@@ -23,7 +23,7 @@
 	  (cffi cffi))
 
   (define %match-parent -1.0)
-  (define %wrap-conent 0)
+  (define %wrap-content 0)
 	(define %fill-rest -2.0)
   ;;layout
   (define (grid-layout row col )
@@ -362,11 +362,11 @@
     (let loop ((child (vector-ref widget %child))
 	       (height 0.0))
       (if (pair? child)
-	  (begin
-	    (if (= (widget-get-attr (car child) %status) 1)
-		(set! height (+ height (vector-ref (car child) %h  ))))
-	    (loop (cdr child) height ))
-	  height)))
-  
+				(begin
+					;;(printf "child h ~a\n"  (widget-get-attr (car child) %h) )
+					(if (= (widget-get-attr (car child) %status) 1)
+						(set! height (+ height (vector-ref (car child) %h  ))))
+					(loop (cdr child) height ))
+				height)))
   
 )

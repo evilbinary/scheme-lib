@@ -15,10 +15,37 @@ mvp_t* mvp_create(int shader, int width, int height) {
   mat4_set_identity(&self->projection);
   mat4_set_identity(&self->model);
   mat4_set_identity(&self->view);
-  // mat4_set_orthographic( &self->projection, 0, width*2,height*2,0,-1,1);
-  mat4_set_orthographic(&self->projection, 0, width * 2, 0, height * 2, -1, 1);
-
+  mat4_set_orthographic(&self->projection, 0, width, height, 0, -1, 1);
+  // mat4_set_orthographic(&self->projection, 0, width * 2, 0, height * 2, -1,
+  // 1);
   return self;
+}
+void mvp_set_orthographic(mvp_t* self, float left, float right, float bottom,
+                          float top, float znear, float zfar) {
+  glUseProgram(self->shader);                        
+  mat4_set_orthographic(&self->projection, left, right, bottom, top, znear,
+                        zfar);
+  mvp_set_mvp(self);
+}
+
+void mvp_set_shader(mvp_t* self, int shader) { self->shader = shader; }
+
+mat4* mvp_get_projection(mvp_t* self) { return &self->projection; }
+
+mat4* mvp_get_model(mvp_t* self) { return &self->model; }
+
+mat4* mvp_get_view(mvp_t* self) { return &self->view; }
+
+int mvp_get_shader(mvp_t* self) { return &self->shader; }
+
+void mvp_set_mvp(mvp_t* mvp) {
+  // glUniform1i(glGetUniformLocation(mvp->shader, "texture"), 0);
+  glUniformMatrix4fv(glGetUniformLocation(mvp->shader, "model"), 1, 0,
+                     mvp->model.data);
+  glUniformMatrix4fv(glGetUniformLocation(mvp->shader, "view"), 1, 0,
+                     mvp->view.data);
+  glUniformMatrix4fv(glGetUniformLocation(mvp->shader, "projection"), 1, 0,
+                     mvp->projection.data);
 }
 
 font_t* font_create(char* font_name) {
@@ -64,11 +91,11 @@ void draw_solid_quad(mvp_t* mvp, float x1, float y1, float x2, float y2,
                      float r, float g, float b, float a) {
   glUseProgram(mvp->shader);
   {
-    glActiveTexture(GL_TEXTURE0);
-    //glEnable(GL_BLEND);
+    // glActiveTexture(GL_TEXTURE0);
+    // glEnable(GL_BLEND);
     // glBindTexture(GL_TEXTURE_2D, mvp->shader);
-    //glDisable(GL_TEXTURE_2D);
-    //glEnable(GL_TEXTURE_2D);
+    // glDisable(GL_TEXTURE_2D);
+    // glEnable(GL_TEXTURE_2D);
     glUniform1i(glGetUniformLocation(mvp->shader, "texture"), 0);
     glUniformMatrix4fv(glGetUniformLocation(mvp->shader, "model"), 1, 0,
                        mvp->model.data);

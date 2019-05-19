@@ -56,4 +56,7 @@ void glShaderSource2(GLuint shader, GLsizei count, const GLchar *string,
 
 void draw_solid_quad(mvp_t *mvp, float x1, float y1, float x2, float y2,
                      float r, float g, float b, float a);
+void mvp_set_orthographic(mvp_t *self, float left, float right, float bottom,
+                          float top, float znear, float zfar);
+void mvp_set_mvp(mvp_t *mvp);
 #endif

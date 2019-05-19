@@ -266,7 +266,7 @@ void buffer_delete_text(buffer_t *buffer, int row_start, int col_start,
     is_swap = 1;
   }
 
-  for (int i = row_start; i <= row_end; i++) {
+  for (int i = row_end; i >= row_start; i--) {
     line_t *line = buffer->lines[i];
     int start = 0;
     int end = line->count;
@@ -285,16 +285,18 @@ void buffer_delete_text(buffer_t *buffer, int row_start, int col_start,
         end = col_end;
       }
     }
-    if (i == row_start || i == row_end) {
+    if (row_start == 0 && row_end == line->count) {
+      buffer_delete_line(buffer, i);
+    } else if (i == row_start || i == row_end) {
       if (start > end) {
         int temp = start;
         start = end;
         end = temp;
       }
-      printf("buffer_delete_line_text %d %d,%d\n", i, start, end);
+      // printf("buffer_delete_line_text %d %d,%d\n", i, start, end);
       buffer_delete_line_text(buffer, i, start, end);
     } else {
-      printf("buffer_delete_line %d\n", i);
+      // printf("buffer_delete_line %d\n", i);
       buffer_delete_line(buffer, i);
     }
   }
@@ -397,8 +399,7 @@ void gl_render_line(line_t *line, float *sx, float *sy) {
   }
   if (line->colors != NULL) {
     sth_draw_text_colors(font->stash, font->id, font->size, line->sx, line->sy,
-                         line->width * 2, -1, line->texts, line->colors, &dx,
-                         &dy);
+                         line->width, -1, line->texts, line->colors, &dx, &dy);
   } else {
     uint32_t color = 0xffffffff;
     if (line->color != NULL) {
@@ -409,7 +410,7 @@ void gl_render_line(line_t *line, float *sx, float *sy) {
     float r = (color >> 16 & 0xff) / 255.0;
     float a = (color >> 24 & 0xff) / 255.0;
     sth_draw_text(font->stash, font->id, font->size, line->sx, line->sy,
-                  line->width * 2, -1, line->texts, r, g, b, a, &dx, &dy);
+                  line->width, -1, line->texts, r, g, b, a, &dx, &dy);
   }
   line->height = dy - line->sy;
   *sy += line->height;
@@ -450,8 +451,8 @@ void gl_render_edit_once(edit_t *self, float x, float y, char *text,
                          int color) {
   gl_set_edit_text(self, text);
   if (self->status == UPDATED) {
-    self->bound.left = x * 2;
-    self->bound.top = y * 2;
+    self->bound.left = x * self->scale;
+    self->bound.top = y * self->scale;
     gl_render_selection(self);
     gl_render_params(self, &color);
     if (self->editable == 1) {
@@ -462,8 +463,8 @@ void gl_render_edit_once(edit_t *self, float x, float y, char *text,
 
 void gl_render_edit(edit_t *self, float x, float y) {
   if (self == NULL) return;
-  self->bound.left = x * 2;
-  self->bound.top = y * 2;
+  self->bound.left = x * self->scale;
+  self->bound.top = y * self->scale;
   if (self->status == UPDATED) {
     gl_render_selection(self);
     gl_render_params(self, NULL);
@@ -563,7 +564,7 @@ void gl_edit_mouse_event(edit_t *self, int action, float x, float y) {
     self->select_end[1] = self->buffer->cursor_col;
     printf("start %d,%d end %d,%d\n", self->select_start[0],
            self->select_start[1], self->select_end[0], self->select_end[1]);
-    printf("gl_get_selection %s\n", gl_get_selection(self));
+    // printf("gl_get_selection %s\n", gl_get_selection(self));
   }
   self->select_press = action;
 }
@@ -581,11 +582,14 @@ void reset_delete_selection(edit_t *self) {
   if (self->select_start[0] > self->select_end[0]) {
     start_row = self->select_end[0];
     start_col = self->select_end[1];
+    self->select_start[0] = start_row;
+    self->select_start[1] = start_col;
+  } else {
+    self->select_end[0] = start_row;
+    self->select_end[1] = start_col;
   }
   self->buffer->cursor_row = start_row;
   self->buffer->cursor_col = start_col;
-  self->select_end[0] = start_row;
-  self->select_end[1] = start_col;
 }
 
 void gl_render_line_selected(mvp_t *mvp, line_t *line, int start, int end,
@@ -796,11 +800,8 @@ void gl_edit_key_event(edit_t *self, int key, int scancode, int action,
       update_cursor_pos(buffer);
     } else if (key == 259) {  // backspace
       if (gl_edit_get_selection_length(self) > 1) {
-        printf("gl_edit_get_selection_length %d\n",
-               gl_edit_get_selection_length(self));
         buffer_delete_text(buffer, self->select_start[0], self->select_start[1],
                            self->select_end[0], self->select_end[1]);
-
         reset_delete_selection(self);
       } else {
         if (buffer->cursor_col <= 0 && buffer->cursor_row > 0) {
@@ -878,7 +879,8 @@ void pos_to_cursor(buffer_t *buffer, float x, float y) {
   float dy = 0;
   int row = 0;
   for (int i = 0; i < buffer->line_count; i++) {
-    if (y * 2.0 >= dy && y * 2.0 < (dy + buffer->lines[i]->height)) {
+    if (y * buffer->scale >= dy &&
+        y * buffer->scale < (dy + buffer->lines[i]->height)) {
       break;
     }
     row++;
@@ -886,7 +888,7 @@ void pos_to_cursor(buffer_t *buffer, float x, float y) {
   }
   if (row >= buffer->line_count) return;
   font_t *font = buffer->font;
-  int col = sth_pos(font->stash, font->id, font->size, x * 2,
+  int col = sth_pos(font->stash, font->id, font->size, x * buffer->scale,
                     buffer->lines[row]->texts, buffer->lines[row]->count);
 
   // printf("row is %d col is %d  text=%s\n", row, col,
@@ -945,9 +947,9 @@ edit_t *gl_new_edit(int shader, float w, float h, float width, float height) {
   self->select_start[1] = 0;
   self->select_end[0] = 0;
   self->select_end[1] = 0;
-
-  self->bound.width = w * 2;
-  self->bound.height = h * 2;
+  self->scale = 2;
+  self->bound.width = w * self->scale;
+  self->bound.height = h * self->scale;
   self->bound.left = 0;
   self->bound.top = 0;
   self->window_width = width;
@@ -960,6 +962,7 @@ edit_t *gl_new_edit(int shader, float w, float h, float width, float height) {
   self->buffer->font = self->font;
   self->buffer->width = self->bound.width;
   self->buffer->color = &self->color;
+  self->buffer->scale = self->scale;
 
   update_cursor_pos(self->buffer);
 
@@ -967,14 +970,16 @@ edit_t *gl_new_edit(int shader, float w, float h, float width, float height) {
   mat4_set_identity(&self->mvp.projection);
   mat4_set_identity(&self->mvp.model);
   mat4_set_identity(&self->mvp.view);
-  mat4_set_orthographic(&self->mvp.projection, 0, width * 2, height * 2, 0, -1,
-                        1);
+  mat4_set_orthographic(&self->mvp.projection, 0, width * self->scale,
+                        height * self->scale, 0, -1, 1);
   return self;
 }
 
 void gl_resize_edit_window(edit_t *self, float width, float height) {
-  mat4_set_orthographic(&self->mvp.projection, 0, width * 2, height * 2, 0, -1,
-                        1);
+  glUseProgram(self->mvp.shader);
+  mat4_set_orthographic(&self->mvp.projection, 0, width * self->scale,
+                        height * self->scale, 0, -1, 1);
+  mvp_set_mvp(&self->mvp);
 }
 
 void gl_add_edit_text(edit_t *self, char *text) {

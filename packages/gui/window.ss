@@ -39,6 +39,7 @@
 
   (define fb-width  (cffi-alloc 8) )
   (define fb-height (cffi-alloc 8))
+  (define ratio 1)
 
   (define (window-post-empty-event)
     (glfw-post-empty-event)
@@ -110,9 +111,10 @@
     (glfw-set-window-size-callback
      window
      (lambda (w width height)
+       (glViewport 0 0 (* width ratio) (* height ratio))
+       (widget-window-resize width height)
        (glClearColor 0.3 0.3 0.32 1.0 )
        (glClear (+   GL_COLOR_BUFFER_BIT ))
-       (widget-window-resize width height)
        (widget-render)
        (glfw-swap-buffers window)
        ;;(printf "resize ~a ~a\n" width height)
@@ -143,7 +145,7 @@
       (glfw-get-framebuffer-size window fb-width fb-height)
       (printf "~a ,~a ~a,~a\n" (cffi-get-int fb-width) (cffi-get-int fb-height) width height)
       (glfw-swap-interval 1)
-      
+      (set! ratio  (/ (cffi-get-int fb-width) width) )
       (widget-init width height (/  (cffi-get-int fb-width) width) )
       (window-event-init window)
       ;;(collect-thread)

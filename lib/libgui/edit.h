@@ -47,7 +47,7 @@ typedef struct {
   float cursor_y;
   float width;
   float height;
-
+  int scale;
   // history_t * history;
   // history_t * last_save_history;
 } buffer_t;
@@ -87,6 +87,7 @@ typedef struct _edit_t {
 
   void *colors;
   int colors_avail;
+  int scale;
 
 } edit_t;
 

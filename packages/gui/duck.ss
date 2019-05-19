@@ -511,13 +511,13 @@
       (widget-set-layout
        widget
        (lambda (widget . args)
-	 (flow-layout widget)
-	 (widget-set-attrs widget 'scroll-height
-		      (calc-child-height widget))
-	 ;;(printf "all child height ~a\n" (calc-child-height widget))
-	 ;;(printf "widget ~a,~a\n" (widget-get-attr widget %w)  (widget-get-attr widget %h))
-	 (widget-set-attrs widget 'scroll-y 0.0)
-	 ))
+				(flow-layout widget)
+				(widget-set-attrs widget 'scroll-height
+								(calc-child-height widget))
+				;;(printf "all child height ~a\n" (calc-child-height widget))
+				;;(printf "widget ~a,~a\n" (widget-get-attr widget %w)  (widget-get-attr widget %h))
+				(widget-set-attrs widget 'scroll-y 0.0)
+	 			))
       (widget-set-draw
        widget
        (lambda (widget parent);;draw
@@ -578,59 +578,59 @@
 	 (begin
 	   (if (= type %event-scroll)
 	       (begin
-		 ;;(printf "event scroll ~a\n" type)
-		 (widget-set-attrs widget 'scroll-height
-			      (calc-child-height widget))
+					;;(printf "event scroll ~a\n" type)
+					(widget-set-attrs widget 'scroll-height
+									(calc-child-height widget))
 
-		 (let ((offsety (* -1.0 (widget-get-attrs widget 'rate)
-				   (vector-ref data 1))))
+					(let ((offsety (* -1.0 (widget-get-attrs widget 'rate)
+								(vector-ref data 1))))
 
-		   ;;over top
-		   (if (< (+ (widget-get-attrs widget 'scroll-y) offsety) 0)
-		       (begin
-			 (set! offsety 0.0)
-			 (widget-layout-update widget);;may change
-			 (widget-set-attrs widget 'scroll-y 0.0)
-			 )
-		       ;;over height
-		       (if (> (+ (widget-get-attrs widget 'scroll-y) offsety) (widget-get-attrs widget 'scroll-height)  )
-			   (begin
-			     (set! offsety 0.0)
-			     (widget-set-attrs widget 'scroll-y (widget-get-attrs widget 'scroll-height))
-			     )
-			   (begin
-			     (widget-set-attrs widget 'scroll-y
-					  (+ (widget-get-attrs widget 'scroll-y)
-					     offsety ))
-			     (plus-child-y-offset widget offsety)
-			     )))
-		   (widget-child-rect-event-scroll widget type data)
-		   ;;(printf "(set! offsety 0)=>~a\n" offsety)
-		   ;; (printf "(calc-height widget)=>~a scroll-y=~a offsety=~a\n"
-		   ;; 	   (calc-child-height widget)
-		   ;; 	   (vector-ref widget %scroll-y)
-		   ;; 	   offsety
-		   ;; 	   )
-		   ))	)
+						;;over top
+						(if (< (+ (widget-get-attrs widget 'scroll-y) offsety) 0)
+								(begin
+						(set! offsety 0.0)
+						(widget-layout-update widget);;may change
+						(widget-set-attrs widget 'scroll-y 0.0)
+						)
+								;;over height
+								(if (> (+ (widget-get-attrs widget 'scroll-y) offsety) (widget-get-attrs widget 'scroll-height)  )
+							(begin
+								(set! offsety 0.0)
+								(widget-set-attrs widget 'scroll-y (widget-get-attrs widget 'scroll-height))
+								)
+							(begin
+								(widget-set-attrs widget 'scroll-y
+									(+ (widget-get-attrs widget 'scroll-y)
+										offsety ))
+								(plus-child-y-offset widget offsety)
+								)))
+						(widget-child-rect-event-scroll widget type data)
+						;;(printf "(set! offsety 0)=>~a\n" offsety)
+						; (printf "(calc-height widget)=>~a scroll-y=~a offsety=~a\n"
+						; 	   (calc-child-height widget)
+						; 	   (widget-get-attrs widget 'scroll-y)
+						; 	   offsety
+						; 	   )
+						)))
 	   (if (= type %event-mouse-button)
-	       (begin
-		 (widget-child-rect-event-mouse-button widget type data)
-		 ;;(printf "scroll click event ~a ~a ~a\n" type text data)
-		 ;;(draw-widget-child-rect parent widget )
+	     (begin
+				(widget-child-rect-event-mouse-button widget type data)
+				;;(printf "scroll click event ~a ~a ~a\n" type text data)
+				;;(draw-widget-child-rect parent widget )
 		 ))
 	   (if (= type %event-key)
-	       (begin
-		 ;;(printf "scroll key event ~a ~a\n" type data)
-		 (widget-child-key-event widget type data)
-		 ;;(draw-widget-child-rect parent widget )
+	    (begin
+		 		;;(printf "scroll key event ~a ~a\n" type data)
+		 		(widget-child-key-event widget type data)
+		 		;;(draw-widget-child-rect parent widget )
 		 ))
 	   (if (= type %event-char)
-	       (begin
-		 (widget-child-key-event widget type data)
+	    (begin
+		 		(widget-child-key-event widget type data)
 		 ))
 	   (if (= type %event-motion)
-	       (begin
-		  (widget-child-rect-event-mouse-motion widget type data)
+	      (begin
+		  		(widget-child-rect-event-mouse-motion widget type data)
 		 ;;(printf "motion ~a ~a\n" type data)
 		 ))
 	   )
@@ -651,10 +651,12 @@
        (lambda (ww text)
 	 			(graphic-edit-set-text  (widget-get-attrs ww '%edit) text)
 				(widget-set-attr widget %h (gl-edit-get-height ed))
+				;;(printf "event ====> ~a ~a\n" (format "%event-~a" %text) (widget-get-attr widget %h) )
+				(widget-layout-event widget)
 				(if (equal? #t (widget-get-attrs ww 'syntax-on))
 						(let ((syntax-cache (gl-edit-get-highlight ed))
 									(syn (widget-get-attrs widget 'syntax))
-						)
+						)	
 							(printf "re render syntax ~a\n" syntax-cache )
 							(parse-syntax syn syntax-cache (gl-edit-get-text ed))
 							(gl-edit-update-highlight ed)
@@ -666,44 +668,47 @@
        widget
        "%event-color-hook"
        (lambda (ww name color)
-	 (graphic-edit-set-color (widget-get-attrs ww '%edit) color)
-	 ))
+	 			(graphic-edit-set-color (widget-get-attrs ww '%edit) color)
+	 			))
 
 	   (widget-set-attrs
        widget
        "%event-cursor-color-hook"
        (lambda (ww name color)
-	 		(gl-edit-set-cursor-color (widget-get-attrs ww '%edit) color)
-	 ))
+	 			(gl-edit-set-cursor-color (widget-get-attrs ww '%edit) color)
+	 		))
 
-	(widget-set-attrs
+			(widget-set-attrs
 				widget
 				"%event-font-line-height-hook"
 				(lambda (ww name val)
-				( gl-edit-set-font-line-height (widget-get-attrs ww '%edit) val)
-		))
+					( gl-edit-set-font-line-height (widget-get-attrs ww '%edit) val)
+					(widget-layout-event widget)
+				))
 	
 
-	  (widget-set-attrs
-       widget
-       "%event-select-color-hook"
-       (lambda (ww name color)
-	 		(gl-edit-set-select-color (widget-get-attrs ww '%edit) color)
-	 ))
+			(widget-set-attrs
+				widget
+				"%event-select-color-hook"
+					(lambda (ww name color)
+					(gl-edit-set-select-color (widget-get-attrs ww '%edit) color)
+				))
 
       (widget-set-attrs
        widget
        "%event-font-hook"
-       (lambda (ww name value)
-	 (gl-edit-set-font (widget-get-attrs ww '%edit) value -1)
-	 ))
+       (lambda (ww name value) 
+				(gl-edit-set-font (widget-get-attrs ww '%edit) value -1)
+				(widget-layout-event widget)
+	 			))
 
        (widget-set-attrs
        widget
        "%event-font-size-hook"
        (lambda (ww name value)
-	 (gl-edit-set-font (widget-get-attrs ww '%edit) 0 value)
-	 ))
+	 			(gl-edit-set-font (widget-get-attrs ww '%edit) 0 value)
+				(widget-layout-event widget)
+	 			))
 
 
       (widget-set-attrs
@@ -715,8 +720,9 @@
 						(syn (widget-get-attrs widget 'syntax)) )
 							(widget-set-attrs widget 'syntax syn)
 							(widget-set-attrs widget 'syntax-cache syntax-cache)
-							(parse-syntax syn syntax-cache (gl-edit-get-text ed))		
+							(parse-syntax syn syntax-cache (gl-edit-get-text ed))	
 							(gl-edit-update-highlight ed)
+							(widget-set-attr widget %h (gl-edit-get-height ed))
 							))))
 
 			; (widget-set-attrs
@@ -739,85 +745,89 @@
 	       (ww  (vector-ref  widget %w))
 	       (hh  (vector-ref  widget %h))
 	       )
-	   (vector-set! widget %gx gx)
-	   (vector-set! widget %gy gy)
+					(vector-set! widget %gx gx)
+					(vector-set! widget %gy gy)
 
-	   (if (equal? '() background)
-	       '()
-	       (draw-panel gx gy ww hh '() background))
-	   
-	   (graphic-draw-edit ed gx gy)
-	   )))
+					(if (equal? '() background)
+							'()
+							(draw-panel gx gy ww hh '() background))
+					
+					(graphic-draw-edit ed gx gy)
+					)))
       
       (widget-set-event
        widget
        (lambda (widget parent type data);;event
-	 ;;(printf ">>>>>>>event ~a ~a\n" type data)
-	 (if (= type %event-key)
-	     (begin
-	       ;;(printf "edit key event ~a ~a\n" type data )
-	       (gl-edit-key-event ed
-				  (vector-ref data 0)
-				  (vector-ref data 1)
-				  (vector-ref data 2)
-				  (vector-ref data 3) )
-	      (if (equal? #t (widget-get-attrs widget 'syntax-on))
-					(let ((syntax-cache (gl-edit-get-highlight ed) )
-								(params '())
-								(syn (widget-get-attrs widget 'syntax)) )
+	 			;;(printf ">>>>>>>event ~a ~a\n" type data)
+				(if (= type %event-key)
+						(begin
+							;;(printf "edit key event ~a ~a\n" type data )
+							(gl-edit-key-event ed
+								(vector-ref data 0)
+								(vector-ref data 1)
+								(vector-ref data 2)
+								(vector-ref data 3) )
+							(if (equal? #t (widget-get-attrs widget 'syntax-on))
+								(let ((syntax-cache (gl-edit-get-highlight ed) )
+											(params '())
+											(syn (widget-get-attrs widget 'syntax)) )
+											'()
+											(set! params (gl-edit-get-text ed))
+											;;(printf "re render syntax ~a ~a\n" syntax-cache params)
+											(parse-syntax syn syntax-cache params)
+											(gl-edit-update-highlight ed)
+									))
+							))
+				(if (= type %event-char)
+						(begin
+							;;(printf ">edit char event ~a ~a\n" type data )
+							(gl-edit-char-event ed
+								(vector-ref data 0)
+								(vector-ref data 1)
+								)
+							(if (equal? #t (widget-get-attrs widget 'syntax-on))
+						(let ((syntax-cache (gl-edit-get-highlight ed) )
+						(params '())
+						(syn (widget-get-attrs widget 'syntax))
+						)
+							(set! params (gl-edit-get-text ed))
+							;;(printf "re render syntax ~a ~a\n" syntax-cache params)
+							;;(parse-syntax syn syntax-cache params)
+							;;(gl-edit-update-highlight ed)
+							)
+						)
+							))
+				(if (= type %event-motion)
+						(begin
+							'()
+							(gl-edit-mouse-motion-event ed
+												(vector-ref data 0)
+												(vector-ref data 1))
+							))
+					(if (= type %event-layout)
+						(begin
 								'()
-								(set! params (gl-edit-get-text ed))
-								;;(printf "re render syntax ~a ~a\n" syntax-cache params)
-								(parse-syntax syn syntax-cache params)
-								(gl-edit-update-highlight ed)
-						))
-	       ))
-	 (if (= type %event-char)
-	     (begin
-	       ;;(printf ">edit char event ~a ~a\n" type data )
-	       (gl-edit-char-event ed
-				   (vector-ref data 0)
-				   (vector-ref data 1)
-				   )
-	       (if (equal? #t (widget-get-attrs widget 'syntax-on))
-		   (let ((syntax-cache (gl-edit-get-highlight ed) )
-			 (params '())
-			 (syn (widget-get-attrs widget 'syntax))
-			 )
-		     (set! params (gl-edit-get-text ed))
-		     ;;(printf "re render syntax ~a ~a\n" syntax-cache params)
-		     ;;(parse-syntax syn syntax-cache params)
-		     ;;(gl-edit-update-highlight ed)
-		     )
-		   )
-	       ))
-	 (if (= type %event-motion)
-	     (begin
-	       '()
-	       (gl-edit-mouse-motion-event ed
-	       			    (vector-ref data 0)
-	       			    (vector-ref data 1))
-	       ))
-		(if (= type %event-layout)
-	     (begin
-	       '()
-					;;(printf "event layout\n")
-	       ))
-		(if (= type %event-scroll)
-	     (begin
-	       	;;(printf "event scroll ~a ~a\n" (widget-get-attr widget %x ) (widget-get-attr widget %y))
-					(gl-edit-set-scroll ed (widget-get-attr widget %x ) (widget-get-attr widget %y) )
-	       ))
-	 (if (= type %event-mouse-button )
-	     (begin
-	       (gl-edit-mouse-event ed
-				    (vector-ref data 1)
-				    (vector-ref data 3)
-				    (vector-ref data 4))
-	       ;;(printf "button click event ~a ~a ~a\n" type text data)
-	       ;;(draw-widget-child-rect parent widget )
-	       ))
-	 ))
+								(widget-set-attr widget %h (gl-edit-get-height ed))
+								;;(printf "event layout ~a edit height ~a ~a\n" data (gl-edit-get-height ed) (widget-get-attr widget %h ) )
+								;;(graphic-edit-set-text ed (gl-edit-get-text ed))
+								;;(printf "event layout\n")
+							))
+					(if (= type %event-scroll)
+						(begin
+								; (printf "edit height ~a\n" (gl-edit-get-height ed) )
+								; (printf "event scroll ~a ~a\n" (widget-get-attr widget %x ) (widget-get-attr widget %y))
+								(gl-edit-set-scroll ed (widget-get-attr widget %x ) (widget-get-attr widget %y) )
+							))
+				(if (= type %event-mouse-button )
+						(begin
+							(gl-edit-mouse-event ed
+									(vector-ref data 1)
+									(vector-ref data 3)
+									(vector-ref data 4))
+							;;(printf "button click event ~a ~a ~a\n" type text data)
+							;;(draw-widget-child-rect parent widget )
+							))
+				))
       
       widget
       

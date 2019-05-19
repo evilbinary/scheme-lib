@@ -56,6 +56,7 @@
    widget-child-rect-event-mouse-motion
 	 widget-child-rect-key-event
    widget-child-key-event
+	 widget-layout-event
    widget-get-parent-cond
    in-rect
    is-in

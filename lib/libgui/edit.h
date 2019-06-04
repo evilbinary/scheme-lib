@@ -69,10 +69,10 @@ typedef struct _edit_t {
 
   int select_start[2];
   int select_end[2];
-  int select_color;
+  int selected_color;
   char *select_text;
   int select_text_avail;
-  char *selected_bg_color;
+  int selected_bg_color;
   int select_press;
   int cursor_color;
 

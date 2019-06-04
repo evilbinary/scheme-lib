@@ -621,7 +621,7 @@ void gl_render_selection(edit_t *self) {
     return;
   }
   buffer_t *buffer = self->buffer;
-  int color = self->selected_bg_color;
+  int color = self->selected_color;
   int row_start = self->select_start[0];
   int row_end = self->select_end[0];
   if (row_start > row_end) {
@@ -917,7 +917,7 @@ void gl_edit_set_scroll(edit_t *self, float x, float y) {
 }
 
 void gl_edit_set_select_color(edit_t *self, int color) {
-  self->select_color = color;
+  self->selected_color = color;
 }
 
 void gl_edit_set_cursor_color(edit_t *self, int color) {
@@ -939,7 +939,7 @@ edit_t *gl_new_edit(int shader, float w, float h, float width, float height) {
   self->scroll_x = 0;
   self->scroll_y = 0;
   self->cursor_color = 0xffF8F8F0;
-  self->select_color = 0xffff0000;
+  self->selected_color = 0xffff0000;
   self->selected_bg_color = 0xff49483E;
   self->select_text = NULL;
   self->select_text_avail = 0;

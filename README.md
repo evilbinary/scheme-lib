@@ -70,41 +70,5 @@ duck-editor 鸭子编辑器：[https://github.com/evilbinary/duck-editor](https:
 2. `adb push config.xml /sdcard/org.evilbinary.chez/scm/conf/config.xml`
 3. 打开scheme app就可以直接运行啦。
 
-## 高级篇
-### android使用外部库
-1. 手工添加Android.mk和源码文件到`scheme-lib/android/src`下命名为libhadd的文件夹。
-   add.c 内容如下：
-	 ```c
-	#include <stdio.h>
-	#include <stdarg.h>
-	int add(int a,int b){
-		return a+b;
-	}    
-	```
-	Android.mk内容如下：
-	```makefile
-	LOCAL_PATH := $(call my-dir)
-	include $(CLEAR_VARS)
-	include $(LOCAL_PATH)/../Optimizations.mk
-	LOCAL_MODULE    := add
-	LOCAL_SRC_FILES := add.c
-	LOCAL_C_INCLUDES :=
-	LOCAL_CFLAGS +=  -I. -I./c/
-	LOCAL_CFLAGS += -g -Wall -DANDROID    -DINLINES -DGC_MACROS   -Wno-unused-parameter -pie -fPIE   -fPIC
-	LOCAL_LDLIBS += -ldl -llog -lz
-	include $(BUILD_SHARED_LIBRARY)
-	```
-
-2. 执行`make android`。
-3. 将编译后生成的库`android/src/libs/libadd.so` 同步到`/sdcard/org.evilbinary.chez/lib`目录下，这样能调用外部库了。
-4. 调用外`libadd.so`库和使用代码如下：
-
-	```scheme
-	(import  (scheme) (utils libutil) )
-	(load-lib "libadd.so")
-	(define-c-function int add (int int) )
-	(display (add 100 1234))
-	```
-
 [1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.5.apk   "scheme apk"
 [2]: https://github.com/evilbinary/data/blob/master/pic/scheme-lib-2.0-win32.zip  "scheme-lib-2.0-win32.zip"

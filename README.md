@@ -27,6 +27,11 @@ scheme lib官方网站：[http://scheme-lib.evilbinary.org/](http://scheme-lib.e
 letsgo 莱茨狗抢狗软件：[https://github.com/scheme-lib/letsgo](https://github.com/scheme-lib/letsgo)  
 duck-editor 鸭子编辑器：[https://github.com/evilbinary/duck-editor](https://github.com/evilbinary/duck-editor)
 
+### 文档
+[开发文档](https://github.com/evilbinary/scheme-lib/tree/master/docs)
+
+
+
 ### 截图
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/editor.jpg" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/editor2.png" width="400px" />

@@ -54,10 +54,11 @@
    is-in-child-widget
    widget-child-rect-event-mouse-button
    widget-child-rect-event-mouse-motion
-	 widget-child-rect-key-event
+   widget-child-rect-key-event
    widget-child-key-event
-	 widget-layout-event
+   widget-layout-event
    widget-get-parent-cond
+   widget-rect-fun
    in-rect
    is-in
    widget-set-child-attr
@@ -70,10 +71,11 @@
    widget-is-in-widget
    
    %status-active
+   %status-default
    %event
    %event-char
    %event-scroll
-	 %event-layout
+   %event-layout
    %child
    %status
    %visible
@@ -99,7 +101,7 @@
    %last-common-attr
    %event-key
    %event-motion
-
+   %event-motion-out
    
    )
   (import (scheme) (gui graphic) (gui stb))
@@ -149,7 +151,8 @@
   (define %event-mouse-button 3)
   (define %event-motion 1)
   (define %event-resize 6)
- 	(define %event-layout 7)
+  (define %event-layout 7)
+  (define %event-motion-out 8)	 
 
   (define cursor-x 0)
   (define cursor-y 0)
@@ -752,10 +755,14 @@
 	    ;;(widget-set-attr (car w) %status %status-default)
 	    (let ((fun (widget-get-attrs  (car w) '%event-rect-function)))
 	      (if (procedure? fun)
-		  (if (fun (car w)  cursor-x cursor-y)
-		      (let ((event (vector-ref  (car w) %event)))
-			(event  (car w) '() type data)
-			))))
+			(if (fun (car w)  cursor-x cursor-y)
+				(let ((event (vector-ref  (car w) %event)))
+					(event  (car w) '() type data)
+					)
+				(let ((event (vector-ref  (car w) %event)))
+					(event  (car w) '() %event-motion-out data)
+					)
+					)))
 	    (l (cdr w)))
 	  ))
     (let loop ((len (- (length $widgets) 1) ))
@@ -867,17 +874,17 @@
 	(let loop ((child (vector-ref widget %child)))
 	  (if (pair? child)
 	      (begin
-		(if (widget-rect-fun (car child) lmx lmy)
-		    (begin
-		      ;;(draw-widget-rect (car child) 255.0 0.0 0.0 1.0)
-		      ;;(printf "in here ~a\n" (widget-get-attr (car child) %text))
-		      ;;(widget-to-local-mouse widget data)
-		      ((vector-ref (car child) %event)
-		       (car child)
-		       widget
-		       type
-		       data2
-		       )))
+			(if (widget-rect-fun (car child) lmx lmy)
+				(begin
+				;;(draw-widget-rect (car child) 255.0 0.0 0.0 1.0)
+				;;(printf "in here ~a\n" (widget-get-attr (car child) %text))
+				;;(widget-to-local-mouse widget data)
+				((vector-ref (car child) %event)
+				(car child)
+				widget
+				type
+				data2
+				)))
 		
 		(loop (cdr child)))
 	      )))]

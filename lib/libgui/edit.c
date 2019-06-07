@@ -1035,7 +1035,7 @@ char *gl_get_edit_text(edit_t *self) {
     memcpy(&self->texts[pos], self->crlf, crlf_len);
     pos += crlf_len;
   }
-  // self->texts[pos - 1] = 0;
+  self->texts[pos] = 0;
   // printf("get_text:\n");
   // print_string(self->texts, strlen(self->texts));
   // printf("\n");

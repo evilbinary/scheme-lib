@@ -137,8 +137,8 @@
     (let ((window '()))
       (glfw-init)
       (set! window (glfw-create-window width  height  title   0  0) )
-      (glfw-window-hint GLFW_DEPTH_BITS 16)
-      (glfw-window-hint 0 GLFW_TRUE)
+      ;;(glfw-window-hint GLFW_DEPTH_BITS 16)
+      ;;(glfw-window-hint 0 GLFW_TRUE)
       
       (glfw-make-context-current window);
       (glad-load-gles2-loader  (get-glfw-get-proc-address) )

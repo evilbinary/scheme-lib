@@ -145,14 +145,16 @@
 			;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -1.0) 0.0 255.0 0.0 0.3)
 			;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -10.0) (random 255.0)  0.0  0.0 0.5)
 			;;   )
-			(draw-item gx gy w h text)
+			
+			(draw-item-bg gx gy w h)
 			;;hover
 			(if  (= (widget-get-attr widget %status) %status-active)
-				(draw-rect gx
+				(draw-hover gx
 					gy
 					(widget-get-attr widget %w)
 					(widget-get-attr widget %h)
 					))
+			(draw-text gx gy w h text)
 			))
 		
 		(if (equal? #t (widget-get-attrs widget 'static))

@@ -15,6 +15,8 @@
         draw-video
         draw-tab
         draw-scroll-bar
+        draw-hover
+        draw-item-bg
     )
 
     (import (scheme)
@@ -32,6 +34,9 @@
 		       text)
     )
 
+  (define (draw-item-bg x y w h)
+    (graphic-draw-solid-quad x y (+ x w) (+ y  h)  61.0 61.0 61.0 0.9 )
+    )
   (define (draw-item x y w h text)
     (graphic-draw-solid-quad x y (+ x w) (+ y  h)  61.0 61.0 61.0 0.9 )
     (graphic-draw-text (+ x (/ w 2.0 ) -8)
@@ -112,13 +117,21 @@
         (graphic-draw-text x y text )]
         [(x y text color)
         (graphic-draw-text x y text color)
-        ])
+        ]
+        [(x y w h text)
+        (graphic-draw-text (+ x (/ w 2.0 ) -8)
+		       (+ y (/ h 2.0) -12 )
+		       text)
+        ]
         )
+        )
+  (define (draw-hover x y w h)
+    (draw-rect x y w h))
 
   (define draw-rect
      (case-lambda
       [( x y w h)
-       (graphic-draw-solid-quad x y (+ x w) (+ y  h)  128.0 30.0 34.0 0.5)]
+       (graphic-draw-solid-quad x y (+ x w) (+ y  h)  31.0 31.0 31.0 0.4)]
       [( x y w h color)
        (graphic-draw-solid-quad x y (+ x w) (+ y  h)  color)]))
 

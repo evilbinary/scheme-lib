@@ -1,49 +1,28 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;author:evilbinary on 11/19/16.
-;email:rootdebug@163.com
+;Copyright 2016-2080 evilbinary.
+;作者:evilbinary on 11/11/18.
+;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(import  (scheme) (gles gles1) (glut glut) (gui imgui)  )
-(define (imgui-test-hello-world)
-      (glut-init)
-      (imgui-init)
+(import  (scheme)
+	 (glfw glfw)
+	 (gui duck)
+	 (gui window)
+	 (gui widget)
+	 )
 
-      ;(imgui-scale 1.5 1.5)
-      (glut-touch-event (lambda (type x y)
-          (imgui-touch-event type x y)
+(define window '() )
+(define width 800)
+(define height 700)
 
-          ))
-      (glut-mouse-event (lambda (button state)
-        ;(glut-log "mouse-event")
-          (imgui-mouse-event button state)))
-      (glut-motion-event (lambda (x y)
-            ;(glut-log "motion-event")
-            (imgui-motion-event x y)
-        ))
-      (glut-key-event (lambda (event)
-          (imgui-key-event
-             (glut-event-get event 'type)
-             (glut-event-get event 'keycode)
-             (glut-event-get event 'char)
-             (glut-event-get event 'chars))
-           (if (= 4 (glut-event-get event 'keycode ))
-             (begin (imgui-exit)
-             (glut-exit)))
-          ))
+(define (duck-app)
+  (set! window (window-create width height "hello鸭子"))
 
-      (glut-display (lambda ()
-              (imgui-render-start)
-              ;;(imgui-test)
-              (imgui-set-next-window-size (imgui-make-vec2 200.0 140.0) 0)
-              (imgui-begin "evilbinary" 0)
-              (imgui-text "hello,world!")
-              (imgui-end)
-              (imgui-render-end)
-          ))
-      (glut-reshape (lambda(w h)
-                    (imgui-resize w h)
-                     ))
-      (glut-main-loop)
-      (imgui-exit)
-      (glut-exit)
-      )
- (imgui-test-hello-world)
+  (let ((d (dialog 100.0 80.0 300.0 200.0 "hello")))
+	'()
+	)
+  ;;run
+  (window-loop window)
+  (window-destroy window)
+  )
+
+(duck-app)

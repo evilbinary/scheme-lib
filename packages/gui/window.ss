@@ -18,6 +18,7 @@
    window-set-wait-mode
    window-set-size
    window-set-title
+   window-set-input-mode
    )
 
   (import (scheme)
@@ -40,6 +41,30 @@
   (define fb-width  (cffi-alloc 8) )
   (define fb-height (cffi-alloc 8))
   (define ratio 1)
+  (define cursors (make-hashtable equal-hash equal?))
+
+  (define (window-set-input-mode window mode)
+    (cond
+      [(eq? mode 'normal)  
+        (glfw-set-input-mode window GLFW_CURSOR GLFW_CURSOR_NORMAL)]
+      [(eq? mode 'hidden)  
+        (glfw-set-input-mode window GLFW_CURSOR GLFW_CURSOR_HIDDEN)]
+      [(eq? mode 'disable)  
+        (glfw-set-input-mode window GLFW_CURSOR GLFW_CURSOR_DISABLED)]
+    )
+  )
+
+  (define (window-cursor-init)
+   (hashtable-set! cursors 'arrow (glfw-create-standard-cursor GLFW_ARROW_CURSOR))
+   (hashtable-set! cursors 'hand (glfw-create-standard-cursor GLFW_HAND_CURSOR))
+   (hashtable-set! cursors 'ibeam (glfw-create-standard-cursor GLFW_IBEAM_CURSOR))
+   (hashtable-set! cursors 'crosshair (glfw-create-standard-cursor GLFW_CROSSHAIR_CURSOR ))
+   (hashtable-set! cursors 'hresize (glfw-create-standard-cursor GLFW_HRESIZE_CURSOR ))
+   (hashtable-set! cursors 'vresize (glfw-create-standard-cursor GLFW_VRESIZE_CURSOR))   
+  )
+  
+  (define (window-set-cursor window mod)
+    (glfw-set-cursor window (hashtable-ref cursors mod '()) ))
 
   (define (window-post-empty-event)
     (glfw-post-empty-event)
@@ -146,6 +171,10 @@
       (printf "~a ,~a ~a,~a\n" (cffi-get-int fb-width) (cffi-get-int fb-height) width height)
       (glfw-swap-interval 1)
       (set! ratio  (/ (cffi-get-int fb-width) width) )
+      (window-cursor-init)
+      (widget-init-cursor (lambda (mod)
+        (window-set-cursor window mod)
+        ))
       (widget-init width height (/  (cffi-get-int fb-width) width) )
       (window-event-init window)
       ;;(collect-thread)

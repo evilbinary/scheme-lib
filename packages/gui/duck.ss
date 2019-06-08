@@ -337,6 +337,7 @@
 		   (draw-widget-child-rect parent widget )))
 	     )
 	 (begin
+	   (widget-set-cursor 'hand )
 	   (if (and (= type %event-mouse-button) (= (vector-ref data 1) 1) )
 	       (begin
 		 ;;(printf "tree click event ~a ~a ~a\n" type text data)
@@ -662,6 +663,8 @@
 						(syn (widget-get-attrs widget 'syntax))
 						)
 							(set! params (gl-edit-get-text ed))
+							;;(printf "params ~a\n" params)
+							(vector-set! widget %text params)
 							;;(printf "re render syntax ~a ~a\n" syntax-cache params)
 							;;(parse-syntax syn syntax-cache params)
 							;;(gl-edit-update-highlight ed)
@@ -670,7 +673,7 @@
 							))
 				(if (= type %event-motion)
 						(begin
-							'()
+							(widget-set-cursor 'ibeam)
 							(gl-edit-mouse-motion-event ed
 												(vector-ref data 0)
 												(vector-ref data 1))

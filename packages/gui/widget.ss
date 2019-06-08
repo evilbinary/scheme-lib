@@ -31,8 +31,8 @@
    widget-set-attr
    widget-get-attrs
    widget-set-attrs
-   widget-disable-cursor
-   widget-set-cursor
+   widget-disable-custom-cursor
+   widget-set-custom-cursor
    widget-new
    widget-copy
    widget-set-text-font-size
@@ -69,7 +69,8 @@
    plus-child-y-offset
    is-in-widget
    widget-is-in-widget
-   
+   widget-init-cursor
+   widget-set-cursor
    %status-active
    %status-default
    %event
@@ -159,6 +160,14 @@
   (define cursor-arrow 0)
   
   (define default-layout '() )
+  (define default-cursor '() )
+
+  (define (widget-init-cursor cursor)
+	(set! default-cursor cursor))
+
+  (define (widget-set-cursor mod)
+	(if (procedure? default-cursor)
+		(default-cursor mod)))
 
 
   (define (plus-child-y-offset widget offsety)
@@ -747,6 +756,7 @@
 	(begin
 	  (set! cursor-x (vector-ref data 0))
 	  (set! cursor-y (vector-ref data 1))
+	  (widget-set-cursor 'arrow)
 	  ))
     ;;process virtual rect
     (let l ((w $widgets))
@@ -986,14 +996,14 @@
     (graphic-render)
     )
 
-  (define (widget-set-cursor cursor)
+  (define (widget-set-custom-cursor cursor)
     (set! cursor-arrow cursor))
 
-  (define (widget-show-cursor)
+  (define (widget-show-custom-cursor)
     (if (>= cursor-arrow 0)
 	(set! cursor-arrow (load-texture "cursor.png"))))
 
-  (define (widget-disable-cursor)
+  (define (widget-disable-custom-cursor)
     (set! cursor-arrow -1))
 
   (define widget-init

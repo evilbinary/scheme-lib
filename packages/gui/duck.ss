@@ -317,7 +317,7 @@
 		 ;;   )
 		 (draw-text gx
 		 	    (+ gy)
-		 	    text)
+		 	    (widget-get-attr widget %text) )
 
 		 ))
 	   

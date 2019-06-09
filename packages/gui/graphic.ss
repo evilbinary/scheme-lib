@@ -407,15 +407,37 @@
           )]
 	    ))
 
-    (define (graphic-draw-line-strip lines r g b a)
-      (let ((vertices (v 'float lines)))
-        (glUseProgram default-program)
-        (glUniform4f uniform-default-color (/ r 255.0) (/ g 255.0) (/ b 255.0) (* a 1.0))
-        (glVertexAttribPointer 0 2 GL_FLOAT GL_FALSE 0 vertices)
-        (glEnableVertexAttribArray 0)
-        (glDrawArrays GL_LINE_STRIP 0 2)
-        (glUseProgram 0)
-        (uv vertices)
+    (define graphic-draw-line-strip 
+       (case-lambda 
+       [(lines r g b a)
+        (let ((vertices (v 'float lines)))
+          (glUseProgram default-program)
+          (glUniform4f uniform-default-color (/ r 255.0) (/ g 255.0) (/ b 255.0) (* a 1.0))
+          (glVertexAttribPointer 0 2 GL_FLOAT GL_FALSE 0 vertices)
+          (glEnableVertexAttribArray 0)
+          (glDrawArrays GL_LINE_STRIP 0 (/ (length lines ) 2))
+          (glUseProgram 0)
+          (uv vertices)
+        )]
+
+        [(lines color)
+        (let ((vertices (v 'float lines))
+                  (r (fixnum->flonum  (bitwise-bit-field color 16 24)))
+                  (g (fixnum->flonum  (bitwise-bit-field color 8 16)))
+                  (b (fixnum->flonum  (bitwise-bit-field color 0 8)))
+                  (a  (/ (fixnum->flonum  (if (= 0 (bitwise-bit-field color 24 32))
+                      255
+                      (bitwise-bit-field color 24 32)
+                      )) 255.0)) )
+          (glUseProgram default-program)
+          (glUniform4f uniform-default-color (/ r 255.0) (/ g 255.0) (/ b 255.0) (* a 1.0))
+          (glVertexAttribPointer 0 2 GL_FLOAT GL_FALSE 0 vertices)
+          (glEnableVertexAttribArray 0)
+          (glDrawArrays GL_LINE_STRIP 0 (/ (length lines ) 2))
+          (glUseProgram 0)
+          (uv vertices)
+        )]
+        
         ))
 
     (define graphic-draw-round-rect

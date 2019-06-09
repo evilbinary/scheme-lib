@@ -71,6 +71,7 @@
    widget-is-in-widget
    widget-init-cursor
    widget-set-cursor
+   widget-remove
    %status-active
    %status-default
    %event
@@ -162,6 +163,9 @@
   (define default-layout '() )
   (define default-cursor '() )
 
+ ;;widget x y w h layout draw event childs status top bottom left righ 
+  (define $widgets (list ))
+
   (define (widget-init-cursor cursor)
 	(set! default-cursor cursor))
 
@@ -202,13 +206,12 @@
   (define (widget-set-layout widget layout)
     (vector-set! widget %layout layout))
   
-  ;;widget x y w h layout draw event childs status top bottom left righ 
-  (define $widgets (list ))
 
   (define widget-add
     (case-lambda
      [(p)
       (set! $widgets (append! $widgets (list p)))
+	  ((vector-ref p %layout) p)
       p]
      [(p w)
       (vector-set! w %parent p)
@@ -688,6 +691,37 @@
     (set! $widgets (remove! widget $widgets ))
     (set! $widgets (append $widgets (list  widget))) )
 
+  (define (widget-remove-child parent child)
+	(let ((childs (vector->list (widget-get-attr parent %child))))
+		;;(printf "before childs=>~a" childs)
+		(set! childs (remove! child childs))
+		;;(printf "childs=>~a" childs)
+		(widget-set-attr parent %child (list->vector childs)))
+  )
+
+  (define (widget-print widget)
+    (let loop ((w $widgets) (index 0) )
+      (if (pair? w)
+	  (begin
+	    (printf "widgets[~a]=>~a " index (widget-get-attr (car w) %text) )
+		(loop (cdr w) (+ index 1))
+		))
+		)
+		(printf "\n")
+		)
+
+  (define (widget-remove w)
+	(let ((parent (widget-get-attr w %parent)))
+		(if (null? parent )
+			(begin
+				(widget-print $widgets)
+				;;(set-top-level-value! '$widgets  (remove! w $widgets ))
+				(set! $widgets (remove! w $widgets ))
+				(widget-print $widgets)
+				)
+			(widget-remove-child parent w))
+		))
+
   (define (widget-get-attr widget index)
     (vector-ref widget index))
 
@@ -980,7 +1014,6 @@
      ))
 
   (define (widget-render)
-    ;;(printf "dialog=====>~a\n" $widgets)
     (let loop ((w $widgets))
       (if (pair? w)
 	  (begin

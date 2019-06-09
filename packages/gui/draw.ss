@@ -17,6 +17,7 @@
         draw-scroll-bar
         draw-hover
         draw-item-bg
+        draw-border
     )
 
     (import (scheme)
@@ -128,6 +129,16 @@
   (define (draw-hover x y w h)
     (draw-rect x y w h))
 
+  (define (draw-border x y w h color)
+    (graphic-draw-line-strip 
+      (list  x  y
+            (+ x  w) y
+            (+ x w ) (+ y h) 
+            (+ x ) (+ y h)
+             x  y
+             ) color)
+  )
+
   (define draw-rect
      (case-lambda
       [( x y w h)
@@ -150,27 +161,27 @@
 		   (+ x w) (+ y h)
 		   0.0 0.0 1.0 1.0 src))
       (if (equal? (hashtable-ref attrs 'mode '()) 'center-crop)
-	  (let ((h1 (hashtable-ref attrs 'height h))
-		(w1 (hashtable-ref attrs 'width w)))
-	    (if (> h1 w1)
-		(graphic-draw-texture-quad
-		 x y
-		 (+ x w) (+ y h)
-		 0.0
-		 (/ (/ (- h1 h) 2) h1)
-		 1.0
-		 1.0
-		 src)
-		(graphic-draw-texture-quad
-		 x y
-		 (+ x w) (+ y h)
-		 (/ (/ (- w1 w) 2) w1 )
-		 0.0
-		 1.0
-		 1.0
-		 src)
-	    )
-	    ))
+        (let ((h1 (hashtable-ref attrs 'height h))
+          (w1 (hashtable-ref attrs 'width w)))
+          (if (> h1 w1)
+            (graphic-draw-texture-quad
+            x y
+            (+ x w) (+ y h)
+            0.0
+            (/ (/ (- h1 h) 2) h1)
+            1.0
+            1.0
+            src)
+            (graphic-draw-texture-quad
+            x y
+            (+ x w) (+ y h)
+            (/ (/ (- w1 w) 2) w1 )
+            0.0
+            1.0
+            1.0
+            src)
+          )
+          ))
       ]
      ))
 

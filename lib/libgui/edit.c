@@ -454,7 +454,12 @@ void gl_render_edit_once(edit_t *self, float x, float y, char *text,
     self->bound.left = x * self->scale;
     self->bound.top = y * self->scale;
     gl_render_selection(self);
-    gl_render_params(self, &color);
+    int c = color;
+    if (color > 0) {
+      gl_render_params(self, &color);
+    } else {
+      gl_render_params(self, NULL);
+    }
     if (self->editable == 1) {
       gl_render_cursor(self);
     }
@@ -990,6 +995,7 @@ void gl_add_edit_text(edit_t *self, char *text) {
 void gl_set_edit_text(edit_t *self, char *text) {
   // printf("gl_set_edit_text=> %s", text);
   self->status = UPDATING;
+  // clear_draw(self->buffer->font->stash);
   string_to_buffer_lines(self->buffer, text, NULL);
   self->status = UPDATED;
 }
@@ -1059,7 +1065,7 @@ void buffer_color(buffer_t *buffer, void *colors) {
 void gl_edit_set_highlight(edit_t *self, void *colors) {
   if (colors == NULL) return;
   // buffer_color(self->buffer, colors);
-  // self->colors = colors;
+  self->colors = colors;
 }
 
 void gl_edit_update_highlight(edit_t *self) {
@@ -1068,16 +1074,22 @@ void gl_edit_update_highlight(edit_t *self) {
 
 void *gl_edit_get_highlight(edit_t *self) {
   int total = buffer_total_text_length(self->buffer);
-  if (self->colors_avail < total) {
+  //printf("gl_edit_get_highlight total=>%d colors_avail=>%d\n", total, self->colors_avail);
+  if (self->colors_avail < total*4) {
     int alloc_size = 4 * total;
     void *new_colors = malloc(alloc_size);
     if (self->colors != NULL) {
       memcpy(new_colors, self->colors, total);
     }
+    // clear_draw(self->buffer->font->stash);
+    self->status = UPDATING;
     void *old_colors = self->colors;
     self->colors = new_colors;
     self->colors_avail = alloc_size;
     free(old_colors);
+    // printf("gl_edit_get_highlight==== total=>%d colors_avail=>%d\n", total,
+    //        self->colors_avail);
+    self->status = UPDATED;
   }
   return self->colors;
 }

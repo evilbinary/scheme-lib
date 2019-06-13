@@ -454,12 +454,7 @@ void gl_render_edit_once(edit_t *self, float x, float y, char *text,
     self->bound.left = x * self->scale;
     self->bound.top = y * self->scale;
     gl_render_selection(self);
-    int c = color;
-    if (color > 0) {
-      gl_render_params(self, &color);
-    } else {
-      gl_render_params(self, NULL);
-    }
+    gl_render_params(self, &color);
     if (self->editable == 1) {
       gl_render_cursor(self);
     }

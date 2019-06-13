@@ -211,7 +211,7 @@
 				(number-color (get-color syntax 'number))
 				(keyword-color (get-color syntax 'keyword))
 				(identify-color (get-color syntax 'identify)))
-			(let loop ((i 0) ( index 0) (len  (string-length text)  ) (c (string-ref text 0)) )
+			(let loop ((i 0) ( index 0) (len  (- (string-length text) 0) ) (c (string-ref text 0)) )
 			(if (< i len)
 				(let ((token-len 0)
 							(text-color '() ))

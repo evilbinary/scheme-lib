@@ -295,29 +295,35 @@
 
 	   (if (null? parent)
 	       (let ((gx (+ (vector-ref widget %x)))
-		     (gy (+ (vector-ref widget %y))))
-		 (vector-set! widget %gx gx)
-		 (vector-set! widget %gy gy)
+		     	(gy (+ (vector-ref widget %y))))
+				(vector-set! widget %gx gx)
+				(vector-set! widget %gy gy)
 		 
 		 ;;(graphic-sissor-begin gx gy w h)
 		 ;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h) 255.0 0.0 0.0 0.5)
 		 )
-	       (let ((gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
-		     (gy   (+ (vector-ref parent %gy) (vector-ref widget %y))))
-		 (vector-set! widget %gx gx)
-		 (vector-set! widget %gy gy)
-		 ;;(printf "~a,~a\n" (vector-ref widget %x) (vector-ref widget %y))
-		 ;;(graphic-draw-solid-quad x y (+ x w) (+ y h) 0.0 255.0 0.0 0.2)
-		 
-		 ;;(graphic-sissor-begin gx gy  w  h )
+	       (let ((gx (+ (vector-ref parent %gx) (vector-ref widget %x)))
+		     (gy (+ (vector-ref parent %gy) (vector-ref widget %y)))
+			 (color (widget-get-attrs  widget 'color ))
+			 )
+			(vector-set! widget %gx gx)
+			(vector-set! widget %gy gy)
+			;;(printf "~a,~a\n" (vector-ref widget %x) (vector-ref widget %y))
+			;;(graphic-draw-solid-quad x y (+ x w) (+ y h) 0.0 255.0 0.0 0.2)
+			
+			;;(graphic-sissor-begin gx gy  w  h )
 
-		 ;;(if (eqv? 'tree-item (vector-ref widget %type))
-		 ;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -1.0) (random 255.0) 255.0 0.0 0.3)
-		 ;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -10.0) (random 255.0)  0.0  0.0 0.5)
-		 ;;   )
-		 (draw-text gx
-		 	    (+ gy)
-		 	    (widget-get-attr widget %text) )
+			;;(if (eqv? 'tree-item (vector-ref widget %type))
+			;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -1.0) (random 255.0) 255.0 0.0 0.3)
+			;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -10.0) (random 255.0)  0.0  0.0 0.5)
+			;;   )
+			(if (null? color)
+				(draw-text gx
+						(+ gy)
+						(widget-get-attr widget %text ) )
+				(draw-text gx
+						(+ gy)
+						(widget-get-attr widget %text) color))
 
 		 ))
 	   
@@ -379,7 +385,7 @@
       (widget-set-attrs widget 'scroll-x  0.0)
       (widget-set-attrs widget 'scroll-y  0.0)
       (widget-set-attrs widget 'scroll-height  0.0)
-      
+      (widget-set-attrs widget 'show-scroll #t)
       (widget-set-layout
        widget
        (lambda (widget . args)
@@ -429,11 +435,11 @@
 		 (if (equal? '() background)
 		     '()
 		     (draw-panel gx gy w h '() background))
-		 
-		 (draw-scroll-bar (+ gx w -10.0 ) gy 10.0 h
-				  (widget-get-attrs widget 'scroll-y)
-				  (+ (widget-get-attrs widget 'scroll-height) -40.0)
-				  )
+		 (if (equal? #t (widget-get-attrs widget 'show-scroll))
+			(draw-scroll-bar (+ gx w -10.0 ) gy 10.0 h
+					(widget-get-attrs widget 'scroll-y)
+					(+ (widget-get-attrs widget 'scroll-height) -40.0)
+					))
 		 ))
 	   ;;(draw (vector-ref widget %draw))
 	   (widget-draw-rect-child widget)
@@ -551,21 +557,21 @@
 	 			(gl-edit-set-cursor-color (widget-get-attrs ww '%edit) color)
 	 		))
 
-			(widget-set-attrs
-				widget
-				"%event-font-line-height-hook"
-				(lambda (ww name val)
-					( gl-edit-set-font-line-height (widget-get-attrs ww '%edit) val)
-					(widget-layout-event widget)
-				))
-	
+		(widget-set-attrs
+			widget
+			"%event-font-line-height-hook"
+			(lambda (ww name val)
+				( gl-edit-set-font-line-height (widget-get-attrs ww '%edit) val)
+				(widget-layout-event widget)
+			))
 
-			(widget-set-attrs
-				widget
-				"%event-select-color-hook"
-					(lambda (ww name color)
-					(gl-edit-set-select-color (widget-get-attrs ww '%edit) color)
-				))
+
+		(widget-set-attrs
+			widget
+			"%event-select-color-hook"
+				(lambda (ww name color)
+				(gl-edit-set-select-color (widget-get-attrs ww '%edit) color)
+			))
 
       (widget-set-attrs
        widget

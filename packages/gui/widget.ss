@@ -62,6 +62,7 @@
    in-rect
    is-in
    widget-set-child-attr
+   widget-set-child-attrs
    widget-child-rect-event-scroll
    widget-active
    widget-event
@@ -741,6 +742,15 @@
 	    (loop (cdr child)))
 	  )))
 
+  (define (widget-set-child-attrs widget index value)
+  	;;(printf "widget-set-child-attrs ~a\n" (vector-ref widget %child) )
+    (let loop ((child (vector-ref widget %child)))
+      (if (pair? child)
+	  (begin
+	    (widget-set-attrs (car child) index value)
+	    ;;(printf "=====>set child ~a ~a\n" (widget-get-attr (car child) %text) (widget-get-attrs (car child) index))
+	    (loop (cdr child)))
+	  )))
 
   ;; (define (widget-set-child widget index value)
   ;;   (let loop ((child (vector-ref widget %child)))

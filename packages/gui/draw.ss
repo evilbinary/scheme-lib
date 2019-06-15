@@ -26,25 +26,27 @@
 	  (gui video)
 	  (gui stb))
 
-(define (draw-button x y w h text)
-    (graphic-draw-solid-quad  x y
-			      (+ x w) (+ y h)
-			      31.0 31.0 31.0 0.9)
-    (graphic-draw-text (+ x (/ w 2.0 ) -8)
-		       (+ y (/ h 2.0) -12 )
-		       text)
-    )
+  (define (draw-button x y w h text)
+      (graphic-draw-solid-quad  x y
+              (+ x w) (+ y h)
+              31.0 31.0 31.0 0.9)
+      (graphic-draw-text (+ x (/ w 2.0 ) -8)
+            (+ y (/ h 2.0) -12 )
+            text)
+      )
 
-  (define (draw-item-bg x y w h)
-    (graphic-draw-solid-quad x y (+ x w) (+ y  h)  61.0 61.0 61.0 0.9 )
-    )
+  (define (draw-item-bg x y w h color)
+    (if (null? color )
+        (graphic-draw-solid-quad x y (+ x w) (+ y  h)  61.0 61.0 61.0 0.9 )
+        (graphic-draw-solid-quad x y (+ x w) (+ y  h)  color)
+    ))
+
   (define (draw-item x y w h text)
     (graphic-draw-solid-quad x y (+ x w) (+ y  h)  61.0 61.0 61.0 0.9 )
     (graphic-draw-text (+ x (/ w 2.0 ) -8)
 		       (+ y (/ h 2.0) -12 )
 		       text)
     )
-  
   
   (define (draw-video v x y w h )
     (video-render v x y (+ x w) (+ y h) )

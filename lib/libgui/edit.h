@@ -78,7 +78,8 @@ typedef struct _edit_t {
 
   float font_size;  // create default size
   char *font_name;  // create default name
-
+  int show_lineno;
+  int lineno_color;
   int color;
   int bg_color;
 

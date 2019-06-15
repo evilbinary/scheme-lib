@@ -133,9 +133,12 @@
 			(draw-item gx gy w h text)
 			)
 			(let ((gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
-				(gy   (+ (vector-ref parent %gy) (vector-ref widget %y))))
-			(vector-set! widget %gx gx)
-			(vector-set! widget %gy gy)
+				(gy   (+ (vector-ref parent %gy) (vector-ref widget %y)))
+				(color (widget-get-attrs widget 'color))
+				(background (widget-get-attrs  widget 'background ))
+				)
+				(vector-set! widget %gx gx)
+				(vector-set! widget %gy gy)
 			;;(printf "~a,~a\n" (vector-ref widget %x) (vector-ref widget %y))
 			;;(graphic-draw-solid-quad x y (+ x w) (+ y h) 0.0 255.0 0.0 0.2)
 			
@@ -145,8 +148,7 @@
 			;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -1.0) 0.0 255.0 0.0 0.3)
 			;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -10.0) (random 255.0)  0.0  0.0 0.5)
 			;;   )
-			
-			(draw-item-bg gx gy w h)
+			(draw-item-bg gx gy w h background)
 			;;hover
 			(if  (= (widget-get-attr widget %status) %status-active)
 				(draw-hover gx
@@ -154,7 +156,12 @@
 					(widget-get-attr widget %w)
 					(widget-get-attr widget %h)
 					))
-			(draw-text gx gy w h text)
+			;;(draw-text gx gy w h text)
+			(if (null? color)
+				(draw-text gx gy w h
+						(widget-get-attr widget %text ) )
+				(draw-text gx gy w h
+						(widget-get-attr widget %text) color))
 			))
 		
 		(if (equal? #t (widget-get-attrs widget 'static))
@@ -177,7 +184,9 @@
 			)
 		(begin
 			(if (= type %event-motion)
-				(begin ;;(equal? (widget-get-attrs widget 'root ) #f)
+				(begin 
+				(widget-set-cursor 'arrow)
+				;;(equal? (widget-get-attrs widget 'root ) #f)
 					;;(printf "motion ~a\n" (widget-get-attr widget %text))
 					(if (is-in widget data)
 						(begin  ;;(equal? '() (widget-get-attrs widget 'root))
@@ -588,8 +597,20 @@
 	 			(gl-edit-set-font (widget-get-attrs ww '%edit) 0 value)
 				(widget-layout-event widget)
 	 			))
-
-
+	(widget-set-attrs
+		widget
+		"%event-show-no-hook"
+		(lambda (ww name value)
+					(gl-edit-set-show-no (widget-get-attrs ww '%edit) value)
+					(widget-layout-event widget)
+					))
+	(widget-set-attrs
+		widget
+		"%event-lineno-color-hook"
+		(lambda (ww name value)
+					(gl-edit-set-lineno-color (widget-get-attrs ww '%edit) value)
+					))	
+		
       (widget-set-attrs
        widget
        "%event-syntax-on-hook"

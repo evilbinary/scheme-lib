@@ -52,6 +52,8 @@
      gl-edit-set-select-color
      gl-edit-set-cursor-color
      gl-edit-set-font-line-height
+     gl-edit-set-show-no
+     gl-edit-set-lineno-color
      
      )
     (import (scheme) (utils libutil) (cffi cffi) (gles gles2) )
@@ -74,6 +76,8 @@
     (def-function gl-edit-set-font-line-height "gl_edit_set_font_line_height" (void* float) void)
 
     (def-function gl-edit-set-editable "gl_edit_set_editable" (void*  int) void)
+    (def-function gl-edit-set-show-no "gl_edit_set_show_no" (void*  int) void)
+    (def-function gl-edit-set-lineno-color "gl_edit_set_lineno_color" (void*  int) void)
 
 
     (def-function gl-new-edit "gl_new_edit" (int float float float float) void*)

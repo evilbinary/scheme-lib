@@ -163,6 +163,7 @@
   
   (define default-layout '() )
   (define default-cursor '() )
+  (define default-cursor-mode '() )
 
  ;;widget x y w h layout draw event childs status top bottom left righ 
   (define $widgets (list ))
@@ -172,7 +173,11 @@
 
   (define (widget-set-cursor mod)
 	(if (procedure? default-cursor)
-		(default-cursor mod)))
+	  	(if (equal? default-cursor-mode mod)
+		  '()
+			(begin 
+				(set! default-cursor-mode mod)
+				(default-cursor mod)))))
 
 
   (define (plus-child-y-offset widget offsety)
@@ -800,7 +805,6 @@
 	(begin
 	  (set! cursor-x (vector-ref data 0))
 	  (set! cursor-y (vector-ref data 1))
-	  (widget-set-cursor 'arrow)
 	  ))
     ;;process virtual rect
     (let l ((w $widgets))

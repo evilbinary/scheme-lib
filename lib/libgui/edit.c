@@ -427,6 +427,44 @@ float gl_render_lines(buffer_t *buffer, float sx, float sy) {
   return sy;
 }
 
+void gl_render_lineno(edit_t *self, float sx, float sy,int no) {
+  buffer_t *buffer = self->buffer;
+  font_t *font = buffer->font;
+  char lineno[64];
+  char buf[24];
+  float dx, dy;
+  sprintf(buf,"%%%dd",no);
+  sth_begin_draw(buffer->font->stash);
+  for (int i = 0; i < buffer->line_count; i++) {
+    // printf("line:%d %s\n", i, buffer->lines[i]->texts);
+    line_t *line = buffer->lines[i];
+    sprintf(lineno, buf, i+1);
+    uint32_t color = 0xffffffff;
+    // if(self->lineno_color>=0){
+    color = self->lineno_color;
+    //   printf("lineno_color=>0\n");
+    // }else if (line->color != NULL) {
+    //   color = *line->color;
+    // }
+    float b = (color & 0xff) / 255.0;
+    float g = (color >> 8 & 0xff) / 255.0;
+    float r = (color >> 16 & 0xff) / 255.0;
+    float a = (color >> 24 & 0xff) / 255.0;
+    sth_draw_text(font->stash, font->id, font->size, sx, line->sy, line->width,
+                  -1, lineno, r, g, b, a, &dx, &dy);
+  }
+  sth_end_draw(buffer->font->stash);
+}
+
+int calc_number(int num) {
+  int i = 0;
+  do {
+    num = num / 10;
+    i++;
+  } while (num != 0);
+  return i;
+}
+
 void gl_render_params(edit_t *self, void *pcolor) {
   float sx = self->bound.left;
   float sy = self->bound.top;
@@ -443,7 +481,15 @@ void gl_render_params(edit_t *self, void *pcolor) {
     if (pcolor != NULL) {
       self->color = *(int *)pcolor;
     }
-    self->ebound.height = gl_render_lines(self->buffer, sx, sy);
+    float ssx = sx;
+    int no=calc_number(self->buffer->line_count);
+    if (self->show_lineno == 1) {
+      ssx += no * 20.0;
+    }
+    self->ebound.height = gl_render_lines(self->buffer, ssx, sy);
+    if (self->show_lineno == 1) {
+      gl_render_lineno(self, sx, sy,no);
+    }
   }
 }
 
@@ -857,7 +903,9 @@ void gl_render_cursor(edit_t *self) {
   buffer_t *buffer = self->buffer;
   float sx = self->bound.left;
   float sy = self->bound.top;
-
+  if (self->show_lineno == 1) {
+      sx += calc_number(self->buffer->line_count) * 20.0;
+  }
   // gl_render_prepare_string(&self->mvp, buffer->font);
   sth_begin_draw(self->buffer->font->stash);
   // printf("buffer->cursor_x %f\n", buffer->cursor_x + sx);
@@ -963,6 +1011,8 @@ edit_t *gl_new_edit(int shader, float w, float h, float width, float height) {
   self->buffer->width = self->bound.width;
   self->buffer->color = &self->color;
   self->buffer->scale = self->scale;
+  self->show_lineno = 0;
+  self->lineno_color=-1;
 
   update_cursor_pos(self->buffer);
 
@@ -1069,8 +1119,9 @@ void gl_edit_update_highlight(edit_t *self) {
 
 void *gl_edit_get_highlight(edit_t *self) {
   int total = buffer_total_text_length(self->buffer);
-  //printf("gl_edit_get_highlight total=>%d colors_avail=>%d\n", total, self->colors_avail);
-  if (self->colors_avail < total*4) {
+  // printf("gl_edit_get_highlight total=>%d colors_avail=>%d\n", total,
+  // self->colors_avail);
+  if (self->colors_avail < total * 4) {
     int alloc_size = 4 * total;
     void *new_colors = malloc(alloc_size);
     if (self->colors != NULL) {
@@ -1090,18 +1141,23 @@ void *gl_edit_get_highlight(edit_t *self) {
 }
 
 void gl_edit_set_color(edit_t *self, int color) {
-  printf("gl_edit_set_color %x\n", color);
   self->color = color;
-  // self->color=0xff0000ff;
 }
 
+void gl_edit_set_lineno_color(edit_t *self, int color) {
+  self->lineno_color = color;
+}
+
+
+
+void gl_edit_set_show_no(edit_t* self,int no){
+  self->show_lineno=no;
+}
 void gl_edit_set_foreground(edit_t *self, int color) {
-  printf("gl_edit_set_foreground %x\n", color);
   gl_edit_set_color(self, color);
 }
 
 void gl_edit_set_background(edit_t *self, int color) {
-  printf("gl_edit_set_background\n");
   self->bg_color = color;
 }
 

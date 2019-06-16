@@ -427,18 +427,19 @@ float gl_render_lines(buffer_t *buffer, float sx, float sy) {
   return sy;
 }
 
-void gl_render_lineno(edit_t *self, float sx, float sy,int no) {
+void gl_render_lineno(edit_t *self, float sx, float sy) {
   buffer_t *buffer = self->buffer;
   font_t *font = buffer->font;
   char lineno[64];
   char buf[24];
   float dx, dy;
-  sprintf(buf,"%%%dd",no);
+  int no = calc_number(self->buffer->line_count);
+  sprintf(buf, "%%%dd", no);
   sth_begin_draw(buffer->font->stash);
   for (int i = 0; i < buffer->line_count; i++) {
     // printf("line:%d %s\n", i, buffer->lines[i]->texts);
     line_t *line = buffer->lines[i];
-    sprintf(lineno, buf, i+1);
+    sprintf(lineno, buf, i + 1);
     uint32_t color = 0xffffffff;
     // if(self->lineno_color>=0){
     color = self->lineno_color;
@@ -481,14 +482,10 @@ void gl_render_params(edit_t *self, void *pcolor) {
     if (pcolor != NULL) {
       self->color = *(int *)pcolor;
     }
-    float ssx = sx;
-    int no=calc_number(self->buffer->line_count);
+    self->ebound.height =
+        gl_render_lines(self->buffer, sx + self->lineno_width, sy);
     if (self->show_lineno == 1) {
-      ssx += no * 20.0;
-    }
-    self->ebound.height = gl_render_lines(self->buffer, ssx, sy);
-    if (self->show_lineno == 1) {
-      gl_render_lineno(self, sx, sy,no);
+      gl_render_lineno(self, sx, sy);
     }
   }
 }
@@ -499,6 +496,7 @@ void gl_render_edit_once(edit_t *self, float x, float y, char *text,
   if (self->status == UPDATED) {
     self->bound.left = x * self->scale;
     self->bound.top = y * self->scale;
+
     gl_render_selection(self);
     gl_render_params(self, &color);
     if (self->editable == 1) {
@@ -507,10 +505,19 @@ void gl_render_edit_once(edit_t *self, float x, float y, char *text,
   }
 }
 
+void calc_lineno_width(edit_t *self){
+  int no = calc_number(self->buffer->line_count);
+  self->lineno_width = no * self->font_size/self->scale+ 10;
+}
+
 void gl_render_edit(edit_t *self, float x, float y) {
   if (self == NULL) return;
   self->bound.left = x * self->scale;
   self->bound.top = y * self->scale;
+
+  if (self->show_lineno == 1) {
+    calc_lineno_width(self);
+  }
   if (self->status == UPDATED) {
     gl_render_selection(self);
     gl_render_params(self, NULL);
@@ -588,6 +595,7 @@ void gl_edit_cursor_move_down(buffer_t *self) {
 
 void gl_edit_mouse_motion_event(edit_t *self, float x, float y) {
   // printf("gl_edit_mouse_motion_event %f,%f\n", x, y);
+  x -= self->lineno_width/self->scale;
   if (self->select_press == 1) {
     pos_to_cursor(self->buffer, x - self->scroll_x, y - self->scroll_y);
     self->select_end[0] = self->buffer->cursor_row;
@@ -597,6 +605,7 @@ void gl_edit_mouse_motion_event(edit_t *self, float x, float y) {
 
 void gl_edit_mouse_event(edit_t *self, int action, float x, float y) {
   // printf("gl_edit_mouse_event %d %f,%f\n", action, x, y);
+  x -= self->lineno_width/self->scale;
 
   if (action == 1) {  // press mouse button
     pos_to_cursor(self->buffer, x - self->scroll_x, y - self->scroll_y);
@@ -844,6 +853,9 @@ void gl_edit_key_event(edit_t *self, int key, int scancode, int action,
       gl_edit_cursor_move_down(buffer);
       buffer->cursor_col = 0;
       update_cursor_pos(buffer);
+      if (self->show_lineno == 1) {
+        calc_lineno_width(self);
+      }
     } else if (key == 259) {  // backspace
       if (gl_edit_get_selection_length(self) > 1) {
         buffer_delete_text(buffer, self->select_start[0], self->select_start[1],
@@ -901,25 +913,13 @@ void gl_render_string(font_t *font, float size, char *text, float sx, float sy,
 void gl_render_cursor(edit_t *self) {
   float dx = 0, dy = 0;
   buffer_t *buffer = self->buffer;
-  float sx = self->bound.left;
+  float sx = self->bound.left + self->lineno_width;
   float sy = self->bound.top;
-  if (self->show_lineno == 1) {
-      sx += calc_number(self->buffer->line_count) * 20.0;
-  }
-  // gl_render_prepare_string(&self->mvp, buffer->font);
   sth_begin_draw(self->buffer->font->stash);
-  // printf("buffer->cursor_x %f\n", buffer->cursor_x + sx);
   gl_render_string(buffer->font, buffer->font->size, "|",
                    buffer->cursor_x + sx - 6.0, buffer->cursor_y + sy, &dx, &dy,
                    self->cursor_color);
-  // gl_render_end_string(buffer->font);
   sth_end_draw(self->buffer->font->stash);
-
-  /*draw_solid_quad(&self->mvp, self->buffer->cursor_x, self->buffer->cursor_y,
-                  self->buffer->cursor_x + 4.0, self->buffer->cursor_y
-                  + 20.0, 1.0, 0.0, 0.0, 1.0);
-  draw_solid_quad(&self->mvp, 100.0, 100.0, 120.0, 120.0, 255.0, 255.0, 255.0,
-  0.5);*/
 }
 
 void pos_to_cursor(buffer_t *buffer, float x, float y) {
@@ -1012,7 +1012,8 @@ edit_t *gl_new_edit(int shader, float w, float h, float width, float height) {
   self->buffer->color = &self->color;
   self->buffer->scale = self->scale;
   self->show_lineno = 0;
-  self->lineno_color=-1;
+  self->lineno_color = -1;
+  self->lineno_width = 0;
 
   update_cursor_pos(self->buffer);
 
@@ -1140,26 +1141,18 @@ void *gl_edit_get_highlight(edit_t *self) {
   return self->colors;
 }
 
-void gl_edit_set_color(edit_t *self, int color) {
-  self->color = color;
-}
+void gl_edit_set_color(edit_t *self, int color) { self->color = color; }
 
 void gl_edit_set_lineno_color(edit_t *self, int color) {
   self->lineno_color = color;
 }
 
-
-
-void gl_edit_set_show_no(edit_t* self,int no){
-  self->show_lineno=no;
-}
+void gl_edit_set_show_no(edit_t *self, int no) { self->show_lineno = no; }
 void gl_edit_set_foreground(edit_t *self, int color) {
   gl_edit_set_color(self, color);
 }
 
-void gl_edit_set_background(edit_t *self, int color) {
-  self->bg_color = color;
-}
+void gl_edit_set_background(edit_t *self, int color) { self->bg_color = color; }
 
 void gl_edit_set_font_size(edit_t *self, float size) {
   font_t *font = self->font;

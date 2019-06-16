@@ -290,102 +290,76 @@
       (widget-set-layout
        widget
        (lambda (widget . args)
-	 (linear-layout widget)
-	 ))
+	 	(linear-layout widget)
+	 	))
       
       (widget-set-draw
        widget
        (lambda (widget parent);;draw
-	 (let ((x  (vector-ref  widget %x))
-	       (y  (vector-ref widget %y))
-	       (w  (vector-ref  widget %w))
-	       (h  (vector-ref  widget %h))
-	       (draw (vector-ref widget %draw)))
+		(let ((x  (vector-ref  widget %x))
+			(y  (vector-ref widget %y))
+			(w  (vector-ref  widget %w))
+			(h  (vector-ref  widget %h))
+			(draw (vector-ref widget %draw)))
 
-	   (if (null? parent)
-	       (let ((gx (+ (vector-ref widget %x)))
-		     	(gy (+ (vector-ref widget %y))))
+		(if (null? parent)
+			(let ((gx (+ (vector-ref widget %x)))
+					(gy (+ (vector-ref widget %y))))
+					(vector-set! widget %gx gx)
+					(vector-set! widget %gy gy)
+			)
+			(let ((gx (+ (vector-ref parent %gx) (vector-ref widget %x)))
+				(gy (+ (vector-ref parent %gy) (vector-ref widget %y)))
+				(color (widget-get-attrs  widget 'color ))
+				)
 				(vector-set! widget %gx gx)
 				(vector-set! widget %gy gy)
-		 
-		 ;;(graphic-sissor-begin gx gy w h)
-		 ;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h) 255.0 0.0 0.0 0.5)
-		 )
-	       (let ((gx (+ (vector-ref parent %gx) (vector-ref widget %x)))
-		     (gy (+ (vector-ref parent %gy) (vector-ref widget %y)))
-			 (color (widget-get-attrs  widget 'color ))
-			 )
-			(vector-set! widget %gx gx)
-			(vector-set! widget %gy gy)
-			;;(printf "~a,~a\n" (vector-ref widget %x) (vector-ref widget %y))
-			;;(graphic-draw-solid-quad x y (+ x w) (+ y h) 0.0 255.0 0.0 0.2)
-			
-			;;(graphic-sissor-begin gx gy  w  h )
-
-			;;(if (eqv? 'tree-item (vector-ref widget %type))
-			;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -1.0) (random 255.0) 255.0 0.0 0.3)
-			;;(graphic-draw-solid-quad gx gy (+ gx w) (+ gy h -10.0) (random 255.0)  0.0  0.0 0.5)
-			;;   )
-			(if (null? color)
-				(draw-text gx
-						(+ gy)
-						(widget-get-attr widget %text ) )
-				(draw-text gx
-						(+ gy)
-						(widget-get-attr widget %text) color))
-
-		 ))
-	   
-	   (if (= (widget-get-attr widget %status) 1)
-	       (widget-draw-child widget)
-	       )
-	   
-	   ;;(graphic-sissor-end)
-	   )))
+				(if (null? color)
+					(draw-text gx
+							(+ gy)
+							(widget-get-attr widget %text ) )
+					(draw-text gx
+							(+ gy)
+							(widget-get-attr widget %text) color))
+			))
+		(if (= (widget-get-attr widget %status) 1)
+			(widget-draw-child widget)
+			)
+		)))
       
       (widget-set-event
        widget
        (lambda (widget parent type data);;event
-	 (if (null? parent)
-	     (begin
-	       (if (= type %event-mouse-button)
-		   (draw-widget-child-rect parent widget )))
-	     )
-	 (begin
-	   (widget-set-cursor 'hand )
-	   (if (and (= type %event-mouse-button) (= (vector-ref data 1) 1) )
-	       (begin
-		 ;;(printf "tree click event ~a ~a ~a\n" type text data)
-		 ;;click head
-		 (if (is-in-widget-top widget
-				        (vector-ref data 3)
-					(vector-ref data 4) )
-		     (let ()
-		       (if (= 0 (widget-get-attr widget %status) )
-			   (widget-set-attr widget %status 1)
-			   (widget-set-attr widget %status 0))
-		       
-		       ;;(widget-set-child-attr widget %status (widget-get-attr widget %status))
-		       (widget-layout-update (widget-get-root widget))
-		       (if (procedure? (widget-get-events widget 'click))
-			   ((widget-get-events widget 'click) widget parent type data)
-			   )
-		       ;; (printf "### ~a status=~a  ~a\n\n" (widget-get-attr  widget  %text)
-		       ;; 	       (widget-get-attr widget %status)
-		       ;; 	       (widget-get-attr widget %h) )
-		       )
-		     )
-		 ;;(draw-widget-child-rect parent widget )
-		 ;;(widget-child-rect-event widget type data)
-
-		 ;;(draw-widget-rect widget  (random 255.0) 0.0 0.0 1.0)
-		 (widget-child-rect-event-mouse-button widget type data)
-		 
-		)))
-	 #t
+		(if (null? parent)
+			(begin
+			(if (= type %event-mouse-button)
+			(draw-widget-child-rect parent widget )))
+			)
+		(begin
+		(widget-set-cursor 'hand )
+		(if (and (= type %event-mouse-button) (= (vector-ref data 1) 1) )
+			(begin
+			;;(printf "tree click event ~a ~a ~a\n" type text data)
+			;;click head
+			(if (is-in-widget-top widget
+							(vector-ref data 3)
+						(vector-ref data 4) )
+				(let ()
+					(if (= 0 (widget-get-attr widget %status) )
+						(widget-set-attr widget %status 1)
+						(widget-set-attr widget %status 0))
+					
+					;;(widget-set-child-attr widget %status (widget-get-attr widget %status))
+					(widget-layout-update (widget-get-root widget))
+					(if (procedure? (widget-get-events widget 'click))
+					((widget-get-events widget 'click) widget parent type data)
+				))
+			(widget-child-rect-event-mouse-button widget type data) )
+			)))
+	 	#t
 	 ))
       widget
-      ))
+    ))
   
   (define (scroll w h)
     (let ((widget (widget-new 0.0 0.0 w h "")))

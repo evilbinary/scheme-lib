@@ -505,9 +505,9 @@ void gl_render_edit_once(edit_t *self, float x, float y, char *text,
   }
 }
 
-void calc_lineno_width(edit_t *self){
+void calc_lineno_width(edit_t *self) {
   int no = calc_number(self->buffer->line_count);
-  self->lineno_width = no * self->font_size/self->scale+ 10;
+  self->lineno_width = no * self->font_size / self->scale + 10;
 }
 
 void gl_render_edit(edit_t *self, float x, float y) {
@@ -547,6 +547,15 @@ void update_cursor_pos(buffer_t *self) {
   self->cursor_y = cur_row * self->font->stash->fonts->lineh * self->font->size;
   self->cursor_x =
       measure_text(self->font, self->lines[cur_row]->texts, self->cursor_col);
+}
+
+int gl_edit_get_line_count(edit_t *self) { return self->buffer->line_count; }
+
+int gl_edit_get_row_count(edit_t *self, int row) {
+  if (row < self->buffer->line_count) {
+    return self->buffer->lines[row]->count;
+  }
+  return 0;
 }
 
 void gl_edit_cursor_move_left(buffer_t *self) {
@@ -595,17 +604,24 @@ void gl_edit_cursor_move_down(buffer_t *self) {
 
 void gl_edit_mouse_motion_event(edit_t *self, float x, float y) {
   // printf("gl_edit_mouse_motion_event %f,%f\n", x, y);
-  x -= self->lineno_width/self->scale;
+  x -= self->lineno_width / self->scale;
   if (self->select_press == 1) {
     pos_to_cursor(self->buffer, x - self->scroll_x, y - self->scroll_y);
     self->select_end[0] = self->buffer->cursor_row;
     self->select_end[1] = self->buffer->cursor_col;
   }
 }
+void gl_edit_set_selection(edit_t *self, int start_row, int start_col,
+                           int end_row, int end_col) {
+  self->select_start[0] = start_row;
+  self->select_start[1] = start_col;
+  self->select_end[0] = end_row;
+  self->select_end[1] = end_col;
+}
 
 void gl_edit_mouse_event(edit_t *self, int action, float x, float y) {
   // printf("gl_edit_mouse_event %d %f,%f\n", action, x, y);
-  x -= self->lineno_width/self->scale;
+  x -= self->lineno_width / self->scale;
 
   if (action == 1) {  // press mouse button
     pos_to_cursor(self->buffer, x - self->scroll_x, y - self->scroll_y);
@@ -799,18 +815,13 @@ char *gl_get_selection(edit_t *self) {
         end = tmp;
       }
     }
-    // printf("--------->self->select_start[1]=%d self->select_end[1]=%d
-    // %d,%d\n",
-    //        self->select_start[1], self->select_end[1], start, end);
-    // printf("&self->select_text[pos]=%p
-    // &line->texts[start]=%p\n",&self->select_text[pos], &line->texts[start]);
-
     memcpy(&self->select_text[pos], &line->texts[start], end - start);
     pos += (end - start);
     memcpy(&self->select_text[pos], self->crlf, crlf_len);
     pos += crlf_len;
   }
   self->select_text[pos - 1] = 0;
+  // printf("gl_get_selection %s\n",self->select_text);
   return self->select_text;
 }
 

@@ -584,7 +584,48 @@
 		(lambda (ww name value)
 					(gl-edit-set-lineno-color (widget-get-attrs ww '%edit) value)
 					))	
-		
+	
+	(widget-set-attrs
+		widget
+		"%event-get-selection-hook"
+		(lambda (ww name)
+					(gl-edit-get-selection (widget-get-attrs ww '%edit))
+					))
+
+	(widget-set-attrs
+		widget
+		"%event-get-selection-hook"
+		(lambda (ww name)
+					(gl-edit-get-selection (widget-get-attrs ww '%edit))
+					))
+
+	(widget-set-attrs
+		widget
+		"%event-get-line-count-hook"
+		(lambda (ww name)
+					(gl-edit-get-line-count (widget-get-attrs ww '%edit))
+					))
+	
+	(widget-set-attrs
+		widget
+		"%event-get-last-row-count-hook"
+		(lambda (ww name)
+					(gl-edit-get-row-count (widget-get-attrs ww '%edit) 
+						(- (gl-edit-get-line-count (widget-get-attrs ww '%edit)) 1))
+					))
+
+	(widget-set-attrs
+		widget
+		"%event-selection-hook"
+		(lambda (ww name val)
+					(gl-edit-set-selection (widget-get-attrs ww '%edit) 
+						(list-ref val 0)
+						(list-ref val 1)
+						(list-ref val 2)
+						(list-ref val 3)
+						 )
+					))
+
       (widget-set-attrs
        widget
        "%event-syntax-on-hook"

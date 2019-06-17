@@ -54,7 +54,10 @@
      gl-edit-set-font-line-height
      gl-edit-set-show-no
      gl-edit-set-lineno-color
-     
+     gl-edit-get-selection
+     gl-edit-set-selection
+     gl-edit-get-line-count
+     gl-edit-get-row-count
      )
     (import (scheme) (utils libutil) (cffi cffi) (gles gles2) )
 
@@ -78,6 +81,14 @@
     (def-function gl-edit-set-editable "gl_edit_set_editable" (void*  int) void)
     (def-function gl-edit-set-show-no "gl_edit_set_show_no" (void*  int) void)
     (def-function gl-edit-set-lineno-color "gl_edit_set_lineno_color" (void*  int) void)
+    (def-function gl-edit-get-selection "gl_get_selection" (void* ) string)
+    (def-function gl-edit-set-selection "gl_edit_set_selection" (void*  int int int int) void)
+
+
+    (def-function gl-edit-get-line-count "gl_edit_get_line_count" (void* ) int)
+    (def-function gl-edit-get-row-count "gl_edit_get_row_count" (void* int) int)
+
+
 
 
     (def-function gl-new-edit "gl_new_edit" (int float float float float) void*)

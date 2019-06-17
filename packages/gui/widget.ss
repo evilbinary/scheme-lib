@@ -498,7 +498,10 @@
 
   (define (widget-get-attrs widget name)
     (let ((h (vector-ref widget %attrs )))
-      (hashtable-ref h name '() )))
+	  (let ((hook (hashtable-ref h (format "%event-get-~a-hook" name) '())))
+		(if (procedure? hook)
+	    	(hook widget name)
+      		(hashtable-ref h name '() )))))
 
   (define (widget-attrs widget)
     (vector-ref widget %attrs))
@@ -507,8 +510,8 @@
     (let ((h (vector-ref widget %attrs )))
       (hashtable-set! h name value)
       (let ((hook (hashtable-ref h (format "%event-~a-hook" name) '())))
-	(if (procedure? hook)
-	    (hook widget name value)))
+		(if (procedure? hook)
+	    	(hook widget name value)))
       ))
 
   (define (widget-get-events widget name)

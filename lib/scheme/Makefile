@@ -17,7 +17,7 @@ CXXFLAGS= -Wall -Wformat
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
-	LIBS += -lm -lrt
+	LIBS += -ldl -lrt
 	CXXFLAGS += 
 	CXXFLAGS += 
 	CFLAGS += 

@@ -9,6 +9,7 @@
    flow-layout
    grid-layout
    pop-layout
+   free-layout
 
    calc-child-height
    calc-all-child-line-height
@@ -30,6 +31,28 @@
     (lambda (widget row col)
       '()
       )
+    )
+
+  (define (free-layout widget)
+    (let ((x  (vector-ref widget %x))
+	    (y  (vector-ref widget %y))
+	    (w  (vector-ref widget %w))
+	    (h  (vector-ref widget %h))
+	    (top  (vector-ref widget %top))
+	    (left  (vector-ref widget %left))
+	    (right  (vector-ref widget %right))
+	    (bottom  (vector-ref widget %bottom))
+	    (child (vector-ref widget %child))
+	    )
+	(let loop ((c child) )
+	  (if (pair? c)
+	      (begin
+			(process-match-parent (car c))
+			(if (procedure? (vector-ref (car c) %layout))
+				((vector-ref (car c) %layout) (car c)))
+			(loop (cdr c) ))
+	      )))
+	(widget-child-update-pos widget)
     )
 
 (define pop-layout

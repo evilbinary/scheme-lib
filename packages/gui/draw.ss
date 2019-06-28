@@ -18,13 +18,19 @@
         draw-hover
         draw-item-bg
         draw-border
+        draw-get-text-width
+        draw-widget-text
     )
 
     (import (scheme)
 	  (utils libutil)
 	  (gui graphic )
+    (gui widget)
 	  (gui video)
 	  (gui stb))
+
+  (define (draw-get-text-width text)
+    (graphic-measure-text (graphic-get-font '()) text))
 
   (define (draw-button x y w h text)
       (graphic-draw-solid-quad  x y
@@ -114,20 +120,56 @@
         (graphic-draw-line x1 y1 x2 y2
 		       color))
 
+
+    (define (draw-widget-text widget)
+      (let* ((color (widget-get-attrs widget 'color))
+        (parent (widget-get-attr widget %parent))
+				(tw (widget-get-attrs widget 'text-width))
+				(ta (widget-get-attrs widget 'text-align))
+        (padding-left (widget-get-attrs widget 'padding-left 0.0))
+        (padding-right (widget-get-attrs widget 'padding-right 0.0))
+        (gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
+				(gy   (+ (vector-ref parent %gy) (vector-ref widget %y)))
+        (w  (widget-get-attr widget %w))
+        (h  (widget-get-attr widget %h))
+        (text (widget-get-attr widget %text ))
+        )
+
+        (if (null? color)
+            (case ta
+              ['left (graphic-draw-text (+ gx padding-left)
+		            (+ gy (/ h 2.0) -12 )
+		            text)]
+              ['right (graphic-draw-text (+ gx padding-left)
+		            (+ gy (/ h 2.0) -12 )
+		            text)]
+              ['center (graphic-draw-text (+ gx padding-left)
+		            (+ gy (/ h 2.0) -12 )
+		            text)]
+              [else (graphic-draw-text (+ gx (- w tw ) padding-left)
+		            (+ gy (/ h 2.0) -12 )
+		            text)]
+            )
+          (begin 
+            (draw-text gx gy w h text color)))
+    ))
+    
+
     (define draw-text
         (case-lambda
         [(x y text)
-        (graphic-draw-text x y text )]
+          (graphic-draw-text x y text )]
         [(x y text color)
-        (graphic-draw-text x y text color)
-        ]
+          (graphic-draw-text x y text color)]
         [(x y w h text)
         (graphic-draw-text (+ x (/ w 2.0 ) -8)
 		       (+ y (/ h 2.0) -12 )
-		       text)
-        ]
-        )
-        )
+		       text)]
+        [(x y w h text tw )
+        (graphic-draw-text (+ x (/ tw 2) )
+		       (+ y (/ h 2.0) -12 )
+		       text)]
+        ))
   (define (draw-hover x y w h)
     (draw-rect x y w h))
 

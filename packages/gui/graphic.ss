@@ -16,7 +16,6 @@
      graphic-sissor-begin
      graphic-sissor-end
      graphic-draw-round-rect
-
      graphic-new-edit
      graphic-draw-edit
      graphic-edit-add-text
@@ -29,6 +28,7 @@
      graphic-edit-set-color
      graphic-get-fps
      graphic-set-ratio
+     graphic-measure-text
 
      load-shader
      
@@ -38,7 +38,6 @@
      gl-edit-set-font-name
      gl-edit-set-font
      gl-edit-get-height
-
      gl-edit-set-highlight
      gl-edit-get-highlight
      gl-edit-update-highlight
@@ -58,6 +57,10 @@
      gl-edit-set-selection
      gl-edit-get-line-count
      gl-edit-get-row-count
+     gl-edit-get-cursor-x
+     gl-edit-get-cursor-y
+     gl-edit-measure-text
+     gl-edit-get-font
      )
     (import (scheme) (utils libutil) (cffi cffi) (gles gles2) )
 
@@ -87,6 +90,8 @@
 
     (def-function gl-edit-get-line-count "gl_edit_get_line_count" (void* ) int)
     (def-function gl-edit-get-row-count "gl_edit_get_row_count" (void* int) int)
+    (def-function gl-edit-get-cursor-x "gl_edit_get_cursor_x" (void*) float)
+    (def-function gl-edit-get-cursor-y "gl_edit_get_cursor_y" (void*) float)
 
 
 
@@ -96,6 +101,8 @@
     (def-function gl-edit-set-text  "gl_set_edit_text" (void*  string ) void)
     (def-function gl-edit-get-text  "gl_get_edit_text" (void* ) string)
     (def-function gl-edit-get-height  "gl_get_edit_height" (void* ) float)
+    (def-function gl-edit-measure-text  "gl_edit_measure_text" (void*) float)
+
 
 
     
@@ -112,6 +119,8 @@
     
     (def-function gl-edit-set-select-color "gl_edit_set_select_color" ( void* int) void)
     (def-function gl-edit-set-cursor-color "gl_edit_set_cursor_color" ( void* int) void)
+    (def-function gl-edit-get-font "gl_edit_get_font" ( void*) void*)
+
 
 
    
@@ -127,6 +136,7 @@
     (def-function mvp-set-orthographic "mvp_set_orthographic" (void* float float float float float float) void)
    
     (def-function font-create "font_create" (string) void*)
+    (def-function measure-text "measure_text" (void* string int) float)
 
     (def-function gl-render-string "gl_render_string" ( void* float string
 							     float float
@@ -328,13 +338,13 @@
       ;;(set! uniform-round-screen-size (glGetUniformLocation round-program "screenSize"))
       program)
       )
-     
+    
     (define (graphic-new-edit w h)
       (let ((ed (gl-new-edit font-program w h my-width my-height) ))
         (hashtable-set! all-edit-cache ed  ed)
         ed
         ))
-
+    
     (define (graphic-draw-edit edit x y)
       (gl-render-edit edit x   y))
 
@@ -355,7 +365,13 @@
 	      (gl-render-edit-once gtext x  y text color)]
       ))
 
+    (define (graphic-measure-text font text)
+      (measure-text font text -1)
+    )
+
     (define (graphic-get-font name)
+     (if (null? name)
+        (gl-edit-get-font gtext)
       (let ((font (hashtable-ref all-font-cache name '())))
         (if (null? font)
             (begin 
@@ -363,7 +379,7 @@
               (hashtable-set! all-font-cache name font)
               font)
             font
-            )))
+            ))))
     
     (define (graphic-new-mvp)
       (mvp-create default-program my-width my-height ))

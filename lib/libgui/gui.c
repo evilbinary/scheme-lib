@@ -55,6 +55,33 @@ font_t* font_create(char* font_name) {
   return self;
 }
 
+font_t *new_font(char *name, float size) {
+  font_t *font = malloc(sizeof(font_t));
+  font->name = name;
+  font->size = size;
+  font->stash = sth_create(512, 512);
+  font->id = sth_add_font(font->stash, name);
+  // sth_add_font_from_memory(self->stash, self->data);
+  return font;
+}
+
+void destroy_font(font_t *font) {
+  if (font == NULL) return;
+  sth_delete(font->stash);
+  free(font);
+  font = NULL;
+}
+
+float measure_text(font_t *font, char *text, int count) {
+  float dx, dy;
+  if(count<0){
+    count=strlen(text);
+  }
+  sth_measure(font->stash, font->id, font->size, -1, text, count, &dx, &dy);
+  //printf("measure_text=> font=%p %s count=%d width=%f\n", font,text,count,dx);
+  return dx;
+}
+
 long get_time() {
   struct timeval tv;
   gettimeofday(&tv, NULL);

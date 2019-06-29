@@ -50,6 +50,9 @@ typedef struct {
   unsigned char *data;
 } font_t;
 
+float measure_text(font_t *font, char *text, int count);
+font_t *new_font(char *name, float size);
+void destroy_font(font_t *font);
 font_t *font_create(char *font_name);
 void glShaderSource2(GLuint shader, GLsizei count, const GLchar *string,
                      const GLint *length);

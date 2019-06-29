@@ -1,22 +1,5 @@
 #include "edit.h"
 
-font_t *new_font(char *name, float size) {
-  font_t *font = malloc(sizeof(font_t));
-  font->name = name;
-  font->size = size;
-  font->stash = sth_create(512, 512);
-  font->id = sth_add_font(font->stash, name);
-  // sth_add_font_from_memory(self->stash, self->data);
-  return font;
-}
-
-void destroy_font(font_t *font) {
-  if (font == NULL) return;
-  sth_delete(font->stash);
-  free(font);
-  font = NULL;
-}
-
 buffer_t *new_buffer() {
   buffer_t *buffer = malloc(sizeof(buffer_t));
   buffer->lines = new_lines(LINE_SIZE);
@@ -527,12 +510,6 @@ void gl_render_edit(edit_t *self, float x, float y) {
   }
 }
 
-float measure_text(font_t *font, char *text, int count) {
-  float dx, dy;
-  sth_measure(font->stash, font->id, font->size, -1, text, count, &dx, &dy);
-  return dx;
-}
-
 void update_cursor_pos(buffer_t *self) {
   int cur_row = self->cursor_row;
   if (cur_row < 0 || self->line_count <= 0) {
@@ -547,6 +524,15 @@ void update_cursor_pos(buffer_t *self) {
   self->cursor_y = cur_row * self->font->stash->fonts->lineh * self->font->size;
   self->cursor_x =
       measure_text(self->font, self->lines[cur_row]->texts, self->cursor_col);
+}
+
+float gl_edit_get_cursor_x(edit_t *self) {
+  return self->buffer->cursor_x / self->scale +
+         self->lineno_width / self->scale;
+}
+
+float gl_edit_get_cursor_y(edit_t *self) {
+  return self->buffer->cursor_y/self->scale+ self->scroll_y ;
 }
 
 int gl_edit_get_line_count(edit_t *self) { return self->buffer->line_count; }
@@ -1037,6 +1023,9 @@ edit_t *gl_new_edit(int shader, float w, float h, float width, float height) {
   return self;
 }
 
+font_t * gl_edit_get_font(edit_t *self){
+  return self->font;
+}
 void gl_resize_edit_window(edit_t *self, float width, float height) {
   glUseProgram(self->mvp.shader);
   mat4_set_orthographic(&self->mvp.projection, 0, width * self->scale,
@@ -1104,6 +1093,13 @@ char *gl_get_edit_text(edit_t *self) {
   // printf("\n");
 
   return self->texts;
+}
+
+float gl_edit_measure_text(edit_t *self){
+  if(self->texts==NULL){
+    gl_get_edit_text(self);
+  }
+  return measure_text(self->buffer->font, self->texts, strlen(self->texts));
 }
 
 void buffer_color(buffer_t *buffer, void *colors) {

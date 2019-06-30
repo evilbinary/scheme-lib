@@ -160,20 +160,20 @@ void line_extend_text(line_t *line, int extend_len) {
 }
 
 void line_insert_text(line_t *line, int col, char *text) {
-  printf(">>>>>>>>>>>>>>>>line_insert_text\n");
+  //printf(">>>>>>>>>>>>>>>>line_insert_text\n");
   int start = line_get_col_index(line, col);
   int len = utf8_strlen(text);
   int len1 = strlen(text);
-  printf("line_insert_text at col=%d start=%d  len=%d len1=%d %s\n", col, start,
-         len, len1, text);
+  // printf("line_insert_text at col=%d start=%d  len=%d len1=%d %s\n", col, start,
+  //        len, len1, text);
   if ((line->actual + len1) > line->available) {
     printf("line no available line->available=%d %d\n", line->available,
            (line->actual + len1));
     line_extend_text(line, line->available * 2);
   }
-  printf("line current %s\n", line->texts);
+  // printf("line current %s\n", line->texts);
   insert_string(line->texts, line->actual, start, text, len1);
-  printf("line after %s$$$\n", line->texts);
+  // printf("line after %s$$$\n", line->texts);
   line->count += len;
   line->actual += len1;
 }
@@ -532,7 +532,7 @@ float gl_edit_get_cursor_x(edit_t *self) {
 }
 
 float gl_edit_get_cursor_y(edit_t *self) {
-  return self->buffer->cursor_y/self->scale+ self->scroll_y ;
+  return self->buffer->cursor_y / self->scale + self->scroll_y;
 }
 
 int gl_edit_get_line_count(edit_t *self) { return self->buffer->line_count; }
@@ -619,8 +619,8 @@ void gl_edit_mouse_event(edit_t *self, int action, float x, float y) {
     pos_to_cursor(self->buffer, x - self->scroll_x, y - self->scroll_y);
     self->select_end[0] = self->buffer->cursor_row;
     self->select_end[1] = self->buffer->cursor_col;
-    printf("start %d,%d end %d,%d\n", self->select_start[0],
-           self->select_start[1], self->select_end[0], self->select_end[1]);
+    // printf("start %d,%d end %d,%d\n", self->select_start[0],
+    //        self->select_start[1], self->select_end[0], self->select_end[1]);
     // printf("gl_get_selection %s\n", gl_get_selection(self));
   }
   self->select_press = action;
@@ -745,11 +745,9 @@ int gl_edit_get_selection_length(edit_t *self) {
   return total;
 }
 
-char *gl_get_selection(edit_t *self) {
+void auto_set_text(edit_t *self) {
   int total = gl_edit_get_selection_length(self);
-  int crlf_len = strlen(self->crlf);
   buffer_t *buffer = self->buffer;
-
   if (self->select_text == NULL) {
     self->select_text = malloc(total * 2);
     self->select_text_avail = total * 2;
@@ -765,36 +763,40 @@ char *gl_get_selection(edit_t *self) {
     self->select_text_avail = avail;
     free(old_texts);
   }
-  int row_start = self->select_start[0];
-  int row_end = self->select_end[0];
-  if (row_start > row_end) {  // selection from  end to start
-    row_start = self->select_end[0];
-    row_end = self->select_start[0];
+}
+
+char *gl_edit_get_text_range(edit_t *self, int row_start, int col_start, int row_end,
+                        int col_end) {
+  int crlf_len = strlen(self->crlf);
+  buffer_t *buffer = self->buffer;
+  auto_set_text(self);
+  int rstart = row_start;
+  int rend = row_end;
+  if (row_start > row_end) {
+    rstart = row_end;
+    rend = row_start;
   }
   int pos = 0;
-  for (int i = row_start; i <= row_end; i++) {
+  for (int i = rstart; i <= rend; i++) {
     line_t *line = buffer->lines[i];
     int start = 0;
     int end = line->actual;
-    // printf("self->select_start[0]=%d self->select_end[0]=%d\n",
-    //        self->select_start[0], self->select_end[0]);
-
-    if (self->select_start[0] > self->select_end[0]) {
-      if (i == row_start) {
-        start = line_get_col_index(line, self->select_end[1]);
+    if (row_start > row_end) {
+      if (i == rstart) {
+        start = line_get_col_index(line, col_end);
       }
-      if (i == row_end) {
-        end = line_get_col_index(line, self->select_start[1]);
+      if (i == rend) {
+        end = line_get_col_index(line, col_start);
       }
     } else {
-      if (i == row_start) {
-        start = line_get_col_index(line, self->select_start[1]);
+      if (i == rstart) {
+        start = line_get_col_index(line, col_start);
       }
-      if (i == row_end) {
-        end = line_get_col_index(line, self->select_end[1]);
+      if (i == rend) {
+        end = line_get_col_index(line, col_end);
       }
     }
-    if (self->select_start[0] == self->select_end[0]) {
+    if (row_start == row_end) {
       if (start > end) {
         int tmp = start;
         start = end;
@@ -807,8 +809,27 @@ char *gl_get_selection(edit_t *self) {
     pos += crlf_len;
   }
   self->select_text[pos - 1] = 0;
-  // printf("gl_get_selection %s\n",self->select_text);
   return self->select_text;
+}
+int gl_edit_get_select_row_start(edit_t *self){
+  return self->select_start[0];
+}
+
+int gl_edit_get_select_row_end(edit_t *self){
+  return self->select_end[0];
+}
+
+int gl_edit_get_select_col_start(edit_t *self){
+  return self->select_start[1];
+}
+
+int gl_edit_get_select_col_end(edit_t *self){
+  return self->select_end[1];
+}
+
+char *gl_edit_get_selection(edit_t *self) {
+  auto_set_text(self);
+  return gl_edit_get_text_range(self,self->select_start[0]  ,self->select_start[1],self->select_end[0],self->select_end[1] );
 }
 
 // events
@@ -817,7 +838,7 @@ void gl_edit_char_event(edit_t *self, int ch, int mods) {
     // int len = utf8_surrogate_len(input);
     char buf[10] = {0};
     utf8_encode(buf, ch);
-    printf("gl_edit_char_event %s\n", buf);
+    //printf("gl_edit_char_event %s\n", buf);
     buffer_t *buffer = self->buffer;
     line_insert_text(buffer->lines[buffer->cursor_row], buffer->cursor_col,
                      buf);
@@ -828,7 +849,7 @@ void gl_edit_char_event(edit_t *self, int ch, int mods) {
 
 void gl_edit_key_event(edit_t *self, int key, int scancode, int action,
                        int mods) {
-  printf("gl_edit_key_event %d %d\n", key, action);
+  //printf("gl_edit_key_event %d %d\n", key, action);
   if (self != NULL && (action == 1 || action == 2)) {
     buffer_t *buffer = self->buffer;
     if (key == 263) {  // left
@@ -870,7 +891,7 @@ void gl_edit_key_event(edit_t *self, int key, int scancode, int action,
       }
       update_cursor_pos(buffer);
     }
-    if (buffer->cursor_row < buffer->line_count) {
+    /* if (buffer->cursor_row < buffer->line_count) {
       printf("row=%d col=%d line_cols=%d  count=%d actual=%d text=",
              buffer->cursor_row, buffer->cursor_col,
              buffer->lines[buffer->cursor_row]->count, buffer->line_count,
@@ -878,7 +899,7 @@ void gl_edit_key_event(edit_t *self, int key, int scancode, int action,
       // print_string(buffer->lines[buffer->cursor_row]->texts,
       //              buffer->lines[buffer->cursor_row]->actual);
       // printf("\n");
-    }
+    }*/
   }
 }
 
@@ -1023,9 +1044,7 @@ edit_t *gl_new_edit(int shader, float w, float h, float width, float height) {
   return self;
 }
 
-font_t * gl_edit_get_font(edit_t *self){
-  return self->font;
-}
+font_t *gl_edit_get_font(edit_t *self) { return self->font; }
 void gl_resize_edit_window(edit_t *self, float width, float height) {
   glUseProgram(self->mvp.shader);
   mat4_set_orthographic(&self->mvp.projection, 0, width * self->scale,
@@ -1095,8 +1114,8 @@ char *gl_get_edit_text(edit_t *self) {
   return self->texts;
 }
 
-float gl_edit_measure_text(edit_t *self){
-  if(self->texts==NULL){
+float gl_edit_measure_text(edit_t *self) {
+  if (self->texts == NULL) {
     gl_get_edit_text(self);
   }
   return measure_text(self->buffer->font, self->texts, strlen(self->texts));

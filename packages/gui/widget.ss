@@ -54,8 +54,9 @@
    widget-child-focus-event
    widget-get-global-center-xy
    widget-print
-   is-in-widget-top
-   is-in-child-widget
+   widget-in-parent-gx
+   widget-in-parent-gy
+  
    widget-child-rect-event-mouse-button
    widget-child-rect-event-mouse-motion
    widget-child-rect-key-event
@@ -65,6 +66,8 @@
    widget-rect-fun
    in-rect
    is-in
+   is-in-widget-top
+   is-in-child-widget
    widget-set-child-attr
    widget-set-child-attrs
    widget-child-rect-event-scroll
@@ -269,7 +272,8 @@
     (case-lambda
      [(p)
       (set! $widgets (append! $widgets (list p)))
-	  ((vector-ref p %layout) p)
+	  (if (procedure? (vector-ref p %layout))
+	  	((vector-ref p %layout) p))
       p]
      [(p w)
       (vector-set! w %parent p)
@@ -388,6 +392,17 @@
 	(list (+ (widget-get-attr widget %gx) (/ (widget-get-attr widget %w) 2) )
 		(+ (widget-get-attr widget %gy) (/ (widget-get-attr widget %h) 2) )
 	 ))
+
+  (define (widget-in-parent-gx widget parent)
+	(if (null? parent)
+		(vector-ref widget %x)
+		(+ (vector-ref parent %gx) (vector-ref widget %x))))
+
+  (define (widget-in-parent-gy widget parent)
+	(if (null? parent)
+		(vector-ref widget %y)
+		(+ (vector-ref parent %gy) (vector-ref widget %y))))
+
 
   (define (far gx gy a b)
 	(+ (* (- gx a) (- gx a))  (* (- gy b) (- gy b)))
@@ -628,7 +643,7 @@
 		(let ((h (vector-ref widget %attrs )))
 		(let ((hook (hashtable-ref h (format "%event-get-~a-hook" name) '())))
 			(if (procedure? hook)
-				(hook widget name)
+				(hook widget name default)
 				(hashtable-ref h name default))))]	
   ))
 
@@ -661,23 +676,23 @@
 	  )
       (set! nw (vector x y
 		       w h
-		       default-layout ;;layout
-		       (lambda (widget parent);;draw
-			 (let ((x  (vector-ref  widget %x))
-			       (y  (vector-ref widget %y))
-			       (w  (vector-ref  widget %w))
-			       (h  (vector-ref  widget %h))
-			       (draw (vector-ref widget %draw)))
-			   ;;(draw-widget-rect widget)
-			   (vector-set! widget %gx x)
-			   (vector-set! widget %gy y)
+		       default-layout ;;layout 4
+		       (lambda (widget parent);;draw 5
+				(let ((x  (vector-ref  widget %x))
+					(y  (vector-ref widget %y))
+					(w  (vector-ref  widget %w))
+					(h  (vector-ref  widget %h))
+					(draw (vector-ref widget %draw)))
+				;;(draw-widget-rect widget)
+				(vector-set! widget %gx x)
+				(vector-set! widget %gy y)
 
-			   ;;(graphic-sissor-begin x y w h)
-			   ;;(draw-dialog x y w h text)
-			   ;;(draw-text x y  (format "status =>~a" (vector-ref widget %status)))
-			   ;;(widget-draw-child widget)
-			   ;;(graphic-sissor-end)
-			   ))
+				;;(graphic-sissor-begin x y w h)
+				;;(draw-dialog x y w h text)
+				;;(draw-text x y  (format "status =>~a" (vector-ref widget %status)))
+				;;(widget-draw-child widget)
+				;;(graphic-sissor-end)
+				))
 		       (lambda (widget parent type data);;event
 			 (if (= type %event-mouse-button)
 			     (let ((xx (vector-ref widget %x))
@@ -771,7 +786,7 @@
 			       ))
 			 )
 		       (list )
-		       0   ;;status
+		       0   ;;status 8
 		       0.0 ;;top
 		       0.0 ;;bottom
 		       0.0 ;;left
@@ -785,11 +800,11 @@
 		       '() ;;parent
 		       0.0 ;;gx
 		       0.0 ;;gy
-		       text  ;;text
+		       text  ;;text 20
 		       '()  ;;
 		       (make-hashtable equal-hash equal?)  ;;attrs
 		       (make-hashtable equal-hash equal?)  ;events
-		       #t ;;visible
+		       #t ;;visible 24
 		       '()
 		       '()
 		       '()
@@ -1178,13 +1193,14 @@
   (define (widget-render)
     (let loop ((w $widgets))
       (if (pair? w)
-	  (begin
-	    ;;(printf "~a ~a\n" (widget-get-attr (car w) %text) (widget-get-attr (car w) %visible))
-	    (if (widget-get-attr (car w) %visible)
-		(let ((draw (vector-ref (car w) %draw)))
-		  (draw (car w) '() )))
-	    (loop (cdr w))
-	    )))
+		(begin
+			;;(printf "~a ~a\n" (widget-get-attr (car w) %text) (widget-get-attr (car w) %visible))
+			(if (widget-get-attr (car w) %visible)
+				(let ((draw (vector-ref (car w) %draw)))
+						(draw (car w) '() )
+						))
+	    (loop (cdr w)))
+	    ))
     ;;(graphic-draw-solid-quad cursor-x cursor-y (+ cursor-x 10.0) (+ cursor-y 10.0) 255.0 0.0 0.0 0.5)
     ;;(if (> cursor-arrow 0)
     ;;   (draw-image cursor-x cursor-y 22.0 24.0 cursor-arrow))

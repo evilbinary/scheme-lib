@@ -61,6 +61,11 @@
      gl-edit-get-cursor-y
      gl-edit-measure-text
      gl-edit-get-font
+     gl-edit-get-text-range
+     gl-edit-get-selection-row-start
+     gl-edit-get-selection-row-end
+     gl-edit-get-selection-col-start
+     gl-edit-get-selection-col-end
      )
     (import (scheme) (utils libutil) (cffi cffi) (gles gles2) )
 
@@ -84,8 +89,13 @@
     (def-function gl-edit-set-editable "gl_edit_set_editable" (void*  int) void)
     (def-function gl-edit-set-show-no "gl_edit_set_show_no" (void*  int) void)
     (def-function gl-edit-set-lineno-color "gl_edit_set_lineno_color" (void*  int) void)
-    (def-function gl-edit-get-selection "gl_get_selection" (void* ) string)
+    (def-function gl-edit-get-selection "gl_edit_get_selection" (void* ) string)
     (def-function gl-edit-set-selection "gl_edit_set_selection" (void*  int int int int) void)
+    (def-function gl-edit-get-text-range "gl_edit_get_text_range" (void*  int int int int) string)
+    (def-function gl-edit-get-selection-row-start "gl_edit_get_select_row_start" (void*) int)
+    (def-function gl-edit-get-selection-row-end "gl_edit_get_select_row_end" (void*) int)
+    (def-function gl-edit-get-selection-col-start "gl_edit_get_select_col_start" (void*) int)
+    (def-function gl-edit-get-selection-col-end "gl_edit_get_select_col_end" (void*) int)
 
 
     (def-function gl-edit-get-line-count "gl_edit_get_line_count" (void* ) int)

@@ -10,6 +10,7 @@
    video-get-fps
    video-set-pause
    video-get-duration
+   video-set-soft-conver
    video-get-current-duration
    )
 
@@ -23,7 +24,9 @@
   (def-function video-set-pause "video_set_pause" (void* int) void)
   (def-function video-get-duration "video_get_duration" (void*) double)
   (def-function video-get-current-duration "video_get_current_duration" (void*) double)
+  (def-function video-set-soft-conver "video_set_soft_conver" (void* int) void)
 
+  
   
 
 

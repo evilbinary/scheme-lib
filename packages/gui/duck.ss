@@ -645,6 +645,32 @@
 						(list-ref val 3)
 						 )
 					))
+	(widget-set-attrs
+		widget
+		"%event-get-text-range-hook"
+		(lambda (ww name val)
+					(gl-edit-get-text-range (widget-get-attrs ww '%edit) 
+						(list-ref val 0)
+						(list-ref val 1)
+						(list-ref val 2)
+						(list-ref val 3)
+						 )
+					))
+	(widget-set-attrs
+		widget
+		"%event-get-current-line-text-hook"
+		(lambda (ww name)
+			(let* ( (ed (widget-get-attrs ww '%edit))
+					(current-row (gl-edit-get-selection-row-start ed))
+					(row-count (gl-edit-get-row-count ed current-row))
+					)
+					(gl-edit-get-text-range  ed
+						current-row
+						0
+						current-row
+						row-count
+						 )
+					)))
 
       (widget-set-attrs
        widget
@@ -673,24 +699,23 @@
       (widget-set-draw
        widget
        (lambda (widget parent);;draw
-	 
-	 (let ((gx  (+ (vector-ref parent %gx) (vector-ref widget %x)))
-	       (gy   (+ (vector-ref parent %gy) (vector-ref widget %y)))
-	       (background (widget-get-attrs  widget 'background ))
-		   (border (widget-get-attrs widget 'border))
-	       (ww  (vector-ref  widget %w))
-	       (hh  (vector-ref  widget %h))
-	       )
-					(vector-set! widget %gx gx)
-					(vector-set! widget %gy gy)
+		(let ((gx  (widget-in-parent-gx widget parent))
+			(gy   (widget-in-parent-gy widget parent) )
+			(background (widget-get-attrs  widget 'background ))
+			(border (widget-get-attrs widget 'border))
+			(ww  (vector-ref  widget %w))
+			(hh  (vector-ref  widget %h))
+			)
+						(vector-set! widget %gx gx)
+						(vector-set! widget %gy gy)
 
-					(if (equal? '() background)
-							'()
-							(draw-panel gx gy ww hh '() background))
-					(if (number? border)
-						(draw-border gx gy ww hh border))
-					(graphic-draw-edit ed gx gy)
-					)))
+						(if (equal? '() background)
+								'()
+								(draw-panel gx gy ww hh '() background))
+						(if (number? border)
+							(draw-border gx gy ww hh border))
+						(graphic-draw-edit ed gx gy)
+						)))
       
       (widget-set-event
        widget

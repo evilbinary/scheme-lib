@@ -75,7 +75,7 @@ libgles.so: $(LIBGLES)
 libalut.so: libalut.so
 	$(MAKE) -C libalut
 
-libgui.so: libgui.so libnanovg.so
+libgui.so: libgui.so
 	$(MAKE) -C libgui
 
 libsocket.so:

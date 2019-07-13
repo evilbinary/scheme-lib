@@ -43,6 +43,13 @@ typedef struct {
 } mvp_t;
 
 typedef struct {
+  mvp_t* mvp;
+  int width;
+  int height;
+  float scale;
+} graphic_t;
+
+typedef struct {
   float size;
   struct sth_stash *stash;
   int id;
@@ -50,16 +57,19 @@ typedef struct {
   unsigned char *data;
 } font_t;
 
-float measure_text(font_t *font, char *text, int count);
+float measure_text(font_t* font, float size, char* text, int count);
 font_t *new_font(char *name, float size);
 void destroy_font(font_t *font);
-font_t *font_create(char *font_name);
 void glShaderSource2(GLuint shader, GLsizei count, const GLchar *string,
                      const GLint *length);
 
-void draw_solid_quad(mvp_t *mvp, float x1, float y1, float x2, float y2,
-                     float r, float g, float b, float a);
+void graphic_draw_solid_quad(mvp_t* mvp, float x1, float y1, float x2,
+                             float y2, float r, float g, float b, float a);
 void mvp_set_orthographic(mvp_t *self, float left, float right, float bottom,
                           float top, float znear, float zfar);
 void mvp_set_mvp(mvp_t *mvp);
+
+void graphic_render_string(font_t* font,float size, float sx, float sy,
+                           char* text, float* dx, float* dy, int color);
+                           
 #endif

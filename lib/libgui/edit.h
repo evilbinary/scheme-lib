@@ -6,7 +6,7 @@
 #ifndef __DUCK_EDIT_H__
 #define __DUCK_EDIT_H__
 
-#include "gui.h"
+#include "graphic.h"
 
 #define LINE_SIZE 512
 #define UPDATING 1
@@ -76,8 +76,6 @@ typedef struct _edit_t {
   int select_press;
   int cursor_color;
 
-  float font_size;  // create default size
-  char *font_name;  // create default name
   int show_lineno;
   int lineno_width;
   int lineno_color;
@@ -98,28 +96,25 @@ line_t **new_lines(size_t size);
 buffer_t *new_buffer();
 line_t *new_line(size_t size);
 
-edit_t *gl_new_edit(int shader, float w, float h, float width, float height);
-void gl_resize_edit_window(edit_t *self, float width, float height);
-void gl_edit_set_highlight(edit_t *self, void *colors);
-void gl_edit_mouse_event(edit_t *self, int action, float x, float y);
-void gl_edit_key_event(edit_t *self, int key, int scancode, int action,
-                       int mods);
-void gl_render_cursor(edit_t *self);
-void gl_add_edit_text(edit_t *self, char *text);
-void gl_set_edit_text(edit_t *self, char *text);
+edit_t *new_edit(int shader, font_t *font, float font_size, float scale,
+                 float w, float h, float width, float height);
+void resize_edit_window(edit_t *self, float width, float height);
+void edit_set_highlight(edit_t *self, void *colors);
+void edit_mouse_event(edit_t *self, int action, float x, float y);
+void edit_key_event(edit_t *self, int key, int scancode, int action, int mods);
+void render_cursor(edit_t *self);
+void add_edit_text(edit_t *self, char *text);
+void set_edit_text(edit_t *self, char *text);
 
-void gl_edit_cursor_move_left(buffer_t *self);
-void gl_edit_cursor_move_right(buffer_t *self);
-void gl_edit_cursor_move_down(buffer_t *self);
-void gl_edit_cursor_move_up(buffer_t *self);
+void edit_cursor_move_left(buffer_t *self);
+void edit_cursor_move_right(buffer_t *self);
+void edit_cursor_move_down(buffer_t *self);
+void edit_cursor_move_up(buffer_t *self);
 
-void gl_render_string(font_t *font, float size, char *text, float sx, float sy,
-                      float *dx, float *dy, int color);
-
-void gl_render_selection(edit_t *self);
-void gl_render_line_selected(mvp_t *mvp, line_t *line, int start, int end,
-                             int color);
-char *gl_get_selection(edit_t *self);
+void render_selection(edit_t *self);
+void render_line_selected(mvp_t *mvp, line_t *line, int start, int end,
+                          int color);
+char *get_selection(edit_t *self);
 
 void calc_cursor(edit_t *self);
 void pos_to_cursor(buffer_t *buffer, float x, float y);

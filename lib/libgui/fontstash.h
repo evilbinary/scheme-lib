@@ -111,6 +111,7 @@ struct sth_stash {
   struct sth_font* fonts;
   int drawing;
   int flags;
+  float scale;
 };
 
 // Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>
@@ -164,6 +165,8 @@ unsigned int decutf8(unsigned int* state, unsigned int* codep,
 struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt,
                             unsigned int codepoint, short isize);
 void flush_draw(struct sth_stash* stash);
+void clear_draw(struct sth_stash* stash);
+
 int get_quad(struct sth_stash* stash, struct sth_font* fnt,
              struct sth_glyph* glyph, short isize, float* x, float* y,
              struct sth_quad* q);
@@ -173,5 +176,7 @@ void sth_measure(struct sth_stash* stash, int idx, float size, float width,
                  char* s, int len, float* dx, float* dy);
 int sth_pos(struct sth_stash* stash, int idx, float size, float width, char* s,
             int count);
-            
+float sth_get_start(struct sth_stash* stash, float size);
+float sth_get_line(struct sth_stash* stash, float size);
+
 #endif  // FONTSTASH_H

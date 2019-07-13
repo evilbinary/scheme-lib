@@ -36,8 +36,6 @@
    widget-set-custom-cursor
    widget-new
    widget-copy
-   widget-set-text-font-size
-   widget-set-text-font-color
    widget-get-events
    widget-set-events
    widget-get-root
@@ -56,6 +54,7 @@
    widget-print
    widget-in-parent-gx
    widget-in-parent-gy
+   widget-add-new-event
   
    widget-child-rect-event-mouse-button
    widget-child-rect-event-mouse-motion
@@ -121,7 +120,7 @@
    %event-deactive
    
    )
-  (import (scheme) (gui graphic) (gui stb))
+  (import (scheme) (gui graphic) (gui stb) (gui utils))
   
   ;;common
   (define %draw 5)
@@ -180,6 +179,7 @@
   (define cursor-y 0)
   (define cursor-arrow 0)
   
+  (define default-widget-new-events '())
   (define default-layout '() )
   (define default-cursor '() )
   (define default-cursor-mode '() )
@@ -818,10 +818,13 @@
 		       
 		       ))
       (widget-set-attrs nw '%w w) 
-      (widget-set-attrs nw '%h h) 
+      (widget-set-attrs nw '%h h)
+	  (loop-event default-widget-new-events nw)
       nw
       ))
 
+  (define (widget-add-new-event proc)
+	(add-event default-widget-new-events proc))
 
   
   (define (widget-resize widget w h)
@@ -1309,18 +1312,6 @@
   (define (widget-destroy)
     (graphic-destroy)
     )
-
-
-  (define (widget-set-text-font-size widget size)
-    ;;(graphic-set-text-font-size (vector-ref widget %text) size)
-    '()
-    )
-
-  (define (widget-set-text-font-color widget r g b a)
-    '()
-    )
-
-
   
 (define draw-widget-rect
   (case-lambda

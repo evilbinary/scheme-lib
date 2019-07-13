@@ -114,6 +114,7 @@ struct sth_stash* sth_create(int cachew, int cacheh) {
   stash->empty_data = empty_data;
   stash->tt_textures = texture;
   stash->flags = FONS_ZERO_TOPLEFT;
+  stash->scale = 1.0;
   glGenTextures(1, &texture->id);
   if (!texture->id) goto error;
   glBindTexture(GL_TEXTURE_2D, texture->id);
@@ -517,15 +518,29 @@ float* setc(float* v, float r, float g, float b, float a) {
   v[3] = a;
   return v + 4;
 }
-
-void flush_draw(struct sth_stash* stash) {
+void clear_draw(struct sth_stash* stash) {
   struct sth_texture* texture = stash->tt_textures;
   short tt = 1;
   while (texture) {
     if (texture->nverts > 0) {
-      glActiveTexture(GL_TEXTURE0);
+      texture->nverts = 0;
+    }
+    texture = texture->next;
+    if (!texture && tt) {
+      texture = stash->bm_textures;
+      tt = 0;
+    }
+  }
+}
+
+void flush_draw(struct sth_stash* stash) {
+  struct sth_texture* texture = stash->tt_textures;
+  short tt = 1;
+  glActiveTexture(GL_TEXTURE0);
+  glEnable(GL_TEXTURE_2D);
+  while (texture) {
+    if (texture->nverts > 0) {
       glBindTexture(GL_TEXTURE_2D, texture->id);
-      glEnable(GL_TEXTURE_2D);
 
       glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, VERT_STRIDE,
                             texture->verts);
@@ -538,13 +553,10 @@ void flush_draw(struct sth_stash* stash) {
       glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, VERT_STRIDE,
                             texture->colors);
       glEnableVertexAttribArray(2);
-
       glDrawArrays(GL_QUADS, 0, texture->nverts);
       glDisableVertexAttribArray(0);
       glDisableVertexAttribArray(1);
       glDisableVertexAttribArray(2);
-      glDisable(GL_TEXTURE_2D);
-
       texture->nverts = 0;
     }
     texture = texture->next;
@@ -553,6 +565,7 @@ void flush_draw(struct sth_stash* stash) {
       tt = 0;
     }
   }
+  glDisable(GL_TEXTURE_2D);
 }
 
 void sth_begin_draw(struct sth_stash* stash) {
@@ -605,9 +618,9 @@ int sth_pos(struct sth_stash* stash, int idx, float size, float width, char* s,
   struct sth_font* fnt = NULL;
   if (stash == NULL) return -1;
   if (stash->flags & FONS_ZERO_TOPLEFT) {
-    y += stash->fonts->lineh * size;
+    y += stash->fonts->lineh * size * stash->scale;
   } else {
-    y -= stash->fonts->lineh * size;
+    y -= stash->fonts->lineh * size * stash->scale;
   }
   sy = y;
   fnt = stash->fonts;
@@ -647,11 +660,7 @@ void sth_measure(struct sth_stash* stash, int idx, float size, float width,
   float sy = y;
   struct sth_font* fnt = NULL;
   if (stash == NULL) return;
-  if (stash->flags & FONS_ZERO_TOPLEFT) {
-    y += stash->fonts->lineh * size;
-  } else {
-    y -= stash->fonts->lineh * size;
-  }
+  y += sth_get_line(stash, size);
   sy = y;
   fnt = stash->fonts;
   while (fnt != NULL && fnt->idx != idx) fnt = fnt->next;
@@ -665,27 +674,10 @@ void sth_measure(struct sth_stash* stash, int idx, float size, float width,
     i++;
     glyph = get_glyph(stash, fnt, codepoint, isize);
     if (!glyph) continue;
-    // if (*s == '\n') {
-    //   if (stash->flags & FONS_ZERO_TOPLEFT) {
-    //     y += stash->fonts->lineh * size;
-    //   } else {
-    //     y -= stash->fonts->lineh * size;
-    //   }
-    //   x = sx;
-    // }
 
     texture = glyph->texture;
-
-    // if (texture->nverts + 4 >= VERT_COUNT) {
-    //   flush_draw(stash);
-    // }
-
     if (width > 0 && x >= (width + sx - glyph->xadv)) {
-      if (stash->flags & FONS_ZERO_TOPLEFT) {
-        y += stash->fonts->lineh * size;
-      } else {
-        y -= stash->fonts->lineh * size;
-      }
+      y += sth_get_line(stash, size);
       x = sx;
     }
 
@@ -693,6 +685,31 @@ void sth_measure(struct sth_stash* stash, int idx, float size, float width,
   }
   if (dx) *dx = x;
   if (dy) *dy = y;
+}
+
+float sth_get_line(struct sth_stash* stash, float size) {
+  float lineh = 0.0;
+  if (stash->flags & FONS_ZERO_TOPLEFT) {
+    lineh += stash->fonts->lineh * size * stash->scale;
+  } else {
+    lineh -= stash->fonts->lineh * size * stash->scale;
+  }
+  return lineh;
+}
+
+float sth_get_start(struct sth_stash* stash, float size) {
+  float y = 0.0;
+  // if (stash->flags & FONS_ZERO_TOPLEFT) {
+  //   float gap = (stash->fonts->lineh + stash->fonts->descender -
+  //                stash->fonts->ascender);
+  //   y += (stash->fonts->ascender - gap) * size;
+  // } else {
+  //   float gap = (stash->fonts->lineh + stash->fonts->descender -
+  //                stash->fonts->ascender);
+  //   y -= (stash->fonts->ascender - gap) * size;
+  // }
+  y += sth_get_line(stash, size) + stash->fonts->descender * size;
+  return y;
 }
 
 void sth_draw_text(struct sth_stash* stash, int idx, float size, float x,
@@ -712,11 +729,9 @@ void sth_draw_text(struct sth_stash* stash, int idx, float size, float x,
 
   if (stash == NULL) return;
   if (s == NULL) return;
-  if (stash->flags & FONS_ZERO_TOPLEFT) {
-    y += stash->fonts->lineh * size;
-  } else {
-    y -= stash->fonts->lineh * size;
-  }
+
+  y += sth_get_start(stash, size);
+
   sy = y;
   fnt = stash->fonts;
   while (fnt != NULL && fnt->idx != idx) fnt = fnt->next;
@@ -730,16 +745,6 @@ void sth_draw_text(struct sth_stash* stash, int idx, float size, float x,
     }
     glyph = get_glyph(stash, fnt, codepoint, isize);
     if (!glyph) continue;
-
-    // if (*s == '\n') {
-    //   if (stash->flags & FONS_ZERO_TOPLEFT) {
-    //     y += stash->fonts->lineh * size;
-    //   } else {
-    //     y -= stash->fonts->lineh * size;
-    //   }
-    //   x = sx;
-    // }
-
     texture = glyph->texture;
 
     if (texture->nverts + 4 >= VERT_COUNT) {
@@ -747,11 +752,7 @@ void sth_draw_text(struct sth_stash* stash, int idx, float size, float x,
     }
 
     if (width > 0 && x >= (width + sx - glyph->xadv)) {
-      if (stash->flags & FONS_ZERO_TOPLEFT) {
-        y += stash->fonts->lineh * size;
-      } else {
-        y -= stash->fonts->lineh * size;
-      }
+      y += sth_get_line(stash, size);
       x = sx;
     }
 
@@ -794,11 +795,7 @@ void sth_draw_text_colors(struct sth_stash* stash, int idx, float size, float x,
 
   if (stash == NULL) return;
   if (s == NULL) return;
-  if (stash->flags & FONS_ZERO_TOPLEFT) {
-    y += stash->fonts->lineh * size;
-  } else {
-    y -= stash->fonts->lineh * size;
-  }
+  y += sth_get_start(stash, size);
   sy = y;
   fnt = stash->fonts;
   while (fnt != NULL && fnt->idx != idx) fnt = fnt->next;
@@ -815,15 +812,6 @@ void sth_draw_text_colors(struct sth_stash* stash, int idx, float size, float x,
     count++;
 
     glyph = get_glyph(stash, fnt, codepoint, isize);
-
-    // if (*s == '\n') {
-    //   if (stash->flags & FONS_ZERO_TOPLEFT) {
-    //     y += stash->fonts->lineh * size;
-    //   } else {
-    //     y -= stash->fonts->lineh * size;
-    //   }
-    //   x = sx;
-    // }
     if (!glyph) {
       // count++;
       continue;
@@ -836,11 +824,7 @@ void sth_draw_text_colors(struct sth_stash* stash, int idx, float size, float x,
     }
 
     if (width > 0 && x >= (width + sx - glyph->xadv)) {
-      if (stash->flags & FONS_ZERO_TOPLEFT) {
-        y += stash->fonts->lineh * size;
-      } else {
-        y -= stash->fonts->lineh * size;
-      }
+      y += sth_get_line(stash, size);
       x = sx;
     }
 
@@ -917,7 +901,7 @@ void sth_vmetrics(struct sth_stash* stash, int idx, float size, float* ascender,
   if (fnt->type != BMFONT && !fnt->data) return;
   if (ascender) *ascender = fnt->ascender * size;
   if (descender) *descender = fnt->descender * size;
-  if (lineh) *lineh = fnt->lineh * size;
+  if (lineh) *lineh = fnt->lineh * size * stash->scale;
 }
 
 void sth_delete(struct sth_stash* stash) {

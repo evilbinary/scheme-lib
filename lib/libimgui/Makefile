@@ -44,7 +44,7 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 #	CXXFLAGS += -D__APPLE__
 endif
 
-ifneq (, $(findstring "MINGW32_NT-", $(UNAME_S)))
+ifeq ($(findstring MINGW32_NT,$(OS_NAME)),MINGW32_NT)
    ECHO_MESSAGE = "Windows"
 	LIBS += 
 	CXXFLAGS+= -DGLAD -I../3rdparty/include -I../libglfw  -I../libglut  -L../libglfw/  -L../libglut/ -lglut -lglfw

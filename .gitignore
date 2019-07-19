@@ -13,13 +13,8 @@ lib/scheme/scheme
 
 lib/libglut
 lib/libscm
-<<<<<<< Updated upstream
-
 *.DS_Store
 *.zip
 *.txt
-
 *.o
-=======
-.DS_Store
->>>>>>> Stashed changes
+*.dll

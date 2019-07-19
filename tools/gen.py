@@ -1,6 +1,8 @@
 #-*- coding: UTF-8 -*-
+
 import os
 import re
+
 types={
         "float":"float",
         "int":"int",
@@ -23,6 +25,7 @@ types={
     
         }
 keepWord='(HSLA|RGBA|RGB|[A-Z])'
+
 def getType(type):
     t=types.get(type)
     if t:

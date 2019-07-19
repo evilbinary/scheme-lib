@@ -31,7 +31,7 @@ OS_NAME :=$(shell echo $(UNAME_S) | tr '[A-Z]' '[a-z]')
 LIBS_ALL= libscm.so libimgui.so libglfw.so libcffi.so libgles.so libnanovg.so \
 	libalut.so libgui.so libsocket.so libc.so 
 
-ifeq ($(UNAME_S), MINGW32_NT-6.1)
+ifneq ("", $(findstring "MINGW32_NT-", $(UNAME_S)))
   OS_NAME:=windows
   LIBSCM =./libscm/libscm.dll
   LIBGLUT =./libglut/libglut.dll

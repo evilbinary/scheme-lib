@@ -44,7 +44,7 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 #	CXXFLAGS += -D__APPLE__
 endif
 
-ifeq ($(UNAME_S), MINGW32_NT-6.1)
+ifneq ("", $(findstring "MINGW32_NT-", $(UNAME_S)))
    	ECHO_MESSAGE = "Windows"
 	LIBS += -lm 
 	CXXFLAGS += 

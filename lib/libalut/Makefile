@@ -29,8 +29,8 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 #	CXXFLAGS += -D__APPLE__
 endif
 
-ifneq (, $(findstring "MINGW32_NT-", $(UNAME_S)))
-   ECHO_MESSAGE = "Windows"
+ifeq ($(findstring MINGW32_NT,$(OS_NAME)),MINGW32_NT)
+    ECHO_MESSAGE = "Windows"
 	LIBS +=  -lopenal
 	CXXFLAGS += 
 	CFLAGS +=  -I../3rdparty/include -DALUT_BUILD_LIBRARY -Wl,--enable-auto-import \

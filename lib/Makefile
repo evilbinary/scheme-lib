@@ -9,14 +9,13 @@ SRC := $(ROOT)
 
 TARGET =scheme/scheme
 
-SUB_DIR :=  libscm \
-	libglut libimgui \
-	scheme	libgl \
-	libcffi libglfw \
-	libnanovg libgui \
+SUB_DIR :=  libscm  libgui libc libcffi libgl\
+	scheme	 \
+	libglfw \
+	libnanovg  \
 	libalut \
-	libc \
 	libvideo \
+	libglut libimgui \
 
 LIBSCM =./libscm/libscm.so
 LIBGLUT =./libglut/libglut.so
@@ -27,11 +26,11 @@ LIBSOCKET=./libsocket/libsocket.so
 LIBVIDEO=./libvideo/libvideo.so
 
 UNAME_S := $(shell uname -s)
-OS_NAME :=$(shell echo $(UNAME_S) | tr '[A-Z]' '[a-z]')
-LIBS_ALL= libscm.so libimgui.so libglfw.so libcffi.so libgles.so libnanovg.so \
-	libalut.so libgui.so libsocket.so libc.so 
+OS_NAME :=$(shell echo $(UNAME_S))
+LIBS_ALL= libscm.so libcffi.so libgles.so libgui.so libsocket.so libc.so  libalut.so    \
+	 libglfw.so libimgui.so libnanovg.so
 
-ifneq (, $(findstring "MINGW32_NT-", $(UNAME_S)))
+ifeq ($(findstring MINGW32_NT,$(OS_NAME)),MINGW32_NT)
   OS_NAME:=windows
   LIBSCM =./libscm/libscm.dll
   LIBGLUT =./libglut/libglut.dll

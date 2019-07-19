@@ -9,37 +9,39 @@ TARGET =bin/scheme
 EXT=.so
 UNAME_S := $(shell uname -s)
 
-ifneq (, $(findstring "MINGW32_NT-", $(UNAME_S)))
+ifeq ($(findstring MINGW32_NT,$(OS_NAME)),MINGW32_NT)
   EXT=.dll
 endif
 SOFILES= lib/libscm/libscm$(EXT) \
-		 lib/libglut/libglut$(EXT)  \
-		 lib/libimgui/libimgui$(EXT) \
 		 lib/libcffi/libcffi$(EXT)  \
-		 lib/libglfw/libglfw$(EXT)  \
 		 lib/libgl/libgles$(EXT)  \
-		 lib/libnanovg/libnanovg$(EXT)  \
+		 lib/libc/libc$(EXT) \
 		 lib/libgui/libgui$(EXT)  \
+		 lib/libglfw/libglfw$(EXT)  \
 		 lib/libvideo/libvideo$(EXT)  \
 		 lib/libalut/libalut$(EXT)  \
 		 lib/libsocket/libsocket$(EXT)  \
-		 lib/libc/libc$(EXT) \
+		 lib/libglut/libglut$(EXT)  \
 		 lib/scheme/scheme	\
 		 lib/boot/scheme.boot	\
 		 lib/boot/petite.boot	\
+		 lib/libimgui/libimgui$(EXT) \
+		 lib/libnanovg/libnanovg$(EXT)  \
+
 		 
 BINFILES=bin/libscm$(EXT) \
-		 bin/libglut$(EXT)  \
-		 bin/libimgui$(EXT) \
 		 bin/libcffi$(EXT)  \
+		 bin/libgui$(EXT)  \
 		 bin/libglfw$(EXT)  \
 		 bin/libgles$(EXT)  \
+		 bin/libc/libc$(EXT) \
+		 bin/libglut$(EXT)  \
 		 bin/libnanovg$(EXT)  \
-		 bin/libgui$(EXT)  \
 		 bin/libvideo$(EXT)  \
 		 bin/libsocket$(EXT)  \
 		 bin/libalut$(EXT)  \
-		 bin/libc/libc$(EXT)
+		 bin/libimgui$(EXT) \
+
 
 all: $(TARGET)
 	@echo "All build finish ^_^ have fun!"

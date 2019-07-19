@@ -14,3 +14,8 @@ lib/scheme/scheme
 lib/libglut
 lib/libscm
 
+*.DS_Store
+*.zip
+*.txt
+
+*.o

@@ -70,7 +70,7 @@
   (define (draw-line x1 y1 x2 y2 color)
     (graphic-draw-line x1 y1 x2 y2 color))
   (define (draw-widget-text widget)
-    (let* ([color (widget-get-attrs widget 'color 0)]
+    (let* ([color (widget-get-attrs widget 'color 4294967295)]
            [parent (widget-get-attr widget %parent)]
            [tw (widget-get-attrs widget 'text-width 0.0)]
            [th (widget-get-attrs widget 'text-height 0.0)]
@@ -83,8 +83,8 @@
                              widget
                              'padding-bottom
                              0.0)]
-           [gx (+ (vector-ref parent %gx) (vector-ref widget %x))]
-           [gy (+ (vector-ref parent %gy) (vector-ref widget %y))]
+           [gx (widget-in-parent-gx widget parent)]
+           [gy (widget-in-parent-gy widget parent)]
            [w (widget-get-attr widget %w)]
            [h (widget-get-attr widget %h)]
            [text (widget-get-attr widget %text)]
@@ -93,23 +93,23 @@
       (case ta
         [(quote left)
          (draw-text font font-size (+ gx padding-left)
-           (+ gy (/ (- h lineh) 2.0) padding-top) text)]
+           (+ gy (/ (- h lineh) 2.0) padding-top) text color)]
         [(quote left-top)
          (draw-text font font-size (+ gx padding-left)
-           (+ gy padding-top) text)]
+           (+ gy padding-top) text color)]
         [(quote right)
          (draw-text font font-size (+ gx padding-left)
-           (+ gy (/ h 2.0)) text)]
+           (+ gy (/ h 2.0)) text color)]
         [(quote center)
          (if (> tw w)
              (draw-text font font-size (+ gx padding-left)
-               (+ gy (/ (- h lineh) 2.0)) text)
+               (+ gy (/ (- h lineh) 2.0)) text color)
              (draw-text font font-size
                (+ gx (/ (- w tw) 2.0) padding-left)
-               (+ gy (/ (- h lineh) 2.0)) text))]
+               (+ gy (/ (- h lineh) 2.0)) text color))]
         [else
          (draw-text font font-size (+ gx (- w tw) padding-left)
-           (+ gy) text)])))
+           (+ gy) text color)])))
   (define draw-text
     (case-lambda
       [(x y text) (graphic-draw-text-immediate x y text)]
@@ -119,7 +119,10 @@
        (graphic-draw-text-immediate font size x y text 4294967295)]
       [(font size x y text color)
        (graphic-draw-text-immediate font size x y text color)]))
-  (define (draw-hover x y w h) (draw-rect x y w h))
+  (define (draw-hover x y w h color)
+    (if (null? color)
+        (draw-rect x y w h)
+        (draw-rect x y w h color)))
   (define (draw-border x y w h color)
     (graphic-draw-line-strip
       (list x y (+ x w) y (+ x w) (+ y h) (+ x) (+ y h) x y)

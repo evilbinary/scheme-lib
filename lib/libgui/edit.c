@@ -480,7 +480,7 @@ void render_edit_once(edit_t *self, float x, float y, char *text, int color) {
 
 void calc_lineno_width(edit_t *self) {
   int no = calc_number(self->buffer->line_count);
-  self->lineno_width = no * self->font->size / self->scale + 10;
+  self->lineno_width = no * self->font->size * self->scale + 10;
 }
 
 void render_edit(edit_t *self, float x, float y) {

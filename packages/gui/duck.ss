@@ -107,33 +107,25 @@
                 [y (vector-ref widget %y)]
                 [w (vector-ref widget %w)]
                 [h (vector-ref widget %h)]
-                [draw (vector-ref widget %draw)])
-            (if (null? parent)
-                (let ([gx (+ (vector-ref widget %x))]
-                      [gy (+ (vector-ref widget %y))])
-                  (vector-set! widget %gx gx)
-                  (vector-set! widget %gy gy)
-                  (draw-item gx gy w h))
-                (let ([gx (+ (vector-ref parent %gx)
-                             (vector-ref widget %x))]
-                      [gy (+ (vector-ref parent %gy)
-                             (vector-ref widget %y))]
-                      [color (widget-get-attrs widget 'color)]
-                      [background (widget-get-attrs widget 'background)])
-                  (vector-set! widget %gx gx)
-                  (vector-set! widget %gy gy)
-                  (draw-item-bg gx gy w h background)
-                  (if (= (widget-get-attr widget %status) %status-active)
-                      (draw-hover
-                        gx
-                        gy
-                        (widget-get-attr widget %w)
-                        (widget-get-attr widget %h)))
-                  (draw-widget-text widget)))
-            (if (equal? #t (widget-get-attrs widget 'static))
-                (widget-set-attr widget %status %status-active))
+                [draw (vector-ref widget %draw)]
+                [gx (widget-in-parent-gx widget parent)]
+                [gy (widget-in-parent-gy widget parent)]
+                [color (widget-get-attrs widget 'color)]
+                [background (widget-get-attrs widget 'background)]
+                [hover-background (widget-get-attrs
+                                    widget
+                                    'hover-background)])
+            (vector-set! widget %gx gx)
+            (vector-set! widget %gy gy)
+            (draw-item-bg gx gy w h background)
             (if (= (widget-get-attr widget %status) %status-active)
-                (widget-draw-child widget)))))
+                (draw-hover gx gy (widget-get-attr widget %w)
+                  (widget-get-attr widget %h) hover-background))
+            (draw-widget-text widget))
+          (if (equal? #t (widget-get-attrs widget 'static))
+              (widget-set-attr widget %status %status-active))
+          (if (= (widget-get-attr widget %status) %status-active)
+              (widget-draw-child widget))))
       (widget-set-event
         widget
         (lambda (widget parent type data)
@@ -255,8 +247,7 @@
                 (let ([gx (+ (vector-ref parent %gx)
                              (vector-ref widget %x))]
                       [gy (+ (vector-ref parent %gy)
-                             (vector-ref widget %y))]
-                      [color (widget-get-attrs widget 'color)])
+                             (vector-ref widget %y))])
                   (vector-set! widget %gx gx)
                   (vector-set! widget %gy gy)
                   (draw-widget-text widget)))
@@ -883,16 +874,16 @@
           (let ([gx (+ (vector-ref parent %gx)
                        (vector-ref widget %x))]
                 [gy (+ (vector-ref parent %gy) (vector-ref widget %y))]
-                [background (widget-get-attrs widget 'background)])
+                [background (widget-get-attrs widget 'background)]
+                [hover-background (widget-get-attrs
+                                    widget
+                                    'hover-background)])
             (vector-set! widget %gx gx)
             (vector-set! widget %gy gy)
             (draw-item-bg gx gy w h background)
             (if (widget-status-is-set widget %status-hover)
-                (draw-hover
-                  gx
-                  gy
-                  (widget-get-attr widget %w)
-                  (widget-get-attr widget %h)))
+                (draw-hover gx gy (widget-get-attr widget %w)
+                  (widget-get-attr widget %h) hover-background))
             (draw-widget-text widget))))
       (widget-set-event
         widget

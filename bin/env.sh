@@ -1,4 +1,4 @@
-export LD_LIBRARY_PATH=.:../packages/:../packages/gui:./apps:../:../lib:../packages/nanopass:../apps/duck-editor:../../duck-editor
+export LD_LIBRARY_PATH=.:../packages/:../packages/gui:./apps:../:../lib:../packages/nanopass:../apps/duck-editor:../../duck-editor:/z/main/jni/apps/duck-editor/
 export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH
 export CHEZSCHEMELIBDIRS=$LD_LIBRARY_PATH
 export SCHEMEHEAPDIRS=.

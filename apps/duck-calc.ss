@@ -7,6 +7,7 @@
 	 (gui duck)
 	 (gui draw)
 	 (gui window)
+   (glut glut)
 	 (gui widget))
 (define (infix-prefix lst)
   (if (list? lst)

@@ -4,10 +4,10 @@
 ;;邮箱:rootdebug@163.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (library (glut glut)
-  (export glut-init glut-main-loop glut-exit glut-display
-   glut-event glut-touch-event glut-motion-event
+  (export glut-init glut-main-loop glut-exit glut-sleep
+   glut-display glut-event glut-touch-event glut-motion-event
    glut-mouse-event glut-key-event glut-reshape glut-idle
-   glut-vector glut-unvector glut-test glut-log
+   glut-vector glut-unvector glut-sleep glut-test glut-log
    glut-test-rotatef glut-set-gl-version
    glut-set-soft-input-mode glut-show-soft-input
    glut-hide-soft-input glut-event-get glut-init-window-size
@@ -48,6 +48,8 @@
         (glut-init-op)
         (if (procedure? (car args))
             (begin (set! glut-init-proc (car args)) (glut-init-op)))))
+  (define glut-sleep
+    (foreign-procedure "glut_sleep" (int) void))
   (define glut-main-loop
     (foreign-procedure "glut_main_loop" () void))
   (define glut-exit (foreign-procedure "glut_exit" () void))
@@ -81,6 +83,7 @@
             (glut-set-soft-input-mode 0 1)
             (set! is-soft-input-show #f)))))
   (define (glut-init-callback)
+    (glut-log "glut-init-proc")
     (if (procedure? glut-init-proc) (glut-init-proc)))
   (define (glut-on-key-event-callback . args)
     (if (procedure? glut-key-event-proc)

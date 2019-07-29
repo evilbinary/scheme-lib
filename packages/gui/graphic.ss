@@ -15,7 +15,9 @@
    graphic-get-font graphic-get-fps graphic-set-ratio
    graphic-measure-text graphic-get-font-lineh
    graphic-get-font-height load-shader graphic-add-init-event
-   graphic-add-resize-event)
+   graphic-add-resize-event graphic-add-font-path
+   glShaderSource2 mvp-create mvp-set-mvp measure-text
+   font-copy font-new)
   (import (scheme) (utils libutil) (cffi cffi) (gles gles2)
     (gui utils))
   (load-librarys "libgui")
@@ -124,6 +126,7 @@
   (define graphic-init-events '())
   (define graphic-resize-events '())
   (define graphic-vars (make-hashtable equal-hash eqv?))
+  (define finded-font-path (make-hashtable equal-hash eqv?))
   (define v-shader-str
     "uniform mat4 model;\n      uniform mat4 view;\n      uniform mat4 projection;\n      uniform vec4 color;\n      attribute vec3 vertex;\n      attribute vec2 tex_coord;\n      varying vec2 v_tex_coord;\n      varying vec4 v_color;\n      void main()\n      {\n        v_tex_coord=tex_coord;\n        v_color=color;\n        gl_Position=projection*view*model*vec4(vertex,1.0);\n      }")
   (define f-shader-str
@@ -151,6 +154,7 @@
     (add-event graphic-init-events proc))
   (define (graphic-add-resize-event proc)
     (add-event graphic-resize-events proc))
+  (define (graphic-add-font-path path) '())
   (define (graphic-init width height)
     (set! my-width width)
     (set! my-height height)
@@ -190,8 +194,8 @@
     (set! font-mvp
       (mvp-create
         font-program
-        (* graphic-ratio my-width)
-        (* graphic-ratio my-height)))
+        (flonum->fixnum (* graphic-ratio my-width))
+        (flonum->fixnum (* graphic-ratio my-height))))
     (hashtable-set! graphic-vars 'font-program font-program)
     (hashtable-set! graphic-vars 'font-mvp font-mvp)
     (hashtable-set! graphic-vars 'my-width my-width)
@@ -254,27 +258,57 @@
     (graphic-get-font-line-height font size))
   (define (graphic-get-font-height font size)
     (graphic-get-font-h font size))
+  (define (get-font-path name)
+    (let ([font-path (hashtable-ref finded-font-path name '())])
+      (if (null? font-path)
+          (let loop ([libs (map car (library-directories))])
+            (if (pair? libs)
+                (begin
+                  (if (and (string? name)
+                           (file-exists?
+                             (string-append (car libs) "/" name))
+                           (eq? ""
+                                (hashtable-ref
+                                  finded-font-path
+                                  (string-append (car libs) "/" name)
+                                  "")))
+                      (let ([libname (string-append (car libs) "/" name)])
+                        (hashtable-set! finded-font-path libname name)
+                        (hashtable-set! finded-font-path name libname)
+                        libname))
+                  (loop (cdr libs)))))
+          font-path)))
   (define graphic-get-font
     (case-lambda
       [(name)
        (if (null? name) (set! name default-font-name))
-       (let ([font (hashtable-ref all-font-cache name '())])
+       (let ([font (hashtable-ref
+                     all-font-cache
+                     (get-font-path name)
+                     '())])
          (if (null? font)
              (begin
                (set! font
-                 (font-new name (* graphic-ratio default-font-size)))
-               (hashtable-set! all-font-cache name font)
+                 (font-new
+                   (get-font-path name)
+                   (* graphic-ratio default-font-size)))
+               (hashtable-set! all-font-cache (get-font-path name) font)
                font)
-             font))]
+             (begin font)))]
       [(name size)
        (if (null? name) (set! name default-font-name))
-       (let ([font (hashtable-ref all-font-cache name '())])
+       (let ([font (hashtable-ref
+                     all-font-cache
+                     (get-font-path name)
+                     '())])
          (if (null? font)
              (begin
-               (set! font (font-new name (* size graphic-ratio)))
-               (hashtable-set! all-font-cache name font)
+               (set! font
+                 (font-new (get-font-path name) (* size graphic-ratio)))
+               (hashtable-set! all-font-cache (get-font-path name) font)
                font)
-             (font-copy font (* size graphic-ratio))))]))
+             (begin
+               (let ([f (font-copy font (* size graphic-ratio))]) f))))]))
   (define (graphic-new-mvp)
     (mvp-create default-program my-width my-height))
   (define (graphic-draw-string-prepare font)

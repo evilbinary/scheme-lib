@@ -13,8 +13,7 @@
     (let* ([text (widget-get-attr widget %text)]
            [font-name (widget-get-attrs widget 'font-name '())]
            [font-size 20.0]
-           [font (graphic-get-font font-name font-size)]
-           [text (widget-get-attr widget %text)])
+           [font (graphic-get-font font-name font-size)])
       (widget-set-attrs widget 'font font)
       (widget-set-attrs widget 'font-size font-size)
       (widget-set-attrs

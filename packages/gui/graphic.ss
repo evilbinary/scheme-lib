@@ -194,8 +194,8 @@
     (set! font-mvp
       (mvp-create
         font-program
-        (flonum->fixnum (* graphic-ratio my-width))
-        (flonum->fixnum (* graphic-ratio my-height))))
+        (flonum->fixnum (* graphic-ratio my-width 1.0))
+        (flonum->fixnum (* graphic-ratio my-height 1.0))))
     (hashtable-set! graphic-vars 'font-program font-program)
     (hashtable-set! graphic-vars 'font-mvp font-mvp)
     (hashtable-set! graphic-vars 'my-width my-width)

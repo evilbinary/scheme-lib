@@ -6,7 +6,7 @@
 (library (cffi cffi)
   (export ffi-prep-cif ffi-prep-cif-var ffi-call load-lib
    load-libs cffi-set-char cffi-set-int cffi-set-float
-   cffi-set-double cffi-set-long cffi-get-uchar
+   cffi-set-double cffi-set-long cffi-get-addr cffi-get-uchar
    cffi-get-uint cffi-get-ulong cffi-get-char cffi-get-int
    cffi-get-float cffi-get-long cffi-get-double
    cffi-get-pointer cffi-get-string cffi-get-string-offset
@@ -150,14 +150,14 @@
   (define ffi-type-float (ffi-type-float-ptr))
   (define ffi-type-double (ffi-type-double-ptr))
   (define ffi-type-longdouble (ffi-type-longdouble-ptr))
+  (define ffi-get-addr
+    (foreign-procedure "ffi_get_addr" (void* integer-32) void*))
   (define ffi-set-char
     (foreign-procedure "ffi_set_char" (void* char) void))
   (define ffi-set-int
     (foreign-procedure "ffi_set_int" (void* int) void))
   (define ffi-set-short
     (foreign-procedure "ffi_set_short" (void* short) void))
-  (define ffi-set-long
-    (foreign-procedure "ffi_set_long" (void* integer-64) void))
   (define ffi-set-uchar
     (foreign-procedure "ffi_set_uchar" (void* char) void))
   (define ffi-set-uint
@@ -181,18 +181,44 @@
       (void* double)
       void))
   (define ffi-set-pointer
-    (foreign-procedure "ffi_set_pointer"
-      (void* integer-64)
-      void))
+    (case (machine-type)
+      [(arm32le)
+       (foreign-procedure "ffi_set_pointer"
+         (void* integer-32)
+         void)]
+      [else
+       (foreign-procedure "ffi_set_pointer"
+         (void* integer-64)
+         void)]))
+  (define ffi-set-long
+    (case (machine-type)
+      [(arm32le)
+       (foreign-procedure "ffi_set_long" (void* integer-32) void)]
+      [else
+       (foreign-procedure "ffi_set_long"
+         (void* integer-64)
+         void)]))
+  (define ffi-copy-mem
+    (case (machine-type)
+      [(arm32le)
+       (foreign-procedure "ffi_copy_mem"
+         (void* void* integer-32)
+         void)]
+      [else
+       (foreign-procedure "ffi_copy_mem"
+         (void* void* integer-64)
+         void)]))
+  (define ffi-get-ulong
+    (case (machine-type)
+      [(arm32le)
+       (foreign-procedure "ffi_get_ulong" (void*) unsigned-32)]
+      [else
+       (foreign-procedure "ffi_get_ulong" (void*) unsigned-64)]))
   (define ffi-set-string
     (foreign-procedure "ffi_set_string" (void* string) void))
   (define ffi-init-struct
     (foreign-procedure "ffi_init_struct"
       (void* int int int void*)
-      void))
-  (define ffi-copy-mem
-    (foreign-procedure "ffi_copy_mem"
-      (void* void* integer-64)
       void))
   (define ffi-get-char
     (foreign-procedure "ffi_get_char" (void*) char))
@@ -208,8 +234,6 @@
     (foreign-procedure "ffi_get_ushort" (void*) unsigned-short))
   (define ffi-get-uint
     (foreign-procedure "ffi_get_uint" (void*) unsigned-int))
-  (define ffi-get-ulong
-    (foreign-procedure "ffi_get_ulong" (void*) unsigned-64))
   (define ffi-get-float
     (foreign-procedure "ffi_get_float" (void*) float))
   (define ffi-get-double
@@ -251,6 +275,7 @@
   (define cffi-alloc $ffi-alloc)
   (define cffi-free $ffi-free)
   (define cffi-set $ffi-set)
+  (define cffi-get-addr ffi-get-addr)
   (define cffi-set-char ffi-set-char)
   (define cffi-set-int ffi-set-int)
   (define cffi-set-float ffi-set-float)

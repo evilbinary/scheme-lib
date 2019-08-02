@@ -7,7 +7,7 @@ QQ群：Lisp兴趣小组239401374
 
 ### 安装编译
 
-# Ubuntu和Debian GNU/Linux
+# Ubuntu和Debian GNU/Linux（仅支持i686和x86_64）
 
 1. 执行`sudo apt-get install freeglut3-dev libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libalut-dev libopenal-dev libffi-dev`命令安装依赖库。
 2. 执行`make`命令就可以编译，对应平台的文件在`bin`目录下。

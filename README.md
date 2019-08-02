@@ -14,7 +14,7 @@ QQ群：Lisp兴趣小组239401374
 3. 进入`bin`目录，执行`source env.sh`，然后运行`./scheme --script ../apps/hello.ss`就可以运行例子。
 
 # osx
-1. 安装xcode command line tool。
+1. 安装[xcode command line tool](https://developer.apple.com/download/more/)。
 2. [brew](https://www.macports.org/)或者[port](https://www.macports.org/)安装`glfw ffmpeg`开发库
 3. 执行`make`命令就可以编译，对应平台的文件在`bin`目录下。
 4. 进入`bin`目录，执行`source env.sh`，然后运行`./scheme --script ../apps/hello.ss`就可以运行例子。

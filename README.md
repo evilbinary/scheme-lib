@@ -9,13 +9,13 @@ QQ群：Lisp兴趣小组239401374
 
 # linux
 
-1. linux下安装`apt-get install freeglut3-dev  libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev  libalut-dev libopenal-dev libffi-dev`依赖库。
+1. Debian/Ubuntu下安装依赖库:执行`sudo apt-get install freeglut3-dev libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libalut-dev libopenal-dev libffi-dev`命令。
 2. 执行`make`命令就可以编译，对应平台的文件在`bin`目录下。
 3. 进入`bin`目录，执行`source env.sh`，然后运行`./scheme --script ../apps/hello.ss`就可以运行例子。
 
 # osx
-1. mac安装xcode command line tool。
-2. brew或者port安装glfw ffmpeg开发库
+1. 安装xcode command line tool。
+2. brew或者port安装`glfw ffmpeg`开发库
 3. 执行`make`命令就可以编译，对应平台的文件在`bin`目录下。
 4. 进入`bin`目录，执行`source env.sh`，然后运行`./scheme --script ../apps/hello.ss`就可以运行例子。
 

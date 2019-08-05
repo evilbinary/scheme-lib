@@ -7,19 +7,19 @@ QQ群：Lisp兴趣小组239401374
 
 ### 安装编译
 
-# linux
+# Ubuntu和Debian GNU/Linux（仅支持i686和x86_64）
 
-1. linux下安装`apt-get install freeglut3-dev  libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev  libalut-dev libopenal-dev libffi-dev`依赖库。
+1. 执行`sudo apt-get install build-essential freeglut3-dev libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libalut-dev libopenal-dev libffi-dev`命令安装依赖库。
 2. 执行`make`命令就可以编译，对应平台的文件在`bin`目录下。
 3. 进入`bin`目录，执行`source env.sh`，然后运行`./scheme --script ../apps/hello.ss`就可以运行例子。
 
-# osx
-1. mac安装xcode command line tool。
-2. brew或者port安装glfw ffmpeg开发库
+# Mac OS X
+1. 安装[XCode Command Line Tool或XCode](https://developer.apple.com/download/more/)。
+2. [brew](https://www.macports.org/)或者[port](https://www.macports.org/)安装`glfw ffmpeg`开发库。
 3. 执行`make`命令就可以编译，对应平台的文件在`bin`目录下。
 4. 进入`bin`目录，执行`source env.sh`，然后运行`./scheme --script ../apps/hello.ss`就可以运行例子。
 
-# windows
+# Windows
 1. 下载已经去除了，因为有人说抱怨运行报错，这下你只能自己编译。真需要的话，加群下载。
 
 # 使用scheme lib的项目
@@ -42,7 +42,7 @@ duck-editor 鸭子编辑器：[https://github.com/evilbinary/duck-editor](https:
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/draw-image.png" width="400px" /> <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/box2d-demo.png" width="400px" />
 
-# android
+# Android
 ## 新手入门
 ### 环境安装 手机版
 1. 先安装[scheme-release-1.5.apk][1]

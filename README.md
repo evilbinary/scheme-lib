@@ -5,21 +5,21 @@ scheme-lib 是一个scheme使用的库。目前支持android osx linux windows�
 QQ群：Lisp兴趣小组239401374
 
 
-### 安装编译
+# 安装编译
 
-# Linux
+## Linux
 
 1. 执行`sudo apt-get install build-essential freeglut3-dev libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libalut-dev libopenal-dev libffi-dev`命令安装依赖库。
 2. 执行`make`命令就可以编译，对应平台的文件在`bin`目录下。
 3. 进入`bin`目录，执行`source env.sh`，然后运行`./scheme --script ../apps/hello.ss`就可以运行例子。
 
-# Mac OS X
+## Mac OS X
 1. 安装[XCode Command Line Tool或XCode](https://developer.apple.com/download/more/)。
 2. [brew](https://www.macports.org/)或者[port](https://www.macports.org/)安装`glfw ffmpeg`开发库。
 3. 执行`make`命令就可以编译，对应平台的文件在`bin`目录下。
 4. 进入`bin`目录，执行`source env.sh`，然后运行`./scheme --script ../apps/hello.ss`就可以运行例子。
 
-# Windows
+## Windows
 1. 下载已经去除了，因为有人说抱怨运行报错，这下你只能自己编译。真需要的话，加群下载。
 
 # 使用scheme lib的项目
@@ -27,12 +27,12 @@ scheme lib官方网站：[http://scheme-lib.evilbinary.org/](http://scheme-lib.e
 letsgo 莱茨狗抢狗软件：[https://github.com/scheme-lib/letsgo](https://github.com/scheme-lib/letsgo)  
 duck-editor 鸭子编辑器：[https://github.com/evilbinary/duck-editor](https://github.com/evilbinary/duck-editor)
 
-### 文档
+# 文档
 [开发文档](https://github.com/evilbinary/scheme-lib/tree/master/docs)
 
 
 
-### 截图
+# 截图
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/calc.png" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/editor2.png" width="400px" />
 
@@ -51,11 +51,7 @@ duck-editor 鸭子编辑器：[https://github.com/evilbinary/duck-editor](https:
 
 运行效果如下：
 
-<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/m-game2.png" width="350px" />
-
-<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/m-game.png" width="350px" />
-
-<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/helloworld.png" width="350px" />
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/m-game2.png" width="350px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/m-game.png" width="350px" />
 
 ### 测试配置
 1. 在手机上输入运行代码可能不方便，所以弄了个配置文件，把需要运行的代码放到配置中会自己加载代码运行。配置文件为`config.xml`内容如下:

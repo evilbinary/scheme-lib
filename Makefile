@@ -15,7 +15,7 @@ endif
 SOFILES= lib/libscm/libscm$(EXT) \
 		 lib/libcffi/libcffi$(EXT)  \
 		 lib/libgl/libgles$(EXT)  \
-		 lib/libc/libc$(EXT) \
+		 lib/libc/libcc$(EXT) \
 		 lib/libgui/libgui$(EXT)  \
 		 lib/libglfw/libglfw$(EXT)  \
 		 lib/libvideo/libvideo$(EXT)  \
@@ -47,7 +47,7 @@ all: $(TARGET)
 	@echo "All build finish ^_^ have fun!"
 
 $(TARGET):  $(SOFILES)
-	@for n in $^; do cp $$n bin ; done
+	@for n in $^; do cp -rf $$n bin ; done
 
 $(SOFILES):
 	$(MAKE) -C lib

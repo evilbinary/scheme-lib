@@ -5,7 +5,7 @@
 ##########################################################
 
 
-TARGET = libc.so
+TARGET = libcc.so
 OBJS = c.o
 PLATFORM=
 BITS =$(shell getconf LONG_BIT)

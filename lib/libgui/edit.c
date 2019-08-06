@@ -480,7 +480,7 @@ void render_edit_once(edit_t *self, float x, float y, char *text, int color) {
 
 void calc_lineno_width(edit_t *self) {
   int no = calc_number(self->buffer->line_count);
-  self->lineno_width = no * self->font->size * self->scale + 10;
+  self->lineno_width = no * self->font->size / self->scale + 10;
 }
 
 void render_edit(edit_t *self, float x, float y) {
@@ -669,7 +669,7 @@ void render_line_selected(mvp_t *mvp, line_t *line, int start, int end,
   float startx = 0;
   float endx = 0;
   if (line->count == 0 || start == end) {
-    endx = line->font->stash->fonts->lineh * line->font->size  / 2;
+    endx = line->font->stash->fonts->lineh * line->font->size / 2;
   } else {
     startx = measure_text(line->font, line->font->size, line->texts, start);
     endx = measure_text(line->font, line->font->size, line->texts, end);

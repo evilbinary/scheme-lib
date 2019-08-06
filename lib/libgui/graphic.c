@@ -3,6 +3,7 @@
  * 邮箱:rootdebug@163.com
  */
 #include "graphic.h"
+#include "logger.h"
 
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
@@ -46,6 +47,7 @@ void mvp_set_mvp(mvp_t* mvp) {
 }
 
 font_t* new_font(char* name, float size) {
+  LOGI("new_font %s %f\n",name,size);
   font_t* font = malloc(sizeof(font_t));
   font->name = malloc(strlen(name));
   strcpy(font->name, name);
@@ -54,7 +56,23 @@ font_t* new_font(char* name, float size) {
   font->id = sth_add_font(font->stash, name);
   // font->stash->fonts->lineh = font->stash->fonts->lineh * 2.0;
   // printf("new font %f %f\n",font->stash->fonts->lineh,size);
+  // LOGI("new_font font=>%p stash=>%p %p\n",font,font->stash,*(font->stash) );
   return font;
+}
+
+void copy_stash(struct sth_stash* src,struct sth_stash* target){
+  target->bm_textures=src->bm_textures;
+  target->tw=src->tw, 
+  target->th=src->th;
+  target->itw=src->itw;
+  target->ith=src->ith;
+  target->empty_data=src->empty_data;
+  target->tt_textures=src->tt_textures;
+  target->bm_textures=src->bm_textures;
+  target->fonts=src->fonts;
+  target->drawing=src->drawing;
+  target->flags=src->flags;
+  target->scale=src->scale;
 }
 
 font_t* copy_font(font_t* oldfont, float size) {
@@ -62,7 +80,8 @@ font_t* copy_font(font_t* oldfont, float size) {
   font->name = oldfont->name;
   font->size = size;
   struct sth_stash* stash = malloc(sizeof(struct sth_stash));
-  memcpy(stash, oldfont->stash, sizeof(struct sth_stash));
+  // memcpy(stash, oldfont->stash, sizeof(struct sth_stash));
+  copy_stash(oldfont->stash,stash);
   font->stash = stash;
   font->id = oldfont->id;
   return font;
@@ -140,7 +159,7 @@ void graphic_draw_solid_quad(mvp_t* mvp, float x1, float y1, float x2, float y2,
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, color);
     glEnableVertexAttribArray(2);
-    glDrawArrays(GL_QUADS, 0, 4);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(2);
   }
@@ -207,6 +226,7 @@ void graphic_render_string_immediate(mvp_t* mvp, font_t* font, float size,
   if (size < 0) {
     size = font->size;
   }
+  
   graphic_render_prepare_string(mvp, font);
   sth_draw_text(font->stash, font->id, size, sx, sy, -1, -1, text, r, g, b, a,
                 dx, dy);
@@ -214,6 +234,10 @@ void graphic_render_string_immediate(mvp_t* mvp, font_t* font, float size,
 }
 
 float graphic_get_font_lineh(font_t* font, float size) {
+  if(font==NULL){
+    printf("graphic_get_font_lineh erro\n");
+    return 0.0;
+  }
   if (size < 0) {
     size = font->size;
   }

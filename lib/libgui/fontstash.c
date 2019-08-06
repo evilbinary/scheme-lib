@@ -16,7 +16,7 @@
 //    misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
 //
-
+#include "logger.h"
 #include "fontstash.h"
 #include <math.h> /* @rlyeh: floorf() */
 #include <stdio.h>
@@ -93,17 +93,26 @@ struct sth_stash* sth_create(int cachew, int cacheh) {
 
   // Allocate memory for the font stash.
   stash = (struct sth_stash*)malloc(sizeof(struct sth_stash));
-  if (stash == NULL) goto error;
+  if (stash == NULL){
+    LOGE("malloc sth_stash error\n");
+     goto error;
+  }
   memset(stash, 0, sizeof(struct sth_stash));
 
   // Create data for clearing the textures
   empty_data = malloc(cachew * cacheh);
-  if (empty_data == NULL) goto error;
+  if (empty_data == NULL){ 
+    LOGE("malloc textures cache error\n");
+    goto error;
+  }
   memset(empty_data, 0, cachew * cacheh);
 
   // Allocate memory for the first texture
   texture = (struct sth_texture*)malloc(sizeof(struct sth_texture));
-  if (texture == NULL) goto error;
+  if (texture == NULL){ 
+    LOGE("malloc texture error\n");
+    goto error;
+  }
   memset(texture, 0, sizeof(struct sth_texture));
 
   // Create first texture for the cache.
@@ -116,7 +125,10 @@ struct sth_stash* sth_create(int cachew, int cacheh) {
   stash->flags = FONS_ZERO_TOPLEFT;
   stash->scale = 1.0;
   glGenTextures(1, &texture->id);
-  if (!texture->id) goto error;
+  if (!texture->id) {
+    LOGE("glGenTextures id = %d erro \n",texture->id);
+    goto error;
+  }
   glBindTexture(GL_TEXTURE_2D, texture->id);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, cachew, cacheh, 0, GL_ALPHA,
                GL_UNSIGNED_BYTE, empty_data);
@@ -129,23 +141,21 @@ error:
   if (stash != NULL) free(stash);
   if (empty_data != NULL) free(empty_data);
   if (texture != NULL) free(texture);
+  LOGE("font stash create error\n");
   return NULL;
 }
 
 int sth_add_font_from_memory(struct sth_stash* stash, unsigned char* buffer) {
   int ret, i, ascent, descent, fh, lineGap;
   struct sth_font* fnt = NULL;
-
   fnt = (struct sth_font*)malloc(sizeof(struct sth_font));
   if (fnt == NULL) {
     ret = STH_ENOMEM;
     goto error;
   }
   memset(fnt, 0, sizeof(struct sth_font));
-
   // Init hash lookup.
   for (i = 0; i < HASH_LUT_SIZE; ++i) fnt->lut[i] = -1;
-
   fnt->data = buffer;
 
   // Init stb_truetype
@@ -153,7 +163,6 @@ int sth_add_font_from_memory(struct sth_stash* stash, unsigned char* buffer) {
     ret = STH_ETTFINIT;
     goto error;
   }
-
   // Store normalized line height. The real line height is got
   // by multiplying the lineh by font size.
   stbtt_GetFontVMetrics(&fnt->font, &ascent, &descent, &lineGap);
@@ -161,12 +170,10 @@ int sth_add_font_from_memory(struct sth_stash* stash, unsigned char* buffer) {
   fnt->ascender = (float)ascent / (float)fh;
   fnt->descender = (float)descent / (float)fh;
   fnt->lineh = (float)(fh + lineGap) / (float)fh;
-
   fnt->idx = idx;
   fnt->type = TTFONT_MEM;
   fnt->next = stash->fonts;
   stash->fonts = fnt;
-
   return idx++;
 
 error:
@@ -198,21 +205,20 @@ int sth_add_font(struct sth_stash* stash, const char* path) {
     goto error;
   }
   fread(data, 1, datasize, fp);
+  idx = sth_add_font_from_memory(stash, data);
   fclose(fp);
   fp = 0;
-
-  idx = sth_add_font_from_memory(stash, data);
   // Modify type of the loaded font.
   if (idx)
     stash->fonts->type = TTFONT_FILE;
   else
     free(data);
-
   return idx;
 
 error:
   if (data) free(data);
   if (fp) fclose(fp);
+  LOGE("sth_add_font %s erro\n",path);
   return ret;
 }
 
@@ -553,7 +559,7 @@ void flush_draw(struct sth_stash* stash) {
       glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, VERT_STRIDE,
                             texture->colors);
       glEnableVertexAttribArray(2);
-      glDrawArrays(GL_QUADS, 0, texture->nverts);
+      glDrawArrays(GL_TRIANGLES, 0, texture->nverts);
       glDisableVertexAttribArray(0);
       glDisableVertexAttribArray(1);
       glDisableVertexAttribArray(2);
@@ -760,18 +766,31 @@ void sth_draw_text(struct sth_stash* stash, int idx, float size, float x,
 
     v = &texture->verts[texture->nverts * 4];
 
-    v = setv(v, q.x0, q.y0, q.s0, q.t0);
-    v = setv(v, q.x1, q.y0, q.s1, q.t0);
-    v = setv(v, q.x1, q.y1, q.s1, q.t1);
-    v = setv(v, q.x0, q.y1, q.s0, q.t1);
+    // v = setv(v, q.x0, q.y0, q.s0, q.t0);
+    // v = setv(v, q.x1, q.y0, q.s1, q.t0);
+    // v = setv(v, q.x1, q.y1, q.s1, q.t1);
+    // v = setv(v, q.x0, q.y1, q.s0, q.t1);
+
+
+ 		v = setv(v, q.x0, q.y0, q.s0, q.t0);
+		v = setv(v, q.x1, q.y0, q.s1, q.t0);
+		v = setv(v, q.x1, q.y1, q.s1, q.t1);
+
+		v = setv(v, q.x0, q.y0, q.s0, q.t0);
+		v = setv(v, q.x1, q.y1, q.s1, q.t1);
+		v = setv(v, q.x0, q.y1, q.s0, q.t1);
 
     c = &texture->colors[texture->nverts * 4];
     c = setc(c, r, g, b, a);
     c = setc(c, r, g, b, a);
     c = setc(c, r, g, b, a);
+    
     c = setc(c, r, g, b, a);
+    c = setc(c, r, g, b, a);
+    c = setc(c, r, g, b, a);
+    
 
-    texture->nverts += 4;
+    texture->nverts += 6;
   }
   if (dx) *dx = x;
   if (dy) *dy = y;
@@ -834,10 +853,18 @@ void sth_draw_text_colors(struct sth_stash* stash, int idx, float size, float x,
 
     v = &texture->verts[texture->nverts * 4];
 
+    // v = setv(v, q.x0, q.y0, q.s0, q.t0);
+    // v = setv(v, q.x1, q.y0, q.s1, q.t0);
+    // v = setv(v, q.x1, q.y1, q.s1, q.t1);
+    // v = setv(v, q.x0, q.y1, q.s0, q.t1);
+
     v = setv(v, q.x0, q.y0, q.s0, q.t0);
-    v = setv(v, q.x1, q.y0, q.s1, q.t0);
-    v = setv(v, q.x1, q.y1, q.s1, q.t1);
-    v = setv(v, q.x0, q.y1, q.s0, q.t1);
+		v = setv(v, q.x1, q.y0, q.s1, q.t0);
+		v = setv(v, q.x1, q.y1, q.s1, q.t1);
+
+		v = setv(v, q.x0, q.y0, q.s0, q.t0);
+		v = setv(v, q.x1, q.y1, q.s1, q.t1);
+		v = setv(v, q.x0, q.y1, q.s0, q.t1);
 
     c = &texture->colors[texture->nverts * 4];
 
@@ -852,7 +879,10 @@ void sth_draw_text_colors(struct sth_stash* stash, int idx, float size, float x,
     c = setc(c, r, g, b, a);
     c = setc(c, r, g, b, a);
 
-    texture->nverts += 4;
+    c = setc(c, r, g, b, a);
+    c = setc(c, r, g, b, a);
+
+    texture->nverts += 6;
   }
   if (dx) *dx = x;
   if (dy) *dy = y;
@@ -895,6 +925,7 @@ void sth_vmetrics(struct sth_stash* stash, int idx, float size, float* ascender,
   struct sth_font* fnt = NULL;
 
   if (stash == NULL) return;
+ 
   fnt = stash->fonts;
   while (fnt != NULL && fnt->idx != idx) fnt = fnt->next;
   if (fnt == NULL) return;

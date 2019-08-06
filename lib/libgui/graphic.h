@@ -71,5 +71,13 @@ void mvp_set_mvp(mvp_t *mvp);
 
 void graphic_render_string(font_t* font,float size, float sx, float sy,
                            char* text, float* dx, float* dy, int color);
-                           
+
+float graphic_get_font_lineh(font_t* font, float size);
+float graphic_get_font_height(font_t* font, float size);
+void graphic_render_string_immediate(mvp_t* mvp, font_t* font, float size,
+                                     float sx, float sy, char* text, float* dx,
+                                     float* dy, int color);
+void graphic_render_string(font_t* font, float size, float sx, float sy,
+                           char* text, float* dx, float* dy, int color);
+                                                             
 #endif

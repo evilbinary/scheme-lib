@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "mat4.h"
-#define M_PI       3.14159265358979323846
+
 mat4 *
 mat4_new( void )
 {

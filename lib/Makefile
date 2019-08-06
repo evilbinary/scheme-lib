@@ -26,8 +26,8 @@ LIBSOCKET=./libsocket/libsocket.so
 LIBVIDEO=./libvideo/libvideo.so
 
 UNAME_S := $(shell uname -s)
-OS_NAME :=$(shell echo $(UNAME_S))
-LIBS_ALL= libscm.so libcffi.so libgles.so libgui.so libsocket.so libc.so  libalut.so    \
+OS_NAME :=$(shell echo $(UNAME_S)| tr '[A-Z]' '[a-z]')
+LIBS_ALL= libscm.so libcffi.so libgles.so libgui.so libsocket.so libcc.so  libalut.so    \
 	 libglfw.so libimgui.so libnanovg.so
 
 ifeq ($(findstring MINGW32_NT,$(OS_NAME)),MINGW32_NT)
@@ -51,7 +51,7 @@ libscm.so: $(LIBSCM)
 libvideo.so: $(LIBVIDEO) libgui.so libgles.so
 	$(MAKE) -C libvideo
 
-libc.so:
+libcc.so:
 	$(MAKE) -C libc
 libglut.so: $(LIBGLUT)
 	$(MAKE) -C libglut

@@ -45,7 +45,7 @@ duck-editor 鸭子编辑器：[https://github.com/evilbinary/duck-editor](https:
 # Android
 ## 新手入门
 ### 环境安装 手机版
-1. 先安装[scheme-release-1.5.apk][1]
+1. 先安装[scheme-release-1.6.apk][1]
 2. 点击下载app库和package库
 3. 下载成功后点击运行计算机demo或者直接打开apps里面的应用demo点击运行
 
@@ -70,5 +70,5 @@ duck-editor 鸭子编辑器：[https://github.com/evilbinary/duck-editor](https:
 2. `adb push config.xml /sdcard/org.evilbinary.chez/scm/conf/config.xml`
 3. 打开scheme app就可以直接运行啦。
 
-[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.5.apk   "scheme apk"
+[1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.6.apk   "scheme apk"
 [2]: https://github.com/evilbinary/data/blob/master/pic/scheme-lib-2.0-win32.zip  "scheme-lib-2.0-win32.zip"

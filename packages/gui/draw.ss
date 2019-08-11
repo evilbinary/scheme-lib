@@ -90,6 +90,9 @@
            [text (widget-get-attr widget %text)]
            [font (widget-get-attrs widget 'font)]
            [font-size (widget-get-attrs widget 'font-size)])
+      (if (widget-status-is-set widget %status-hover)
+          (set! color
+            (widget-get-attrs widget 'hover-color 4294967295)))
       (case ta
         [(quote left)
          (draw-text font font-size (+ gx padding-left)

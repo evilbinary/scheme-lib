@@ -144,7 +144,7 @@
     (glClearColor 0.3 0.3 0.32 1.0)
     (glClear (+ GL_COLOR_BUFFER_BIT))
     (if is-show-fps
-        (graphic-draw-text
+        (graphic-draw-text-immediate
           fps-x
           fps-y
           (format "fps=~a\n" (graphic-get-fps))))
@@ -160,7 +160,7 @@
       (glClearColor 0.3 0.3 0.32 1.0)
       (glClear (+ GL_COLOR_BUFFER_BIT))
       (if is-show-fps
-          (graphic-draw-text
+          (graphic-draw-text-immediate
             fps-x
             fps-y
             (format "fps=~a\n" (graphic-get-fps))))

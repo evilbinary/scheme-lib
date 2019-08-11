@@ -11,7 +11,6 @@ PLATFORM=
 BITS =$(shell getconf LONG_BIT)
 
 
-LIBS = 
 
 CFLAGS = -Wall -Wformat -g  -DGLAD \
 	-I../libgl \
@@ -20,11 +19,12 @@ CFLAGS = -Wall -Wformat -g  -DGLAD \
 	-L../libgui -lgui \
 	-L../libgl -lgles \
 	-L../3rdparty/lib \
-	-lavformat -lavcodec -lswscale -lswresample -lz -lm -lavutil \
+	-lz -lm -lavformat -lavcodec -lswscale -lswresample  -lavutil \
 	-I../libalut \
 	-I../libscm \
 	-L../libalut -lalut \
-	-framework OpenAL \
+	-I/opt/local/include\
+	-L/opt/local/lib
 
 CXXFLAGS= -Wall -Wformat
 
@@ -50,7 +50,7 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 	LIBS += $(extralibs_avcodec) $(extralibs_avformat)
 	CXXFLAGS += 
 	CXXFLAGS += 
-	CFLAGS += $(extralibs_avcodec) $(extralibs_avformat)
+	CFLAGS += $(extralibs_avcodec) $(extralibs_avformat) -framework OpenAL
 	ifeq ($(BITS), 32)
 		PLATFORM=i3osx
 	else

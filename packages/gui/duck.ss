@@ -731,7 +731,13 @@
                     (draw-widget-child-rect parent widget))))
           (begin
             (if (= type %event-mouse-button)
-                (begin (draw-widget-child-rect parent widget))))))
+                (begin
+                  (if (procedure? (widget-get-events widget 'click))
+                      ((widget-get-events widget 'click)
+                        widget
+                        parent
+                        type
+                        data)))))))
       widget))
   (define (video w h src)
     (let ([widget (widget-new 0.0 0.0 w h src)]
@@ -765,7 +771,14 @@
                     (draw-widget-child-rect parent widget))))
           (begin
             (if (= type %event-mouse-button)
-                (begin (draw-widget-child-rect parent widget))))))
+                (begin
+                  (if (procedure? (widget-get-events widget 'click))
+                      ((widget-get-events widget 'click)
+                        widget
+                        parent
+                        type
+                        data))
+                  (draw-widget-child-rect parent widget))))))
       widget))
   (define (image w h src)
     (let* ([widget (widget-new 0.0 0.0 w h src)]

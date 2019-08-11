@@ -33,6 +33,7 @@ duck-editor 鸭子编辑器：[https://github.com/evilbinary/duck-editor](https:
 
 
 # 截图
+<img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/calc.png" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/duck-demo.png" width="400px" />
 
 <img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/calc.png" width="400px" /><img src="https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/screenshot/editor2.png" width="400px" />
 

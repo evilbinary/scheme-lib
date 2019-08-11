@@ -6,7 +6,7 @@
 (library (gui video)
   (export video-new video-render video-destroy video-get-fps
     video-set-pause video-get-duration video-set-soft-conver
-    video-get-current-duration)
+    video-get-current-duration video-get-pause)
   (import (scheme) (utils libutil) (cffi cffi) (gles gles2))
   (load-librarys "libvideo")
   (def-function
@@ -26,6 +26,7 @@
     "video_set_pause"
     (void* int)
     void)
+  (def-function video-get-pause "video_get_pause" (void*) int)
   (def-function
     video-get-duration
     "video_get_duration"

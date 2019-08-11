@@ -6,7 +6,7 @@
 (library (cffi cffi)
   (export ffi-prep-cif ffi-prep-cif-var ffi-call load-lib
    load-libs cffi-set-char cffi-set-int cffi-set-float
-   cffi-set-double cffi-set-long cffi-get-addr cffi-get-uchar
+   cffi-set-double cffi-set-long cffi-get-uchar
    cffi-get-uint cffi-get-ulong cffi-get-char cffi-get-int
    cffi-get-float cffi-get-long cffi-get-double
    cffi-get-pointer cffi-get-string cffi-get-string-offset
@@ -150,8 +150,6 @@
   (define ffi-type-float (ffi-type-float-ptr))
   (define ffi-type-double (ffi-type-double-ptr))
   (define ffi-type-longdouble (ffi-type-longdouble-ptr))
-  (define ffi-get-addr
-    (foreign-procedure "ffi_get_addr" (void* integer-32) void*))
   (define ffi-set-char
     (foreign-procedure "ffi_set_char" (void* char) void))
   (define ffi-set-int
@@ -275,7 +273,6 @@
   (define cffi-alloc $ffi-alloc)
   (define cffi-free $ffi-free)
   (define cffi-set $ffi-set)
-  (define cffi-get-addr ffi-get-addr)
   (define cffi-set-char ffi-set-char)
   (define cffi-set-int ffi-set-int)
   (define cffi-set-float ffi-set-float)

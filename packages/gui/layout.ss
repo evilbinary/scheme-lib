@@ -97,14 +97,14 @@
              [right (vector-ref widget %right)]
              [bottom (vector-ref widget %bottom)]
              [child (vector-ref widget %child)])
-         (if (= (widget-get-attr widget %status) 1)
+         (if (widget-get-attr widget %visible)
              (let loop ([c child] [px left] [py top])
                (if (pair? c)
                    (begin
                      (process-match-parent (car c))
                      (vector-set! (car c) %x px)
                      (vector-set! (car c) %y py)
-                     (if (= (widget-get-attr (car c) %status) 1)
+                     (if (widget-get-attr (car c) %visible)
                          (begin
                            (if (procedure? (vector-ref (car c) %layout))
                                ((vector-ref (car c) %layout) (car c)))
@@ -172,7 +172,6 @@
          (let loop ([c child] [sx left] [sy top] [ww 0])
            (if (pair? c)
                (begin
-                 (vector-set! (car c) %status 1)
                  (process-match-parent (car c))
                  (vector-set!
                    (car c)
@@ -246,7 +245,7 @@
     (let loop ([child (vector-ref widget %child)] [height 0.0])
       (if (pair? child)
           (begin
-            (if (= (widget-get-attr (car child) %status) 1)
+            (if (widget-get-attr (car child) %visible)
                 (set! height (+ height (vector-ref (car child) %h))))
             (loop (cdr child) height))
           height))))

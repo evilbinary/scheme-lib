@@ -285,9 +285,15 @@
                         widget
                         'focus-child
                         (list-ref ret 0))
+                      (widget-set-status (list-ref ret 0) %status-focus)
                       (widget-set-status
                         (list-ref ret 0)
                         %status-hover))))))))
+  (define (set-status status flag) (bitwise-ior status flag))
+  (define (clear-status status flag)
+    (bitwise-and status (bitwise-not flag)))
+  (define (is-set-status status flag)
+    (= 0 (bitwise-xor (bitwise-and status flag) flag)))
   (define (widget-set-status widget status)
     (let ([s (widget-get-attr widget %status)])
       (widget-set-attr widget %status (bitwise-ior s status))))
@@ -301,15 +307,19 @@
     (let ([s (widget-get-attr widget %status)])
       (= 0 (bitwise-xor (bitwise-and s status) status))))
   (define (widget-child-key-event widget type data)
+    (if (= type %event-key)
+        (widget-child-focus-event widget type data))
     (let loop ([child (vector-ref widget %child)])
       (if (pair? child)
           (begin
-            (if (widget-status-is-set (car child) %status-active)
-                ((vector-ref (car child) %event)
-                  (car child)
-                  widget
-                  type
-                  data))
+            (if (or (widget-status-is-set (car child) %status-active)
+                    (widget-status-is-set (car child) %status-focus))
+                (begin
+                  ((vector-ref (car child) %event)
+                    (car child)
+                    widget
+                    type
+                    data)))
             (loop (cdr child))))))
   (define (widget-child-rect-key-event widget type data) '())
   (define (widget-child-rect-event widget type data)
@@ -516,7 +526,7 @@
            (if (= type %event-layout)
                (begin (widget-child-rect-event-layout widget type data)))
            (if (and (or (= type %event-char) (= type %event-key))
-                    (= (vector-ref widget %status) %status-active))
+                    (widget-status-is-set widget %status-active))
                (begin (widget-child-key-event widget type data))))
          (list) 0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 '() 0.0 0.0 text
          '() (make-hashtable equal-hash equal?)
@@ -554,7 +564,10 @@
             (printf
               "widgets[~a]=>~a "
               index
-              (widget-get-attr (car w) %text))
+              (substring
+                (widget-get-attr (car w) %text)
+                0
+                (min 12 (string-length (widget-get-attr (car w) %text)))))
             (loop (cdr w) (+ index 1)))))
     (printf "\n"))
   (define (widget-remove w)
@@ -606,7 +619,10 @@
       (vector-set!
         widget
         %event
-        (lambda (w p t d) (e w p t d) (event w p t d)))))
+        (lambda (w p t d)
+          (let ([ret (event w p t d)])
+            (if (or (equal? ret #t) (null? ret) (equal? ret (void)))
+                (e w p t d)))))))
   (define (widget-add-draw widget event)
     (let ([draw (vector-ref widget %draw)])
       (vector-set!
@@ -654,7 +670,7 @@
     (let l ([w $widgets])
       (if (pair? w)
           (begin
-            (vector-set! (car w) %status %status-default)
+            (widget-set-status (car w) %status-default)
             (let ([fun (widget-get-attrs
                          (car w)
                          '%event-rect-function)])
@@ -678,7 +694,7 @@
                        (vector-ref data 3)
                        (vector-ref data 4)))
                 (begin
-                  (vector-set! w %status %status-active)
+                  (widget-set-status w %status-active)
                   ((vector-ref w %event) w '() %event-mouse-button data))
                 (loop (- len 1)))))))
   (define (widget-scroll-event data)
@@ -787,6 +803,11 @@
                    widget
                    'last-child-hover
                    last-child-hover)))))]))
+  (define (widget-get-short-text widget)
+    (substring
+      (widget-get-attr widget %text)
+      0
+      (min 12 (string-length (widget-get-attr widget %text)))))
   (define widget-child-rect-event-mouse-button
     (case-lambda
       [(widget type data)
@@ -801,11 +822,14 @@
                (begin
                  (if (widget-rect-fun (car child) lmx lmy)
                      (begin
+                       (widget-set-status (car child) %status-active)
                        ((vector-ref (car child) %event)
                          (car child)
                          widget
                          type
-                         data2)))
+                         data2))
+                     (begin
+                       (widget-clear-status (car child) %status-active)))
                  (loop (cdr child))))))]
       [(widget type data fun)
        (let* ([mx (vector-ref data 3)]
@@ -819,11 +843,13 @@
                (begin
                  (if (fun (car child) lmx lmy)
                      (begin
+                       (widget-set-status (car child) %status-active)
                        ((vector-ref (car child) %event)
                          (car child)
                          widget
                          type
-                         data2)))
+                         data2))
+                     (widget-clear-status (car child) %status-active))
                  (loop (cdr child))))))]))
   (define (widget-render)
     (let loop ([w $widgets])

@@ -250,7 +250,7 @@
                   (vector-set! widget %gx gx)
                   (vector-set! widget %gy gy)
                   (draw-widget-text widget)))
-            (if (= (widget-get-attr widget %status) 1)
+            (if (widget-status-is-set widget %status-active)
                 (widget-draw-child widget)))))
       (widget-set-event
         widget
@@ -269,9 +269,12 @@
                         (vector-ref data 3)
                         (vector-ref data 4))
                       (let ()
-                        (if (= 0 (widget-get-attr widget %status))
-                            (widget-set-attr widget %status 1)
-                            (widget-set-attr widget %status 0))
+                        (if (widget-status-is-set widget %status-default)
+                            (widget-set-attr widget %status %status-active)
+                            (widget-set-attr
+                              widget
+                              %status
+                              %status-default))
                         (widget-layout-update (widget-get-root widget))
                         (if (procedure? (widget-get-events widget 'click))
                             ((widget-get-events widget 'click)
@@ -286,15 +289,15 @@
           #t))
       widget))
   (define (scroll w h)
-    (let ([widget (widget-new 0.0 0.0 w h "")])
-      (widget-set-attrs widget 'direction 1)
-      (widget-set-attrs widget 'rate 50.0)
-      (widget-set-attrs widget 'scroll-x 0.0)
-      (widget-set-attrs widget 'scroll-y 0.0)
-      (widget-set-attrs widget 'scroll-height 0.0)
-      (widget-set-attrs widget 'show-scroll #t)
+    (let ([scroll-widget (widget-new 0.0 0.0 w h "")])
+      (widget-set-attrs scroll-widget 'direction 1)
+      (widget-set-attrs scroll-widget 'rate 50.0)
+      (widget-set-attrs scroll-widget 'scroll-x 0.0)
+      (widget-set-attrs scroll-widget 'scroll-y 0.0)
+      (widget-set-attrs scroll-widget 'scroll-height 0.0)
+      (widget-set-attrs scroll-widget 'show-scroll #t)
       (widget-set-layout
-        widget
+        scroll-widget
         (lambda (widget . args)
           (flow-layout widget)
           (widget-set-attrs
@@ -303,7 +306,7 @@
             (calc-child-height widget))
           (widget-set-attrs widget 'scroll-y 0.0)))
       (widget-set-draw
-        widget
+        scroll-widget
         (lambda (widget parent)
           (let ([x (vector-ref widget %x)]
                 [y (vector-ref widget %y)]
@@ -339,7 +342,7 @@
             (widget-draw-rect-child widget)
             (graphic-sissor-end))))
       (widget-set-event
-        widget
+        scroll-widget
         (lambda (widget parent type data)
           (if (null? parent)
               (begin
@@ -390,75 +393,77 @@
                     widget
                     type
                     data))))))
-      widget))
+      scroll-widget))
   (define (edit w h text)
-    (let* ([widget (widget-new 0.0 0.0 w h text)]
+    (let* ([edit-widget (widget-new 0.0 0.0 w h text)]
            [ed (edit-new
-                 (widget-get-attrs widget 'font)
-                 (widget-get-attrs widget 'font-size)
+                 (widget-get-attrs edit-widget 'font)
+                 (widget-get-attrs edit-widget 'font-size)
                  w
                  h)])
-      (widget-set-attrs widget '%edit ed)
+      (widget-set-attrs edit-widget '%edit ed)
       (widget-set-attrs
-        widget
+        edit-widget
         (format "%event-~a" %text)
         (lambda (ww text)
           (edit-set-text (widget-get-attrs ww '%edit) text)
-          (widget-set-attr widget %h (edit-get-height ed))
-          (widget-layout-event widget)
+          (widget-set-attr ww %h (edit-get-height ed))
+          (widget-layout-event ww)
           (if (equal? #t (widget-get-attrs ww 'syntax-on))
               (let ([syntax-cache (edit-get-highlight ed)]
-                    [syn (widget-get-attrs widget 'syntax)]
+                    [syn (widget-get-attrs ww 'syntax)]
                     [params (edit-get-text ed)])
                 (printf "re render syntax ~a\n" syntax-cache)
                 (parse-syntax syn syntax-cache params)
                 (edit-update-highlight ed)))))
+      (edit-set-text ed text)
+      (widget-set-attr edit-widget %h (edit-get-height ed))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-color-hook"
         (lambda (ww name color)
           (edit-set-color (widget-get-attrs ww '%edit) color)))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-cursor-color-hook"
         (lambda (ww name color)
           (edit-set-cursor-color (widget-get-attrs ww '%edit) color)))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-font-line-height-hook"
         (lambda (ww name val)
           (edit-set-font-line-height (widget-get-attrs ww '%edit) val)
-          (widget-layout-event widget)))
+          (widget-layout-event ww)))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-select-color-hook"
         (lambda (ww name color)
           (edit-set-select-color (widget-get-attrs ww '%edit) color)))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-font-hook"
         (lambda (ww name value)
           (edit-set-font (widget-get-attrs ww '%edit) value -1)
-          (widget-layout-event widget)))
+          (widget-layout-event ww)))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-font-size-hook"
         (lambda (ww name value)
           (edit-set-font (widget-get-attrs ww '%edit) 0 value)
-          (widget-layout-event widget)))
+          (widget-layout-event ww)))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-show-no-hook"
         (lambda (ww name value)
           (edit-set-show-no (widget-get-attrs ww '%edit) value)
-          (widget-layout-event widget)))
+          (widget-layout-event ww)))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-lineno-color-hook"
         (lambda (ww name value)
           (edit-set-lineno-color (widget-get-attrs ww '%edit) value)))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-insert-text-at-hook"
         (lambda (ww name value)
           (edit-insert-text-at
@@ -466,66 +471,66 @@
             (list-ref value 0)
             (list-ref value 1)
             (list-ref value 2))
-          (if (equal? #t (widget-get-attrs widget 'syntax-on))
+          (if (equal? #t (widget-get-attrs ww 'syntax-on))
               (let* ([ed (widget-get-attrs ww '%edit)]
                      [syntax-cache (edit-get-highlight ed)]
-                     [syn (widget-get-attrs widget 'syntax)])
-                (widget-set-attrs widget 'syntax-cache syntax-cache)
+                     [syn (widget-get-attrs ww 'syntax)])
+                (widget-set-attrs ww 'syntax-cache syntax-cache)
                 (printf "text ==>~a\n" (edit-get-text ed))
                 (edit-update-highlight ed)))))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-get-selection-hook"
         (lambda (ww name)
           (edit-get-selection (widget-get-attrs ww '%edit))))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-get-selection-hook"
         (lambda (ww name)
           (edit-get-selection (widget-get-attrs ww '%edit))))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-get-line-count-hook"
         (lambda (ww name)
           (edit-get-line-count (widget-get-attrs ww '%edit))))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-get-cursor-x-hook"
         (lambda (ww name)
           (edit-get-cursor-x (widget-get-attrs ww '%edit))))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-get-cursor-y-hook"
         (lambda (ww name)
           (edit-get-cursor-y (widget-get-attrs ww '%edit))))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-get-cursor-xy-hook"
         (lambda (ww name)
           (list
             (edit-get-cursor-x (widget-get-attrs ww '%edit))
             (edit-get-cursor-y (widget-get-attrs ww '%edit)))))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-get-last-row-count-hook"
         (lambda (ww name)
           (edit-get-row-count
             (widget-get-attrs ww '%edit)
             (- (edit-get-line-count (widget-get-attrs ww '%edit)) 1))))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-selection-hook"
         (lambda (ww name val)
           (edit-set-selection (widget-get-attrs ww '%edit) (list-ref val 0)
             (list-ref val 1) (list-ref val 2) (list-ref val 3))))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-get-text-range-hook"
         (lambda (ww name val)
           (edit-get-text-range (widget-get-attrs ww '%edit) (list-ref val 0)
             (list-ref val 1) (list-ref val 2) (list-ref val 3))))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-get-current-line-text-hook"
         (lambda (ww name)
           (let* ([ed (widget-get-attrs ww '%edit)]
@@ -534,20 +539,19 @@
             (edit-get-text-range ed current-row 0 current-row
               row-count))))
       (widget-set-attrs
-        widget
+        edit-widget
         "%event-syntax-on-hook"
         (lambda (ww name val)
-          (if (equal? #t (widget-get-attrs widget 'syntax-on))
+          (if (equal? #t (widget-get-attrs ww 'syntax-on))
               (let ([syntax-cache (edit-get-highlight ed)]
-                    [syn (widget-get-attrs widget 'syntax)])
-                (widget-set-attrs widget 'syntax syn)
-                (widget-set-attrs widget 'syntax-cache syntax-cache)
+                    [syn (widget-get-attrs ww 'syntax)])
+                (widget-set-attrs ww 'syntax syn)
+                (widget-set-attrs ww 'syntax-cache syntax-cache)
                 (parse-syntax syn syntax-cache (edit-get-text ed))
                 (edit-update-highlight ed)
-                (widget-set-attr widget %h (edit-get-height ed))))))
-      (edit-set-text ed text)
+                (widget-set-attr ww %h (edit-get-height ed))))))
       (widget-set-draw
-        widget
+        edit-widget
         (lambda (widget parent)
           (let ([gx (widget-in-parent-gx widget parent)]
                 [gy (widget-in-parent-gy widget parent)]
@@ -563,7 +567,7 @@
             (if (number? border) (draw-border gx gy ww hh border))
             (draw-edit ed gx gy))))
       (widget-set-event
-        widget
+        edit-widget
         (lambda (widget parent type data)
           (if (= type %event-key)
               (begin
@@ -597,9 +601,7 @@
                   (vector-ref data 0)
                   (vector-ref data 1))))
           (if (= type %event-layout)
-              (begin
-                '()
-                (widget-set-attr widget %h (edit-get-height ed))))
+              (begin (widget-set-attr widget %h (edit-get-height ed))))
           (if (= type %event-scroll)
               (begin
                 (edit-set-scroll
@@ -613,7 +615,7 @@
                   (vector-ref data 1)
                   (vector-ref data 3)
                   (vector-ref data 4))))))
-      widget))
+      edit-widget))
   (define (tab w h names)
     (let ([widget (widget-new 0.0 0.0 w h "")])
       (widget-set-layout
@@ -871,10 +873,7 @@
           (if (= type %event-scroll)
               (begin (widget-child-rect-event-scroll widget type data)))
           (if (and (or (= type %event-char) (= type %event-key)))
-              (begin
-                (widget-child-key-event widget type data)
-                (if (= type %event-key)
-                    (widget-child-focus-event widget type data))))
+              (begin (widget-child-key-event widget type data)))
           (if (= type %event-motion)
               (widget-child-rect-event-mouse-motion widget type data))))
       widget))
@@ -908,7 +907,7 @@
             (if (= type %event-motion)
                 (begin (widget-set-status widget %status-hover)))
             (if (= type %event-motion-out)
-                (begin (widget-set-attr widget %status %status-default)))
+                (begin (widget-set-status widget %status-default)))
             (if (= type %event-mouse-button)
                 (begin
                   (if (procedure? (widget-get-events widget 'click))
@@ -943,25 +942,26 @@
       (widget-add-event
         widget
         (lambda (widget parent type data)
-          (if (= type %event-scroll)
-              (begin (widget-child-rect-event-scroll widget type data)))
-          (if (and (or (= type %event-char) (= type %event-key)))
-              (begin
-                (widget-child-key-event widget type data)
-                (if (= type %event-key)
-                    (widget-child-focus-event widget type data))))
-          (if (= type %event-motion)
-              (begin
-                (widget-child-rect-event-mouse-motion widget type data)))
-          (if (= type %event-motion-out)
-              (begin
-                (widget-child-rect-event-mouse-motion widget type data)))
-          (if (and (= type %event-mouse-button)
-                   (= (vector-ref data 1) 1))
-              (if (equal? #t (widget-get-attrs widget 'disable-active))
-                  '()
-                  (widget-active widget))
-              #t)))
+          (let ([ret #t])
+            (if (= type %event-scroll)
+                (begin (widget-child-rect-event-scroll widget type data)))
+            (if (and (or (= type %event-char) (= type %event-key)))
+                (begin
+                  (widget-child-key-event widget type data)
+                  (set! ret #f)))
+            (if (= type %event-motion)
+                (begin
+                  (widget-child-rect-event-mouse-motion widget type data)))
+            (if (= type %event-motion-out)
+                (begin
+                  (widget-child-rect-event-mouse-motion widget type data)))
+            (if (and (= type %event-mouse-button)
+                     (= (vector-ref data 1) 1))
+                (if (equal? #t (widget-get-attrs widget 'disable-active))
+                    '()
+                    (widget-active widget))
+                #t)
+            ret)))
       (widget-set-padding widget 10.0 10.0 40.0 40.0)
       (widget-add widget)
       widget)))

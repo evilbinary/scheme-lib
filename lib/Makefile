@@ -30,7 +30,7 @@ OS_NAME :=$(shell echo $(UNAME_S)| tr '[A-Z]' '[a-z]')
 LIBS_ALL= libscm.so libcffi.so libgles.so libgui.so libsocket.so libcc.so  libalut.so    \
 	 libglfw.so libimgui.so libnanovg.so
 
-ifeq ($(findstring MINGW32_NT,$(OS_NAME)),MINGW32_NT)
+ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
   OS_NAME:=windows
   LIBSCM =./libscm/libscm.dll
   LIBGLUT =./libglut/libglut.dll

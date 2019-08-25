@@ -23,12 +23,13 @@
    widget-find-child-focus widget-child-focus-event
    widget-get-global-center-xy widget-print widget-in-parent-gx
    widget-in-parent-gy widget-add-new-event
-   widget-child-rect-event-mouse-button
+   widget-get-short-text widget-child-rect-event-mouse-button
    widget-child-rect-event-mouse-motion
    widget-child-rect-key-event widget-child-key-event
    widget-layout-event widget-get-parent-cond widget-rect-fun
    in-rect is-in is-in-widget-top is-in-child-widget
    widget-set-child-attr widget-set-child-attrs
+   widget-set-child-status widget-clear-child-status
    widget-child-rect-event-scroll widget-active widget-event
    widget-attrs widget-status-is-set widget-set-status
    widget-clear-status plus-child-y-offset is-in-widget
@@ -297,6 +298,20 @@
   (define (widget-set-status widget status)
     (let ([s (widget-get-attr widget %status)])
       (widget-set-attr widget %status (bitwise-ior s status))))
+  (define (widget-set-child-status widget status)
+    (let loop ([child (vector-ref widget %child)])
+      (if (pair? child)
+          (begin
+            (widget-set-status (car child) status)
+            (widget-set-child-status (car child) status)
+            (loop (cdr child))))))
+  (define (widget-clear-child-status widget status)
+    (let loop ([child (vector-ref widget %child)])
+      (if (pair? child)
+          (begin
+            (widget-clear-status (car child) status)
+            (widget-clear-child-status (car child) status)
+            (loop (cdr child))))))
   (define (widget-clear-status widget status)
     (let ([s (widget-get-attr widget %status)])
       (widget-set-attr
@@ -557,19 +572,29 @@
                     (widget-get-attr parent %child))])
       (set! childs (remove! child childs))
       (widget-set-attr parent %child (list->vector childs))))
-  (define (widget-print widget)
-    (let loop ([w widget] [index 0])
-      (if (pair? w)
-          (begin
-            (printf
-              "widgets[~a]=>~a "
-              index
-              (substring
-                (widget-get-attr (car w) %text)
-                0
-                (min 12 (string-length (widget-get-attr (car w) %text)))))
-            (loop (cdr w) (+ index 1)))))
-    (printf "\n"))
+  (define widget-print
+    (case-lambda
+      [(widget)
+       (let loop ([w widget] [index 0])
+         (if (pair? w)
+             (begin
+               (printf
+                 "widgets[~a]=>~a "
+                 index
+                 (substring
+                   (widget-get-attr (car w) %text)
+                   0
+                   (min 12
+                        (string-length (widget-get-attr (car w) %text)))))
+               (loop (cdr w) (+ index 1)))))
+       (printf "\n")]
+      [(widget call)
+       (let loop ([w widget] [index 0])
+         (if (pair? w)
+             (begin
+               (if (procedure? call) (call (car w)))
+               (loop (cdr w) (+ index 1)))))
+       (printf "\n")]))
   (define (widget-remove w)
     (let ([parent (widget-get-attr w %parent)])
       (if (null? parent)
@@ -747,6 +772,7 @@
                (begin
                  (if (widget-rect-fun (car child) lmx lmy)
                      (begin
+                       (widget-set-status (car child) %status-hover)
                        ((vector-ref (car child) %event)
                          (car child)
                          widget
@@ -760,11 +786,13 @@
            (if (and (not (equal? last-child-hover last-hover)))
                (begin
                  (if (not (null? last-hover))
-                     ((vector-ref last-hover %event)
-                       last-hover
-                       '()
-                       %event-motion-out
-                       data2))
+                     (begin
+                       (widget-clear-status last-hover %status-hover)
+                       ((vector-ref last-hover %event)
+                         last-hover
+                         '()
+                         %event-motion-out
+                         data2)))
                  (widget-set-attrs
                    widget
                    'last-child-hover
@@ -822,14 +850,14 @@
                (begin
                  (if (widget-rect-fun (car child) lmx lmy)
                      (begin
-                       (widget-set-status (car child) %status-active)
+                       (widget-set-status (car child) %status-focus)
                        ((vector-ref (car child) %event)
                          (car child)
                          widget
                          type
                          data2))
                      (begin
-                       (widget-clear-status (car child) %status-active)))
+                       (widget-clear-status (car child) %status-focus)))
                  (loop (cdr child))))))]
       [(widget type data fun)
        (let* ([mx (vector-ref data 3)]
@@ -843,13 +871,13 @@
                (begin
                  (if (fun (car child) lmx lmy)
                      (begin
-                       (widget-set-status (car child) %status-active)
+                       (widget-set-status (car child) %status-focus)
                        ((vector-ref (car child) %event)
                          (car child)
                          widget
                          type
                          data2))
-                     (widget-clear-status (car child) %status-active))
+                     (widget-clear-status (car child) %status-focus))
                  (loop (cdr child))))))]))
   (define (widget-render)
     (let loop ([w $widgets])

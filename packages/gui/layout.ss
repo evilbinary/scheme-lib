@@ -86,7 +86,8 @@
               (widget-set-attr c %h (widget-get-attr parent %h))))))
   (define linear-layout
     (case-lambda
-      [(widget)
+      [(widget) (linear-layout widget (lambda (x) #t))]
+      [(widget fun)
        (process-match-parent widget)
        (let ([x (vector-ref widget %x)]
              [y (vector-ref widget %y)]
@@ -97,7 +98,7 @@
              [right (vector-ref widget %right)]
              [bottom (vector-ref widget %bottom)]
              [child (vector-ref widget %child)])
-         (if (widget-get-attr widget %visible)
+         (if (and (widget-get-attr widget %visible) (fun widget))
              (let loop ([c child] [px left] [py top])
                (if (pair? c)
                    (begin
@@ -113,20 +114,12 @@
                            (widget-set-attr
                              (car c)
                              %h
-                             (widget-get-attr (car c) %top))
-                           (set! py
-                             (+ py (widget-get-attr (car c) %top)))))
+                             (widget-get-attr (car c) %top))))
                      (loop (cdr c) px py))
                    (widget-set-attr widget %h py)))
              (widget-set-attr widget %h (widget-get-attr widget %top)))
          (widget-update-pos widget)
-         (widget-child-update-pos widget))]
-      [(widget layout-info)
-       (let ([x (vector-ref widget %x)]
-             [y (vector-ref widget %y)]
-             [w (vector-ref widget %w)]
-             [h (vector-ref widget %h)])
-         '())]))
+         (widget-child-update-pos widget))]))
   (define frame-layout
     (case-lambda
       [(widget)

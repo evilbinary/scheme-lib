@@ -117,13 +117,13 @@
             (vector-set! widget %gx gx)
             (vector-set! widget %gy gy)
             (draw-item-bg gx gy w h background)
-            (if (= (widget-get-attr widget %status) %status-active)
+            (if (widget-status-is-set widget %status-hover)
                 (draw-hover gx gy (widget-get-attr widget %w)
                   (widget-get-attr widget %h) hover-background))
             (draw-widget-text widget))
           (if (equal? #t (widget-get-attrs widget 'static))
-              (widget-set-attr widget %status %status-active))
-          (if (= (widget-get-attr widget %status) %status-active)
+              (widget-set-status widget %status-active))
+          (if (widget-status-is-set widget %status-active)
               (widget-draw-child widget))))
       (widget-set-event
         widget
@@ -138,36 +138,30 @@
                   (widget-set-cursor 'arrow)
                   (if (is-in widget data)
                       (begin
-                        (if (= %status-default
-                               (widget-get-attr widget %status))
+                        (if (widget-status-is-set widget %status-default)
                             (begin
                               (if (not (null?
                                          (widget-get-attr widget %parent)))
                                   (begin
-                                    (widget-set-child-attr
+                                    (widget-set-child-status
                                       (widget-get-attr widget %parent)
-                                      %status
                                       %status-default)))
-                              (widget-set-attr
-                                widget
-                                %status
-                                %status-active))))
+                              (widget-set-status widget %status-active))))
                       (begin
                         (if (= %status-default
                                (widget-get-attr widget %status))
-                            (widget-set-child-attr
+                            (widget-set-child-status
                               widget
-                              %status
                               %status-default))))
-                  (if (= (widget-get-attr widget %status) %status-active)
+                  (if (widget-status-is-set widget %status-active)
                       (widget-child-rect-event-mouse-motion
                         widget
                         type
                         data))))
             (if (= type %event-motion-out)
                 (begin
-                  (widget-set-attr widget %status %status-default)
-                  (widget-set-child-attr widget %status %status-default)))
+                  (widget-clear-status widget %status-active)
+                  (widget-clear-child-status widget %status-active)))
             (if (and (= type %event-mouse-button)
                      (= (vector-ref data 1) 1))
                 (begin
@@ -176,15 +170,14 @@
                         (vector-ref data 3)
                         (vector-ref data 4))
                       (let ()
-                        (if (= 0 (widget-get-attr widget %status))
+                        (if (widget-status-is-set widget %status-active)
                             (begin
                               (if (not (null?
                                          (widget-get-attr widget %parent)))
                                   (begin
-                                    (widget-set-child-attr
+                                    (widget-clear-status
                                       (widget-get-attr widget %parent)
-                                      %status
-                                      %status-default))))
+                                      %status-active))))
                             (begin
                               (let ([proot (widget-get-parent-cond
                                              widget
@@ -192,29 +185,24 @@
                                                (widget-get-attrs
                                                  p
                                                  'root)))])
-                                (widget-set-attr
+                                (widget-set-status proot %status-default)
+                                (widget-set-child-status
                                   proot
-                                  %status
-                                  %status-default)
-                                (widget-set-child-attr
-                                  proot
-                                  %status
                                   %status-default))))
                         (widget-layout-update (widget-get-root widget))
                         (if (and (procedure?
                                    (widget-get-events widget 'click))
-                                 (equal?
-                                   %status-active
-                                   (widget-get-attr widget %status)))
+                                 (widget-status-is-set
+                                   widget
+                                   %status-active))
                             (begin
                               ((widget-get-events widget 'click)
                                 widget
                                 parent
                                 type
                                 data)
-                              (widget-set-attr
+                              (widget-set-status
                                 widget
-                                %status
                                 %status-default)))))
                   (let ([ret (widget-child-rect-event-mouse-button
                                widget
@@ -229,7 +217,10 @@
       (widget-set-padding widget 20.0 0.0 20.0 0.0)
       (widget-set-layout
         widget
-        (lambda (widget . args) (linear-layout widget)))
+        (lambda (widget . args)
+          (linear-layout
+            widget
+            (lambda (w) (widget-status-is-set widget %status-active)))))
       (widget-set-draw
         widget
         (lambda (widget parent)
@@ -269,19 +260,20 @@
                         (vector-ref data 3)
                         (vector-ref data 4))
                       (let ()
-                        (if (widget-status-is-set widget %status-default)
-                            (widget-set-attr widget %status %status-active)
-                            (widget-set-attr
-                              widget
-                              %status
-                              %status-default))
-                        (widget-layout-update (widget-get-root widget))
                         (if (procedure? (widget-get-events widget 'click))
                             ((widget-get-events widget 'click)
                               widget
                               parent
                               type
-                              data)))
+                              data))
+                        (if (widget-status-is-set widget %status-active)
+                            (begin
+                              (widget-set-child-attr widget %visible #f)
+                              (widget-clear-status widget %status-active))
+                            (begin
+                              (widget-set-child-attr widget %visible #t)
+                              (widget-set-status widget %status-active)))
+                        (widget-layout-update (widget-get-root widget)))
                       (widget-child-rect-event-mouse-button
                         widget
                         type

@@ -33,7 +33,7 @@
 #  endif
 #endif
 
-#ifdef ANDROID
+#if (defined ANDROID) || (defined ARMV6)
     typedef void *ptr;
     typedef int iptr;
     typedef unsigned int uptr;
@@ -55,7 +55,7 @@
     typedef unsigned long int uptr;
     
     #define scm_fixnum(x) ((ptr)(uptr)((x)*8))
-    #define scm_char(x) ((ptr)(uptr)((x)<<8|0x16))
+    #define scm_char(x)   ((ptr)(uptr)((x)<<8|0x16))
     #define scm_nil ((ptr)0x26)
     #define scm_true ((ptr)0xE)
     #define scm_false ((ptr)0x6)
@@ -117,6 +117,7 @@ SCM_API iptr scm_pairp(ptr x);
 SCM_API iptr scm_symbolp(ptr x) ;
 SCM_API iptr scm_procedurep(ptr x);
 SCM_API iptr scm_flonump(ptr x) ;
+SCM_API iptr scm_vectorp(ptr x);
 
 SCM_API ptr scm_flonum(double x);
 SCM_API double scm_flonum_value(ptr x);
@@ -124,5 +125,7 @@ SCM_API double scm_flonum_value(ptr x);
 SCM_API ptr scm_integer64 (long long);
 SCM_API void scm_print(ptr p);
 SCM_API ptr scm_get_thread_context();
+
+
 
 #endif //SCM_H_H

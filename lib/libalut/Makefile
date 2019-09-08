@@ -14,6 +14,8 @@ CXXFLAGS= -Wall -Wformat
 OTHERS=
 
 UNAME_S := $(shell uname -s)
+OS_NAME :=$(shell echo $(UNAME_S)| tr '[A-Z]' '[a-z]')
+
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
 	LIBS += -lopenal -lalut 
@@ -26,10 +28,10 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 	LIBS += 
 	CXXFLAGS += 
 	CFLAGS += -D__APPLE__   -L../3rdparty/lib  -Wl,-all_load ../3rdparty/lib/libalut.a -Wl,-noall_load -I../3rdparty/include -framework OpenAL
-#	CXXFLAGS += -D__APPLE__
+#	CXXFLAGS += -D__APPcLE__
 endif
 
-ifeq ($(findstring MINGW32_NT,$(OS_NAME)),MINGW32_NT)
+ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
     ECHO_MESSAGE = "Windows"
 	LIBS +=  -lopenal
 	CXXFLAGS += 
@@ -43,6 +45,8 @@ endif
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 .c.o:
+	@echo Build complete for $(ECHO_MESSAGE)
+
 	$(CC) $(CFLAGS) -c -o $@ $<
 all: $(TARGET)
 	@echo Build complete for $(ECHO_MESSAGE)
@@ -52,6 +56,3 @@ $(TARGET): $(OBJS)
 
 clean:
 	rm -rf $(TARGET) $(OBJS) *.a 
-
-
-

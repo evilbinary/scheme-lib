@@ -24,6 +24,9 @@ LIBGLFW = ./libglfw/libglfw.so
 LIBGLES= ./libgl/libgles.so
 LIBSOCKET=./libsocket/libsocket.so
 LIBVIDEO=./libvideo/libvideo.so
+LIBGUI =./libgui/libgui.so
+LIBCC =./libc/libcc.so
+LIBALUT =./libalut/libalut.so
 
 UNAME_S := $(shell uname -s)
 OS_NAME :=$(shell echo $(UNAME_S)| tr '[A-Z]' '[a-z]')
@@ -39,6 +42,10 @@ ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
   LIBGLES= ./libgl/libgles.dll
   LIBSOCKET=./libsocket/libsocket.dll
   LIBC=./libc/libc.dll
+  LIBGUI =./libgui/libgui.dll
+  LIBCC =./libc/libcc.dll
+  LIBALUT =./libalut/libalut.dll
+
 endif
 
 all: $(TARGET)	
@@ -51,7 +58,7 @@ libscm.so: $(LIBSCM)
 libvideo.so: $(LIBVIDEO) libgui.so libgles.so
 	$(MAKE) -C libvideo
 
-libcc.so:
+libcc.so: 
 	$(MAKE) -C libc
 libglut.so: $(LIBGLUT)
 	$(MAKE) -C libglut
@@ -71,10 +78,10 @@ libcffi.so: $(LIBFFI)
 libgles.so: $(LIBGLES) 
 	$(MAKE) -C libgl
 
-libalut.so: libalut.so
+libalut.so: 
 	$(MAKE) -C libalut
 
-libgui.so: libgui.so
+libgui.so: 
 	$(MAKE) -C libgui
 
 libsocket.so:

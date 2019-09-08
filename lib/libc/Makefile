@@ -17,6 +17,8 @@ CFLAGS = -Wall -Wformat
 CXXFLAGS= -Wall -Wformat
 
 UNAME_S := $(shell uname -s)
+OS_NAME :=$(shell echo $(UNAME_S)| tr '[A-Z]' '[a-z]')
+
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
 	LIBS += 
@@ -44,7 +46,7 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 #	CXXFLAGS += -D__APPLE__
 endif
 
-ifeq ($(findstring MINGW32_NT,$(OS_NAME)),MINGW32_NT)
+ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
    	ECHO_MESSAGE = "Windows"
 	LIBS += -lm 
 	CXXFLAGS += 

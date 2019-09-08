@@ -8,8 +8,9 @@
 TARGET =bin/scheme
 EXT=.so
 UNAME_S := $(shell uname -s)
+OS_NAME :=$(shell echo $(UNAME_S)| tr '[A-Z]' '[a-z]')
 
-ifeq ($(findstring MINGW32_NT,$(OS_NAME)),MINGW32_NT)
+ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
   EXT=.dll
 endif
 SOFILES= lib/libscm/libscm$(EXT) \

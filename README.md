@@ -28,7 +28,7 @@ letsgo 莱茨狗抢狗软件：[https://github.com/scheme-lib/letsgo](https://gi
 duck-editor 鸭子编辑器：[https://github.com/evilbinary/duck-editor](https://github.com/evilbinary/duck-editor)
 
 # 文档
-[开发文档](https://github.com/evilbinary/scheme-lib/tree/master/docs)
+[开发文档](https://github.com/evilbinary/scheme-lib/tree/master/docs)https://github.com/evilbinary/scheme-lib/tree/master/docs
 
 
 

@@ -53,7 +53,7 @@ ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
 	CXXFLAGS += 
 	CFLAGS += #-Wno-implicit-function-declaration -Wl,--export-all-symbols -Wl,--exclude-all-symbols
 	PLATFORM=i3nt
-	TARGET = libc.dll
+	TARGET = libcc.dll
 
 endif
 

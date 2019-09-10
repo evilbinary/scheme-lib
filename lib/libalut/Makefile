@@ -37,7 +37,7 @@ ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
 	CXXFLAGS += 
 	CFLAGS +=  -I../3rdparty/include -DALUT_BUILD_LIBRARY -Wl,--enable-auto-import \
 		-Wl,--whole-archive  ../3rdparty/lib/libalut.a  -Wl,--no-whole-archive   -Wl,--export-all-symbols \
-
+		 -L/mingw32/lib/ -I/mingw32/include
 	OTHERS+= #-Wl,--out-implib,libalut.dll.a #-Wl,-verbose 
 	TARGET = libalut.dll
 endif

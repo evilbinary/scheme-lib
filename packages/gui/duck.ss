@@ -79,14 +79,12 @@
                         data)))))))
       widget))
   (define (pop w h text)
-    (let ([widget (widget-new 0.0 0.0 w h text)])
+    (let ([widget (widget-new 0.0 0.0 w h text)] [rect-fun '()])
       (widget-set-padding widget 20.0 0.0 20.0 0.0)
       (widget-set-layout
         widget
         (lambda (widget . args) (pop-layout widget)))
-      (widget-set-attrs
-        widget
-        '%event-rect-function
+      (set! rect-fun
         (lambda (ww mx my)
           (let ([in #f]
                 [lmx (- mx (vector-ref widget %x))]
@@ -138,6 +136,10 @@
                   (widget-set-cursor 'arrow)
                   (if (is-in widget data)
                       (begin
+                        (widget-set-attrs
+                          widget
+                          '%event-rect-function
+                          rect-fun)
                         (if (widget-status-is-set widget %status-default)
                             (begin
                               (if (not (null?
@@ -160,6 +162,7 @@
                         data))))
             (if (= type %event-motion-out)
                 (begin
+                  (widget-set-attrs widget '%event-rect-function '())
                   (widget-clear-status widget %status-active)
                   (widget-clear-child-status widget %status-active)))
             (if (and (= type %event-mouse-button)

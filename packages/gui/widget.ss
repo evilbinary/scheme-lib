@@ -692,36 +692,45 @@
                         (set! $last-hover '())))))
             (loop (- len 1))))))
   (define (widget-mouse-button-event data)
-    (let l ([w $widgets])
-      (if (pair? w)
-          (begin
-            (widget-set-status (car w) %status-default)
-            (let ([fun (widget-get-attrs
-                         (car w)
-                         '%event-rect-function)])
-              (if (procedure? fun)
-                  (if (and (widget-get-attr (car w) %visible)
-                           (fun (car w)
-                                (vector-ref data 3)
-                                (vector-ref data 4)))
-                      ((vector-ref (car w) %event)
-                        (car w)
-                        '()
-                        %event-mouse-button
-                        data))))
-            (l (cdr w)))))
-    (let loop ([len (- (length $widgets) 1)])
-      (if (>= len 0)
-          (let ([w (list-ref $widgets len)])
-            (if (and (widget-get-attr w %visible)
-                     (is-in-widget
-                       w
-                       (vector-ref data 3)
-                       (vector-ref data 4)))
-                (begin
-                  (widget-set-status w %status-active)
-                  ((vector-ref w %event) w '() %event-mouse-button data))
-                (loop (- len 1)))))))
+    (let ([have-event #f])
+      (let l ([w $widgets])
+        (if (pair? w)
+            (begin
+              (widget-set-status (car w) %status-default)
+              (let ([fun (widget-get-attrs
+                           (car w)
+                           '%event-rect-function)])
+                (if (procedure? fun)
+                    (if (and (widget-get-attr (car w) %visible)
+                             (fun (car w)
+                                  (vector-ref data 3)
+                                  (vector-ref data 4)))
+                        (begin
+                          (set! have-event #t)
+                          ((vector-ref (car w) %event)
+                            (car w)
+                            '()
+                            %event-mouse-button
+                            data))
+                        (l (cdr w)))
+                    (l (cdr w)))))))
+      (if (not have-event)
+          (let loop ([len (- (length $widgets) 1)])
+            (if (>= len 0)
+                (let ([w (list-ref $widgets len)])
+                  (if (and (widget-get-attr w %visible)
+                           (is-in-widget
+                             w
+                             (vector-ref data 3)
+                             (vector-ref data 4)))
+                      (begin
+                        (widget-set-status w %status-active)
+                        ((vector-ref w %event)
+                          w
+                          '()
+                          %event-mouse-button
+                          data))
+                      (loop (- len 1)))))))))
   (define (widget-scroll-event data)
     (let loop ([len (- (length $widgets) 1)])
       (if (>= len 0)

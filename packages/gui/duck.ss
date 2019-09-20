@@ -355,7 +355,11 @@
                           (set! offsety 0.0)
                           (widget-layout-update widget)
                           (widget-set-attrs widget 'scroll-y 0.0)
-                          (widget-set-child-attr widget %y 0.0))
+                          (let loop ([child (widget-get-child widget)])
+                            (if (pair? child)
+                                (begin
+                                  (widget-set-attr (car child) %y 0.0)
+                                  (loop (cdr child))))))
                         (if (> (+ (widget-get-attrs widget 'scroll-y)
                                   offsety)
                                (widget-get-attrs widget 'scroll-height))

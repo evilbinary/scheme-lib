@@ -40,8 +40,8 @@
     (graphic-draw-solid-quad x y (+ x w) (+ y h) 31.0 31.0 31.0
       0.6)
     (graphic-draw-solid-quad x (+ y (/ (* pos h) scroll-h)) (+ x w)
-      (+ y (/ (* pos h) scroll-h) (/ scroll-h h 0.1)) 61.0 61.0
-      61.0 0.6))
+      (+ y (/ (* pos h) scroll-h) (* (/ h scroll-h) 100.0)) 61.0
+      61.0 61.0 0.6))
   (define draw-panel
     (case-lambda
       [(x y w h text)

@@ -322,7 +322,7 @@
     (let ([s (widget-get-attr widget %status)])
       (= 0 (bitwise-xor (bitwise-and s status) status))))
   (define (widget-child-key-event widget type data)
-    (if (= type %event-key)
+    (if (and (= type %event-key))
         (widget-child-focus-event widget type data))
     (let loop ([child (vector-ref widget %child)])
       (if (pair? child)

@@ -354,7 +354,8 @@
                         (begin
                           (set! offsety 0.0)
                           (widget-layout-update widget)
-                          (widget-set-attrs widget 'scroll-y 0.0))
+                          (widget-set-attrs widget 'scroll-y 0.0)
+                          (widget-set-child-attr widget %y 0.0))
                         (if (> (+ (widget-get-attrs widget 'scroll-y)
                                   offsety)
                                (widget-get-attrs widget 'scroll-height))

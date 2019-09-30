@@ -203,7 +203,7 @@ float buffer_height(buffer_t *buffer) {
                buffer->lines[i]->font->size;
     }
   }
-  // printf("buffer_height=%f\n", total);
+  // printf("buffer_height=%f line_count=%d\n", total ,buffer->line_count);
   return total;
 }
 
@@ -452,7 +452,7 @@ void render_params(edit_t *self, void *pcolor) {
                        self->mvp.view.data);
     glUniformMatrix4fv(glGetUniformLocation(self->mvp.shader, "projection"), 1,
                        0, self->mvp.projection.data);
-    glUniform1i(glGetUniformLocation(self->mvp.shader, "type"), 0);
+    glUniform1i(glGetUniformLocation(self->mvp.shader, "type"), 1);
     if (pcolor != NULL) {
       self->color = *(int *)pcolor;
     }
@@ -857,7 +857,6 @@ void edit_insert_text_at(edit_t *self, int row, int col, char *text) {
 }
 
 void edit_key_event(edit_t *self, int key, int scancode, int action, int mods) {
-  // printf("edit_key_event %d %d\n", key, action);
   if (self != NULL && (action == 1 || action == 2)) {
     buffer_t *buffer = self->buffer;
     if (key == 263) {  // left
@@ -916,11 +915,28 @@ void render_cursor(edit_t *self) {
   buffer_t *buffer = self->buffer;
   float sx = self->bound.left + self->lineno_width;
   float sy = self->bound.top;
-  sth_begin_draw(self->buffer->font->stash);
-  graphic_render_string(buffer->font, buffer->font->size,
-                        buffer->cursor_x + sx - 6.0, buffer->cursor_y + sy, "|",
-                        &dx, &dy, self->cursor_color);
-  sth_end_draw(self->buffer->font->stash);
+
+  float ascender;
+  float descender;
+  float lineh;
+  sth_vmetrics(buffer->font->stash, buffer->font->id, buffer->font->size,
+               &ascender, &descender, &lineh);
+
+  float x1 = buffer->cursor_x + sx-1;
+  float y1 = buffer->cursor_y + sy + 8.0;
+  float x2 = x1 + 3;
+  float y2 = y1 + (ascender - descender * 2) * self->scale / 2;
+  int color = self->cursor_color;
+  float b = (color & 0xff) / 255.0;
+  float g = (color >> 8 & 0xff) / 255.0;
+  float r = (color >> 16 & 0xff) / 255.0;
+  float a = (color >> 24 & 0xff) / 255.0;
+  graphic_draw_solid_quad(&self->mvp, x1, y1, x2, y2, r, g, b, a);
+  // sth_begin_draw(self->buffer->font->stash);
+  // graphic_render_string(buffer->font, buffer->font->size,
+  //                       buffer->cursor_x + sx - 6.0, buffer->cursor_y + sy,
+  //                       "|", &dx, &dy, self->cursor_color);
+  // sth_end_draw(self->buffer->font->stash);
 }
 
 void pos_to_cursor(buffer_t *buffer, float x, float y) {
@@ -1054,8 +1070,9 @@ int get_edit_text_len(edit_t *self) {
   return buffer_total_text_length(self->buffer);
 }
 float get_edit_height(edit_t *self) {
+  // printf("get_edit_height %p %f\n",self,buffer_height(self->buffer) );
   if (self == NULL) return 0.0;
-  return buffer_height(self->buffer);
+  return buffer_height(self->buffer) / self->scale;
 }
 
 char *get_edit_text(edit_t *self) {

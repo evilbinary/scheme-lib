@@ -134,7 +134,7 @@
   (define v-font-shader-str
     "uniform mat4 model;\n      uniform mat4 view;\n      uniform mat4 projection;\n      attribute vec3 vertex;\n      attribute vec2 tex_coord;\n      attribute vec4 color;\n      varying vec2 v_tex_coord;\n      varying vec4 v_color; \n      void main()\n      {\n       v_tex_coord=tex_coord;\n       v_color=color;\n       gl_Position =projection*view*model*vec4(vertex,1.0);\n       }")
   (define f-font-shader-str
-    "uniform sampler2D texture;\n       varying vec2 v_tex_coord; \n       varying vec4 v_color;\n       uniform int type;\n       void main()\n      {\n        if( type==1 ){ \n           gl_FragColor = v_color;\n        }else{\n          gl_FragColor =vec4(v_color.rgb,texture2D(texture, v_tex_coord ).a*v_color.a );\n        }\n    }")
+    "uniform sampler2D texture;\n       varying vec2 v_tex_coord; \n       varying vec4 v_color;\n       uniform int type;\n       void main()\n      {\n        if( type==0 ){ \n           gl_FragColor = v_color;\n        }else{\n          gl_FragColor =vec4(v_color.rgb,texture2D(texture, v_tex_coord ).a*v_color.a );\n        }\n    }")
   (define (graphic-set-ratio ratio)
     (set! graphic-ratio ratio))
   (define (graphic-resize width height)

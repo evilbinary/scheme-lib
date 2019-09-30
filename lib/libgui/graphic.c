@@ -150,7 +150,7 @@ void graphic_draw_solid_quad(mvp_t* mvp, float x1, float y1, float x2, float y2,
     glUniformMatrix4fv(glGetUniformLocation(mvp->shader, "projection"), 1, 0,
                        mvp->projection.data);
 
-    glUniform1i(glGetUniformLocation(mvp->shader, "type"), 1);
+    glUniform1i(glGetUniformLocation(mvp->shader, "type"), 0);
     GLfloat vVertices[] = {
         x1, y1, x2, y1, x2, y2, x1, y2,
     };
@@ -179,6 +179,7 @@ void graphic_render_prepare_string(mvp_t* mvp, font_t* font) {
                      mvp->view.data);
   glUniformMatrix4fv(glGetUniformLocation(mvp->shader, "projection"), 1, 0,
                      mvp->projection.data);
+  glUniform1i(glGetUniformLocation(mvp->shader, "type"), 1);
   sth_begin_draw(font->stash);
 }
 
@@ -226,7 +227,6 @@ void graphic_render_string_immediate(mvp_t* mvp, font_t* font, float size,
   if (size < 0) {
     size = font->size;
   }
-  
   graphic_render_prepare_string(mvp, font);
   sth_draw_text(font->stash, font->id, size, sx, sy, -1, -1, text, r, g, b, a,
                 dx, dy);

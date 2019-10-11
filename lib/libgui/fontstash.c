@@ -640,14 +640,14 @@ int sth_pos(struct sth_stash* stash, int idx, float size, float width, char* s,
     }
     glyph = get_glyph(stash, fnt, codepoint, isize);
     if (!glyph) continue;
-    if ((width + glyph->xoff - glyph->xadv ) <= sx) {
+    if ((width + glyph->xoff - glyph->xadv ) < sx) {
       return i;
     }
-    i++;
     if (!get_quad(stash, fnt, glyph, isize, &x, &y, &q)) continue;
     sx = x;
+    i++;
   }
-  return i;
+  return -1;
 }
 
 void sth_measure(struct sth_stash* stash, int idx, float size, float width,

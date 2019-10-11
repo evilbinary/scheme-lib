@@ -922,7 +922,7 @@ void render_cursor(edit_t *self) {
   sth_vmetrics(buffer->font->stash, buffer->font->id, buffer->font->size,
                &ascender, &descender, &lineh);
 
-  float x1 = buffer->cursor_x + sx-1;
+  float x1 = buffer->cursor_x + sx - 1;
   float y1 = buffer->cursor_y + sy + 8.0;
   float x2 = x1 + 3;
   float y2 = y1 + (ascender - descender * 2) * self->scale / 2;

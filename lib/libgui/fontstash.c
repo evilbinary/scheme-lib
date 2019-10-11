@@ -633,21 +633,21 @@ int sth_pos(struct sth_stash* stash, int idx, float size, float width, char* s,
   while (fnt != NULL && fnt->idx != idx) fnt = fnt->next;
   if (fnt == NULL) return -1;
   if (fnt->type != BMFONT && !fnt->data) return -1;
-
-  for (int i = 0; *s && i < count; ++s) {
+  int i=0;
+  for (i = 0; *s && i < count; ++s) {
     if (decutf8(&state, &codepoint, *(unsigned char*)s)) {
       continue;
     }
-    i++;
     glyph = get_glyph(stash, fnt, codepoint, isize);
     if (!glyph) continue;
-    if ((width + glyph->xoff - glyph->xadv * 2) <= sx) {
+    if ((width + glyph->xoff - glyph->xadv ) <= sx) {
       return i;
     }
+    i++;
     if (!get_quad(stash, fnt, glyph, isize, &x, &y, &q)) continue;
     sx = x;
   }
-  return -1;
+  return i;
 }
 
 void sth_measure(struct sth_stash* stash, int idx, float size, float width,

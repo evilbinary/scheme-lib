@@ -19,7 +19,7 @@ OS_NAME :=$(shell echo $(UNAME_S)| tr '[A-Z]' '[a-z]')
 
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
-	LIBS += -ldl -lrt -lpthread -luuid
+	LIBS += -ldl -lrt -lpthread -luuid -llz4
 	CXXFLAGS += 
 	CXXFLAGS += 
 	CFLAGS += 

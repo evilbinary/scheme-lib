@@ -956,13 +956,13 @@
                 (begin
                   (widget-child-rect-event-mouse-motion widget type data)))
             (if (and (= type %event-mouse-button)
-                     (= (vector-ref data 1) 1))
+                     (= (vector-ref data 1) %event-button-down))
                 (if (equal? #t (widget-get-attrs widget 'disable-active))
                     '()
                     (widget-active widget))
                 #t)
             ret)))
-      (widget-set-padding widget 10.0 10.0 40.0 40.0)
+      (widget-set-padding widget 10.0 10.0 30.0 40.0)
       (widget-add widget)
       widget)))
 

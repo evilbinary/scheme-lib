@@ -60,7 +60,7 @@
            [font (widget-get-attrs widget 'font)]
            [font-size (widget-get-attrs widget 'font-size)]
            [lineh (widget-get-attrs widget 'line-height)]
-           [header-height (widget-get-attrs widget 'head-height 30.0)])
+           [header-height (widget-get-attr widget %top)])
       (graphic-draw-solid-quad gx gy (+ gx w) (+ gy header-height)
         31.0 31.0 31.0 0.9)
       (graphic-draw-solid-quad gx gy (+ gx w) (+ gy h) 31.0 31.0

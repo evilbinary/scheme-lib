@@ -41,7 +41,7 @@
    %margin-right %margin-bottom %draw %attrs
    %event-mouse-button %last-common-attr %event-key
    %event-motion %event-motion-out %event-active
-   %event-deactive)
+   %event-deactive %event-button-down %event-button-up)
   (import (scheme) (gui graphic) (gui stb) (gui utils))
   (define %draw 5)
   (define %x 0)
@@ -68,11 +68,15 @@
   (define %attrs 22)
   (define %events 23)
   (define %visible 24)
-  (define %last-common-attr 25)
-  (define %status-active 1)
+  (define %focus 25)
+  (define %focusable 26)
+  (define %last-common-attr 27)
   (define %status-default 0)
+  (define %status-active 1)
   (define %status-hover 2)
   (define %status-focus 4)
+  (define %status-drag 8)
+  (define %status-resize 16)
   (define window-width 0)
   (define window-height 0)
   (define %event-scroll 4)
@@ -83,8 +87,13 @@
   (define %event-resize 6)
   (define %event-layout 7)
   (define %event-motion-out 8)
+  (define %event-motion-in 9)
+  (define %event-focus-in 10)
+  (define %event-focus-out 11)
   (define %event-active 9)
   (define %event-deactive 10)
+  (define %event-button-down 1)
+  (define %event-button-up 0)
   (define cursor-x 0)
   (define cursor-y 0)
   (define cursor-arrow 0)
@@ -297,7 +306,10 @@
     (= 0 (bitwise-xor (bitwise-and status flag) flag)))
   (define (widget-set-status widget status)
     (let ([s (widget-get-attr widget %status)])
-      (widget-set-attr widget %status (bitwise-ior s status))))
+      (widget-set-attr widget %status (set-status s status))))
+  (define (widget-clear-status widget status)
+    (let ([s (widget-get-attr widget %status)])
+      (widget-set-attr widget %status (clear-status s status))))
   (define (widget-set-child-status widget status)
     (let loop ([child (vector-ref widget %child)])
       (if (pair? child)
@@ -312,12 +324,6 @@
             (widget-clear-status (car child) status)
             (widget-clear-child-status (car child) status)
             (loop (cdr child))))))
-  (define (widget-clear-status widget status)
-    (let ([s (widget-get-attr widget %status)])
-      (widget-set-attr
-        widget
-        %status
-        (bitwise-and s (bitwise-not status)))))
   (define (widget-status-is-set widget status)
     (let ([s (widget-get-attr widget %status)])
       (= 0 (bitwise-xor (bitwise-and s status) status))))
@@ -327,8 +333,7 @@
     (let loop ([child (vector-ref widget %child)])
       (if (pair? child)
           (begin
-            (if (or (widget-status-is-set (car child) %status-active)
-                    (widget-status-is-set (car child) %status-focus))
+            (if (or (widget-status-is-set (car child) %status-focus))
                 (begin
                   ((vector-ref (car child) %event)
                     (car child)
@@ -471,7 +476,6 @@
   (define (widget-new x y w h text)
     (let ([offset (vector 0 0)]
           [active 0]
-          [resize-status 0]
           [resize-pos (vector 0 0)]
           [nw '()])
       (set! nw
@@ -490,30 +494,40 @@
                      [yy (vector-ref widget %y)]
                      [ww (vector-ref widget %w)]
                      [hh (vector-ref widget %h)])
-                 (if (in-rect (+ xx ww -20.0) (+ yy hh -20.0) (+ xx ww)
-                       (+ yy hh) (vector-ref data 3) (vector-ref data 4))
-                     (begin (set! resize-status (vector-ref data 1))))
-                 (if (and (= (vector-ref data 1) 0) (= resize-status 1))
-                     (set! resize-status 0))
-                 (set! active (vector-ref data 1))
-                 (widget-set-attrs widget '%drag 1)))
-           (if (and (= type %event-mouse-button)
-                    (= (vector-ref data 1) 1))
-               (let ([mx (vector-ref data 3)] [my (vector-ref data 4)])
-                 (set! resize-pos (vector mx my))
-                 (set! offset
-                   (vector
-                     (- (vector-ref widget %x) mx)
-                     (- (vector-ref widget %y) my)))
-                 (widget-child-rect-event-mouse-button widget type data)
-                 (if (not (widget-get-attr widget %visible))
-                     (begin (widget-set-attrs widget '%drag 0)))))
+                 (if (= (vector-ref data 1) %event-button-down)
+                     (let ([mx (vector-ref data 3)]
+                           [my (vector-ref data 4)])
+                       (if (in-rect xx yy ww (widget-get-attr widget %top)
+                             mx my)
+                           (widget-set-status widget %status-drag))
+                       (if (or (in-rect (+ xx ww -20.0) (+ yy) 20.0 hh mx
+                                 my)
+                               (in-rect (+ xx) (+ yy hh -20.0) ww 20.0 mx
+                                 my))
+                           (begin
+                             (widget-set-status widget %status-resize)))
+                       (set! resize-pos (vector mx my))
+                       (set! offset
+                         (vector
+                           (- (vector-ref widget %x) mx)
+                           (- (vector-ref widget %y) my)))
+                       (widget-child-rect-event-mouse-button
+                         widget
+                         type
+                         data)
+                       (if (not (widget-get-attr widget %visible))
+                           (begin
+                             (widget-clear-status widget %status-drag)))))
+                 (if (= (vector-ref data 1) %event-button-up)
+                     (begin
+                       (widget-clear-status widget %status-drag)
+                       (widget-clear-status widget %status-resize)))))
            (if (= type %event-motion)
                (begin
-                 (if (and (= active %status-active)
-                          (= (widget-get-attrs widget '%drag) 1))
+                 (if (or (widget-status-is-set widget %status-resize)
+                         (widget-status-is-set widget %status-drag))
                      (let ()
-                       (if (= 1 resize-status)
+                       (if (widget-status-is-set widget %status-resize)
                            (let ([mx (vector-ref data 0)]
                                  [my (vector-ref data 1)]
                                  [w (vector-ref widget %w)]
@@ -544,8 +558,8 @@
                     (widget-status-is-set widget %status-active))
                (begin (widget-child-key-event widget type data))))
          (list) 0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 '() 0.0 0.0 text
-         '() (make-hashtable equal-hash equal?)
-         (make-hashtable equal-hash equal?) #t '() '() '() '() '()
+         'widget (make-hashtable equal-hash equal?)
+         (make-hashtable equal-hash equal?) #t '() #f '() '() '() '()
          '() '() '() '()))
       (widget-set-attrs nw '%w w)
       (widget-set-attrs nw '%h h)
@@ -678,9 +692,8 @@
       (if (>= len 0)
           (let ([w (list-ref $widgets len)])
             (if (and (widget-get-attr w %visible)
-                     (or (equal?
-                           %status-active
-                           (widget-get-attrs w '%drag))
+                     (or (widget-status-is-set w %status-drag)
+                         (widget-status-is-set w %status-resize)
                          (is-in-widget w cursor-x cursor-y)))
                 (let ([event (vector-ref w %event)])
                   (event w '() type data)

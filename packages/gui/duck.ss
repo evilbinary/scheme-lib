@@ -218,12 +218,13 @@
     (let ([widget (widget-new 0.0 0.0 w h text)])
       (widget-set-attrs widget 'text-align 'left-top)
       (widget-set-padding widget 20.0 0.0 20.0 0.0)
+      (widget-set-attrs widget 'expanded #f)
       (widget-set-layout
         widget
         (lambda (widget . args)
           (linear-layout
             widget
-            (lambda (w) (widget-status-is-set widget %status-active)))))
+            (lambda (w) (widget-get-attrs widget 'expanded)))))
       (widget-set-draw
         widget
         (lambda (widget parent)
@@ -244,7 +245,7 @@
                   (vector-set! widget %gx gx)
                   (vector-set! widget %gy gy)
                   (draw-widget-text widget)))
-            (if (widget-status-is-set widget %status-active)
+            (if (widget-get-attrs widget 'expanded)
                 (widget-draw-child widget)))))
       (widget-set-event
         widget
@@ -269,13 +270,19 @@
                               parent
                               type
                               data))
-                        (if (widget-status-is-set widget %status-active)
+                        (if (equal? #t (widget-get-attrs widget 'expanded))
                             (begin
                               (widget-set-child-attr widget %visible #f)
-                              (widget-clear-status widget %status-active))
-                            (begin
-                              (widget-set-child-attr widget %visible #t)
-                              (widget-set-status widget %status-active)))
+                              (widget-set-attrs widget 'expanded #f))
+                            (if (equal?
+                                  #f
+                                  (widget-get-attrs widget 'expanded))
+                                (begin
+                                  (widget-set-child-attr
+                                    widget
+                                    %visible
+                                    #t)
+                                  (widget-set-attrs widget 'expanded #t))))
                         (widget-layout-update (widget-get-root widget)))
                       (widget-child-rect-event-mouse-button
                         widget

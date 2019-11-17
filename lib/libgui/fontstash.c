@@ -173,6 +173,7 @@ int sth_add_font_from_memory(struct sth_stash* stash, unsigned char* buffer) {
   fnt->idx = idx;
   fnt->type = TTFONT_MEM;
   fnt->next = stash->fonts;
+  fnt->nfallbacks=0;
   stash->fonts = fnt;
   return idx++;
 
@@ -328,7 +329,26 @@ inline int sth_add_glyph_for_char(struct sth_stash* stash, int idx, GLuint id,
   return sth_add_glyph_for_codepoint(stash, idx, id, codepoint, size, base, x,
                                      y, w, h, xoffset, yoffset, xadvance);
 }
-
+//
+int sth_add_fallback_font(struct sth_font* font,int fallback_id){
+  if(font->nfallbacks<=FONS_MAX_FALLBACKS){
+    font->fallbacks[font->nfallbacks]=fallback_id;
+    font->nfallbacks++;
+    return font->nfallbacks;
+  }else{
+    return -1;
+  } 
+}
+struct sth_font* get_font_by_index(struct sth_stash* stash, int idx){
+  struct sth_font* fnt = stash->fonts;
+  while (fnt != NULL){
+    if(fnt->idx == idx){
+      return fnt;
+    }
+    fnt = fnt->next;
+  }
+  return NULL;
+}
 struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt,
                             unsigned int codepoint, short isize) {
   int i, g, advance, lsb, x0, y0, x1, y1, gw, gh;
@@ -354,13 +374,32 @@ struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt,
 
   // For bitmap fonts: ignore this glyph.
   if (fnt->type == BMFONT) return 0;
-
+  struct sth_font* temp_fnt=fnt;
   // For truetype fonts: create this glyph.
-  scale = stbtt_ScaleForPixelHeight(&fnt->font, size);
   g = stbtt_FindGlyphIndex(&fnt->font, codepoint);
+  // Try to find the glyph in fallback fonts.
+  if (g == 0) {
+    // printf("====> fnt %p nfallbacks=%d idx=%d\n",fnt, fnt->nfallbacks,fnt->idx);
+		for (i = 0; i < fnt->nfallbacks; ++i) {
+			int index = fnt->fallbacks[i];
+      struct sth_font *fallback_font=get_font_by_index(stash,index);
+      if(fallback_font!=NULL){
+        int fallbackIndex = stbtt_FindGlyphIndex(&fallback_font->font, codepoint);
+        if (fallbackIndex != 0) {
+          g = fallbackIndex;
+          temp_fnt=fallback_font;
+          break;
+        }
+      }
+		}
+    
+		// It is possible that we did not find a fallback glyph.
+		// In that case the glyph index 'g' is 0, and we'll proceed below and cache empty glyph.
+	}
   if (!g) return 0; /* @rlyeh: glyph not found, ie, arab chars */
-  stbtt_GetGlyphHMetrics(&fnt->font, g, &advance, &lsb);
-  stbtt_GetGlyphBitmapBox(&fnt->font, g, scale, scale, &x0, &y0, &x1, &y1);
+  scale = stbtt_ScaleForPixelHeight(&temp_fnt->font, size);
+  stbtt_GetGlyphHMetrics(&temp_fnt->font, g, &advance, &lsb);
+  stbtt_GetGlyphBitmapBox(&temp_fnt->font, g, scale, scale, &x0, &y0, &x1, &y1);
   gw = x1 - x0;
   gh = y1 - y0;
 
@@ -450,7 +489,7 @@ struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt,
   // Rasterize
   bmp = (unsigned char*)malloc(gw * gh);
   if (bmp) {
-    stbtt_MakeGlyphBitmap(&fnt->font, bmp, gw, gh, gw, scale, scale, g);
+    stbtt_MakeGlyphBitmap(&temp_fnt->font, bmp, gw, gh, gw, scale, scale, g);
     // Update texture
     glBindTexture(GL_TEXTURE_2D, texture->id);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

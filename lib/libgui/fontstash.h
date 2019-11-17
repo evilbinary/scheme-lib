@@ -54,6 +54,10 @@
 #define TTFONT_MEM 2
 #define BMFONT 3
 
+#ifndef FONS_MAX_FALLBACKS
+#	define FONS_MAX_FALLBACKS 20
+#endif
+
 enum sth_flags {
   FONS_ZERO_TOPLEFT = 1,
   FONS_ZERO_BOTTOMLEFT = 2,
@@ -89,6 +93,8 @@ struct sth_font {
   float descender;
   float lineh;
   struct sth_font* next;
+  int fallbacks[FONS_MAX_FALLBACKS];
+	int nfallbacks;
 };
 
 struct sth_texture {
@@ -178,5 +184,8 @@ int sth_pos(struct sth_stash* stash, int idx, float size, float width, char* s,
             int count);
 float sth_get_start(struct sth_stash* stash, float size);
 float sth_get_line(struct sth_stash* stash, float size);
+
+struct sth_font* get_font_by_index(struct sth_stash* stash, int idx);
+int sth_add_fallback_font(struct sth_font* font,int idx);
 
 #endif  // FONTSTASH_H

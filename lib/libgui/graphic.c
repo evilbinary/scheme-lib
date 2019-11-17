@@ -46,6 +46,15 @@ void mvp_set_mvp(mvp_t* mvp) {
                      mvp->projection.data);
 }
 
+
+font_t * add_fallback_font(font_t* font,char* fallbackname){
+  printf("load fallback %s\n",fallbackname);
+  font->fallback_id = sth_add_font(font->stash,fallbackname);
+  struct sth_font * fnt=get_font_by_index(font->stash,font->id);
+  int n=sth_add_fallback_font(fnt,font->fallback_id);
+  return font;
+}
+
 font_t* new_font(char* name, float size) {
   LOGI("new_font %s %f\n",name,size);
   font_t* font = malloc(sizeof(font_t));
@@ -54,6 +63,24 @@ font_t* new_font(char* name, float size) {
   font->size = size;
   font->stash = sth_create(512, 512);
   font->id = sth_add_font(font->stash, name);
+  char fallbackname[1024];
+  char ext[20];
+  int len=strlen(name);
+  strcpy(fallbackname,name);
+  strcpy(ext,&name[len-4]);
+  fallbackname[len-4]=0;
+  sprintf(fallbackname,"%s%s%s",fallbackname,"Fallback",ext);
+  if (!access(fallbackname, 0)) {
+    printf("load fallback %s\n",fallbackname);
+    add_fallback_font(font,fallbackname);
+  }else{
+    strcpy(fallbackname,name);
+    fallbackname[len-4]=0;
+    sprintf(fallbackname,"%s%s%s",fallbackname,"-Fallback",ext);
+    if (!access(fallbackname, 0)) {
+      add_fallback_font(font,fallbackname);
+    }
+  }
   // font->stash->fonts->lineh = font->stash->fonts->lineh * 2.0;
   // printf("new font %f %f\n",font->stash->fonts->lineh,size);
   // LOGI("new_font font=>%p stash=>%p %p\n",font,font->stash,*(font->stash) );

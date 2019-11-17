@@ -55,6 +55,7 @@ typedef struct {
   int id;
   char *name;
   unsigned char *data;
+  int fallback_id;
 } font_t;
 
 float measure_text(font_t* font, float size, char* text, int count);

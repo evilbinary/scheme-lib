@@ -38,7 +38,7 @@
   (def-function
     terminal-resize
     "terminal_resize"
-    (void* int int)
+    (void* float float)
     void)
   (def-function
     terminal-set-mvp
@@ -72,6 +72,10 @@
                 [w (vector-ref widget %w)]
                 [h (vector-ref widget %h)]
                 [draw (vector-ref widget %draw)]
+                [background (widget-get-attrs
+                              widget
+                              'background
+                              1711276032)]
                 [top (vector-ref widget %top)]
                 [left (vector-ref widget %left)]
                 [right (vector-ref widget %right)]
@@ -80,13 +84,19 @@
                 [gy (widget-in-parent-gy widget parent)])
             (vector-set! widget %gx gx)
             (vector-set! widget %gy gy)
-            (graphic-sissor-begin gx gy w h)
+            (if (equal? '() background)
+                (draw-panel gx gy w h '())
+                (draw-panel gx gy w h '() background))
             (terminal-render term (+ left gx) (+ top gy))
-            (widget-draw-child widget)
-            (graphic-sissor-end))))
+            (widget-draw-child widget))))
       (widget-set-event
         widget
         (lambda (widget parent type data)
+          (if (= type %event-layout)
+              (terminal-resize
+                term
+                (widget-get-attr widget %w)
+                (widget-get-attr widget %h)))
           (if (and (= type %event-mouse-button))
               (begin
                 (widget-child-rect-event-mouse-button widget type data)))

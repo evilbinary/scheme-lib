@@ -121,7 +121,7 @@
   (define all-font-cache (make-hashtable equal-hash eqv?))
   (define font-mvp 0)
   (define default-mvp 0)
-  (define default-font-name "Roboto-Regular.ttf")
+  (define default-font-name "RobotoMono-Regular.ttf")
   (define default-font-size 18.0)
   (define graphic-init-events '())
   (define graphic-resize-events '())

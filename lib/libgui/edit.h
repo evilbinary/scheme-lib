@@ -75,6 +75,7 @@ typedef struct _edit_t {
   int selected_bg_color;
   int select_press;
   int cursor_color;
+  int cursor_visible;
 
   int show_lineno;
   int lineno_width;

@@ -911,6 +911,9 @@ void edit_key_event(edit_t *self, int key, int scancode, int action, int mods) {
 }
 
 void render_cursor(edit_t *self) {
+  if(self->cursor_visible==0){
+    return;
+  }
   float dx = 0, dy = 0;
   buffer_t *buffer = self->buffer;
   float sx = self->bound.left + self->lineno_width;
@@ -988,6 +991,9 @@ void edit_set_select_color(edit_t *self, int color) {
 void edit_set_cursor_color(edit_t *self, int color) {
   self->cursor_color = color;
 }
+void edit_set_cursor_visible(edit_t* self,int visible){
+  self->cursor_visible=visible;
+}
 
 edit_t *new_edit(int shader, font_t *font, float font_size, float scale,
                  float w, float h, float width, float height) {
@@ -1033,6 +1039,7 @@ edit_t *new_edit(int shader, font_t *font, float font_size, float scale,
   self->show_lineno = 0;
   self->lineno_color = -1;
   self->lineno_width = 0;
+  self->cursor_visible=1;
 
   update_cursor_pos(self->buffer);
 

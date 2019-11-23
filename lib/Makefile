@@ -16,6 +16,7 @@ SUB_DIR :=  libscm  libgui libc libcffi libgl\
 	libalut \
 	libvideo \
 	libglut libimgui \
+	libterminal
 
 LIBSCM =./libscm/libscm.so
 LIBGLUT =./libglut/libglut.so

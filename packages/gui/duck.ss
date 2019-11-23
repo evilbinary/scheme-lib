@@ -372,7 +372,9 @@
                                   (loop (cdr child))))))
                         (if (> (+ (widget-get-attrs widget 'scroll-y)
                                   offsety)
-                               (widget-get-attrs widget 'scroll-height))
+                               (+ (widget-get-attrs
+                                    widget
+                                    'scroll-height)))
                             (begin
                               (set! offsety 0.0)
                               (widget-set-attrs

@@ -18,8 +18,9 @@
    edit-get-text-range edit-get-selection-row-start
    edit-get-selection-row-end edit-get-selection-col-start
    edit-get-selection-col-end edit-insert-text-at
-   edit-set-cursor edit-get-text-length edit-new new-edit
-   draw-edit edit-add-text edit-set-text edit-set-color)
+   edit-set-cursor edit-set-cursor-visible edit-get-text-length
+   edit-new new-edit draw-edit edit-add-text edit-set-text
+   edit-set-color)
   (import (scheme) (utils libutil) (cffi cffi) (gles gles2)
     (gui graphic))
   (load-librarys "libgui")
@@ -212,6 +213,11 @@
   (def-function
     edit-set-cursor-color
     "edit_set_cursor_color"
+    (void* int)
+    void)
+  (def-function
+    edit-set-cursor-visible
+    "edit_set_cursor_visible"
     (void* int)
     void)
   (def-function edit-get-font "edit_get_font" (void*) void*)

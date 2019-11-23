@@ -197,7 +197,7 @@ void glShaderSource2(GLuint shader, GLsizei count, const GLchar* string,
   glShaderSource(shader, count, &string, length);
 }
 
-void graphic_render_prepare_string(mvp_t* mvp, font_t* font) {
+void graphic_set_mvp(mvp_t* mvp){
   glUseProgram(mvp->shader);
   glUniform1i(glGetUniformLocation(mvp->shader, "texture"), 0);
   glUniformMatrix4fv(glGetUniformLocation(mvp->shader, "model"), 1, 0,
@@ -207,6 +207,10 @@ void graphic_render_prepare_string(mvp_t* mvp, font_t* font) {
   glUniformMatrix4fv(glGetUniformLocation(mvp->shader, "projection"), 1, 0,
                      mvp->projection.data);
   glUniform1i(glGetUniformLocation(mvp->shader, "type"), 1);
+}
+
+void graphic_render_prepare_string(mvp_t* mvp, font_t* font) {
+  graphic_set_mvp(mvp);
   sth_begin_draw(font->stash);
 }
 

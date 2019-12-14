@@ -42,7 +42,8 @@
    %event-mouse-button %last-common-attr %event-key
    %event-motion %event-motion-out %event-active
    %event-deactive %event-button-down %event-button-up)
-  (import (scheme) (gui graphic) (gui stb) (gui utils))
+  (import (scheme) (gui keys) (gui graphic) (gui stb)
+    (gui utils))
   (define %draw 5)
   (define %x 0)
   (define %y 1)
@@ -103,11 +104,6 @@
   (define default-cursor '())
   (define default-cursor-mode '())
   (define $last-hover '())
-  (define default-key-map (make-hashtable equal-hash equal?))
-  (define default-key-maps
-    (list '(ctl 2) '(shift 1) '(alt 4) '(super 8) '(caps-lock 16)
-      '(num-lock 32) '(a 65) '(b 66) '(c 67) '(d 68) '(v 86)
-      '(x 88) '(up 265) '(down 264) '(left 263) '(right 262)))
   (define $widgets (list))
   (define (widget-init-cursor cursor)
     (set! default-cursor cursor))
@@ -125,10 +121,6 @@
             (set-default-key-map (cadar l) (caar l))
             (set-default-key-map (caar l) (cadar l))
             (loop (cdr l))))))
-  (define (set-default-key-map key val)
-    (hashtable-set! default-key-map key val))
-  (define (get-default-key-map key)
-    (hashtable-ref default-key-map key '()))
   (define (plus-child-y-offset widget offsety)
     (let loop ([child (vector-ref widget %child)])
       (if (pair? child)
@@ -259,8 +251,17 @@
                 [(quote up)
                  (if (< cy gy) (set! ret (append ret (list (car child)))))]
                 [(quote down)
-                 (if (> cy gy)
-                     (set! ret (append ret (list (car child)))))])
+                 (if (> cy gy) (set! ret (append ret (list (car child)))))]
+                [(quote next)
+                 (if (> cx gx)
+                     (set! ret (append ret (list (car child))))
+                     (if (> cy gy)
+                         (set! ret (append ret (list (car child))))))]
+                [(quote prev)
+                 (if (< cx gx)
+                     (set! ret (append ret (list (car child))))
+                     (if (< cy gy)
+                         (set! ret (append ret (list (car child))))))])
               (loop (cdr child)))))
       (set! ret
         (list-sort
@@ -274,7 +275,11 @@
       ret))
   (define (widget-child-focus-event widget type data)
     (if (= (vector-ref data 2) 1)
-        (let ([focus-child (widget-get-attrs widget 'focus-child)])
+        (let ([focus-child (widget-get-attrs widget 'focus-child)]
+              [focus-key-map-fun (widget-get-attrs
+                                   widget
+                                   'focus-key-map-fun
+                                   get-default-key-map)])
           (if (> (length (widget-get-child widget)) 0)
               (let ([ret '()])
                 (if (null? focus-child)
@@ -286,7 +291,7 @@
                       (set! ret
                         (widget-find-child-focus
                           widget
-                          (get-default-key-map (vector-ref data 0))
+                          (focus-key-map-fun (vector-ref data 0))
                           (list-ref gxy 0)
                           (list-ref gxy 1)))))
                 (if (> (length ret) 0)

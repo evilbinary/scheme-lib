@@ -8,7 +8,7 @@
     view pop progress)
   (import (scheme) (utils libutil) (gui video) (gui edit)
     (gui widget) (gui draw) (gui graphic) (gui layout) (gui stb)
-    (gui syntax))
+    (gui keys) (gui syntax))
   (define (default-attrs widget)
     (let* ([text (widget-get-attr widget %text)]
            [font-name (widget-get-attrs widget 'font-name '())]
@@ -29,6 +29,12 @@
         widget
         'text-height
         (draw-get-text-height font font-size))
+      (widget-set-attrs
+        widget
+        'focus-key-map-fun
+        (lambda (key)
+          (let ([k (get-default-key-map key)])
+            (if (equal? k 'tab) 'next))))
       (widget-set-attrs
         widget
         "%event-font-size-hook"

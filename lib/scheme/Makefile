@@ -10,7 +10,7 @@ OBJS = main.o
 PLATFORM=
 BITS =$(shell getconf LONG_BIT)
 
-LIBS =-L../libscm -lscm -lm
+LIBS =-L../libscm -lscm -lm -L/usr/local/lib -L/usr/lib/x86_64-linux-gnu/
 CFLAGS = -Wall -Wformat -I../libscm -g 
 CXXFLAGS= -Wall -Wformat
 
@@ -26,6 +26,7 @@ ifeq ($(UNAME_S), Linux) #LINUX
 	ifeq ($(BITS), 32)
 		PLATFORM=i3le
 	else
+		LIBS +=-L/usr/lib/x86_64-linux-gnu/
 		PLATFORM=a6le
 	endif
 endif

@@ -108,7 +108,8 @@ type queue_out(pQueue Q){	//入队列
 }
 
 void queue_trav(pQueue Q){	//遍历队列显示结果
-  for(int i = Q->fron; i != Q->rear; i=(i+1)%Q->size){
+  int i;
+  for(i = Q->fron; i != Q->rear; i=(i+1)%Q->size){
     printf(" %d ",Q->data[i]);
   }
 }

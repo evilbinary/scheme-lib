@@ -949,7 +949,8 @@ int video_init_media(video_t* video) {
   // Find the first video stream
   video->videoStream = -1;
   video->audioStream = -1;
-  for (int i = 0; i < video->pFormatCtx->nb_streams; i++) {
+  int i;
+  for (i = 0; i < video->pFormatCtx->nb_streams; i++) {
     if (video->pFormatCtx->streams[i]->codec->codec_type ==
             AVMEDIA_TYPE_VIDEO &&
         video->videoStream < 0) {
@@ -1116,8 +1117,8 @@ video_t* video_new(char* filename, float width, float height) {
 
   // gl init
   video_gl_init(video);
-
-  for (int i = 0; i < MAX_STREAM; i++) {
+  int i;
+  for (i = 0; i < MAX_STREAM; i++) {
     queue_init(&video->packets[i]);
     // printf("queue %d %p
     // %d\n",i,&video->packets[i],queue_get_length(&video->packets[i]) );

@@ -9,7 +9,7 @@ QQ群：Lisp兴趣小组239401374
 
 ## Linux
 
-1. 执行`sudo apt-get install build-essential freeglut3-dev libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libalut-dev libopenal-dev libffi-dev uuid-dev liblz4-dev`命令安装依赖库。
+1. 执行`sudo apt-get install build-essential freeglut3-dev libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libalut-dev libopenal-dev libffi-dev uuid-dev liblz4-dev`命令安装依赖库。如果需要视频支持请加上`libavcodec-dev libavformat-dev libswscale-dev`
 2. 执行`make`命令就可以编译，对应平台的文件在`bin`目录下。
 3. 进入`bin`目录，执行`source env.sh`，然后运行`./scheme --script ../apps/hello.ss`就可以运行例子。
 

@@ -69,4 +69,4 @@ duck-editor 鸭子编辑器：[https://github.com/evilbinary/duck-editor](https:
 3. 打开scheme app就可以直接运行啦。
 
 [1]: https://raw.githubusercontent.com/evilbinary/scheme-lib/master/data/apk/scheme-release-1.6.apk   "scheme apk"
-[2]: https://github.com/evilbinary/data/blob/master/pic/scheme-lib-2.0-win32.zip  "scheme-lib-2.0-win32.zip"
+[2]: https://github.com/evilbinary/data/blob/master/pic/scheme-lib-2.1-win32.zip  "scheme-lib-2.1-win32.zip"

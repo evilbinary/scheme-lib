@@ -1,7 +1,7 @@
 # scheme-lib
 鸭库 scheme-lib 是一个scheme使用的库。目前支持android osx linux windows，其它平台在规划中。
 
-官方主页：[http://scheme-lib.evilbinary.org/](http://scheme-lib.evilbinary.org/)
+官方主页：[https://evilbinary.github.io/scheme-lib/](http://scheme-lib.evilbinary.org/)
 QQ群：Lisp兴趣小组239401374
 
 # 安装编译
@@ -27,7 +27,7 @@ letsgo 莱茨狗抢狗软件：[https://github.com/scheme-lib/letsgo](https://gi
 duck-editor 鸭子编辑器：[https://github.com/evilbinary/duck-editor](https://github.com/evilbinary/duck-editor)
 
 # 文档
-[开发文档](https://github.com/evilbinary/scheme-lib/tree/master/docs)https://github.com/evilbinary/scheme-lib/tree/master/docs
+[开发文档](https://evilbinary.github.io/scheme-lib/)https://evilbinary.github.io/scheme-lib/
 
 
 

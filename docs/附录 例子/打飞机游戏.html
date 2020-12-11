@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>鸭库scheme-lib</title>
+    <meta name="generator" content="VuePress 1.7.1">
+    <script>
+      (function() {
+      var hm1 = document.createElement("script");
+      hm1.src = "https://www.googletagmanager.com/gtag/js?id=G-XM4XMJ9T7L";
+      var s1 = document.getElementsByTagName("script")[0]; 
+      s1.parentNode.insertBefore(hm1, s1);
+      })();
+
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XM4XMJ9T7L');
+        </script>
+    <meta name="description" content="">
+    <meta name="theme-color" content="#3eaf7c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    
+    <link rel="preload" href="/scheme-lib/assets/css/0.styles.be889c48.css" as="style"><link rel="preload" href="/scheme-lib/assets/js/app.7d3796fb.js" as="script"><link rel="preload" href="/scheme-lib/assets/js/2.717986cd.js" as="script"><link rel="preload" href="/scheme-lib/assets/js/3.3680f9a6.js" as="script"><link rel="preload" href="/scheme-lib/assets/js/31.cf140346.js" as="script"><link rel="prefetch" href="/scheme-lib/assets/js/10.9f689f80.js"><link rel="prefetch" href="/scheme-lib/assets/js/11.e96ec370.js"><link rel="prefetch" href="/scheme-lib/assets/js/12.0c97394b.js"><link rel="prefetch" href="/scheme-lib/assets/js/13.c0c38b07.js"><link rel="prefetch" href="/scheme-lib/assets/js/14.49061573.js"><link rel="prefetch" href="/scheme-lib/assets/js/15.a196a7d1.js"><link rel="prefetch" href="/scheme-lib/assets/js/16.d05c1140.js"><link rel="prefetch" href="/scheme-lib/assets/js/17.20acbcd8.js"><link rel="prefetch" href="/scheme-lib/assets/js/18.225fd011.js"><link rel="prefetch" href="/scheme-lib/assets/js/19.7156d96c.js"><link rel="prefetch" href="/scheme-lib/assets/js/20.ddb59844.js"><link rel="prefetch" href="/scheme-lib/assets/js/21.76b988dc.js"><link rel="prefetch" href="/scheme-lib/assets/js/22.b490eaf0.js"><link rel="prefetch" href="/scheme-lib/assets/js/23.756a7dd8.js"><link rel="prefetch" href="/scheme-lib/assets/js/24.bcac95eb.js"><link rel="prefetch" href="/scheme-lib/assets/js/25.2e524cd3.js"><link rel="prefetch" href="/scheme-lib/assets/js/26.39967ac9.js"><link rel="prefetch" href="/scheme-lib/assets/js/27.f8e4c083.js"><link rel="prefetch" href="/scheme-lib/assets/js/28.88482de7.js"><link rel="prefetch" href="/scheme-lib/assets/js/29.5fa2fe9a.js"><link rel="prefetch" href="/scheme-lib/assets/js/30.dd0552c7.js"><link rel="prefetch" href="/scheme-lib/assets/js/32.ba3c6be0.js"><link rel="prefetch" href="/scheme-lib/assets/js/33.c0ca864c.js"><link rel="prefetch" href="/scheme-lib/assets/js/34.306a5faf.js"><link rel="prefetch" href="/scheme-lib/assets/js/35.2238a00d.js"><link rel="prefetch" href="/scheme-lib/assets/js/36.a8ac7a0b.js"><link rel="prefetch" href="/scheme-lib/assets/js/4.a7d87990.js"><link rel="prefetch" href="/scheme-lib/assets/js/5.918194ec.js"><link rel="prefetch" href="/scheme-lib/assets/js/6.c251f99b.js"><link rel="prefetch" href="/scheme-lib/assets/js/7.3d818c5a.js"><link rel="prefetch" href="/scheme-lib/assets/js/8.2d51dbde.js"><link rel="prefetch" href="/scheme-lib/assets/js/9.c7da5c3d.js">
+    <link rel="stylesheet" href="/scheme-lib/assets/css/0.styles.be889c48.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/scheme-lib/" class="home-link router-link-active"><!----> <span class="site-name">鸭库scheme-lib</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links menu can-hide"><div class="nav-item"><a href="/scheme-lib/guide/" class="nav-link">
+  新手指南
+</a></div><div class="nav-item"><a href="/scheme-lib/docs/" class="nav-link router-link-active">
+  文档
+</a></div><div class="nav-item"><a href="/scheme-lib/about/" class="nav-link">
+  关于
+</a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/scheme-lib/guide/" class="nav-link">
+  新手指南
+</a></div><div class="nav-item"><a href="/scheme-lib/docs/" class="nav-link router-link-active">
+  文档
+</a></div><div class="nav-item"><a href="/scheme-lib/about/" class="nav-link">
+  关于
+</a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>第一章 介绍</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/scheme-lib/docs/第一章 介绍/1.0 概述.html" class="sidebar-link">1 关于scheme</a></li><li><a href="/scheme-lib/docs/第一章 介绍/1.1 scheme-lib库.html" class="sidebar-link">1 基本概念</a></li></ul></section></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>第二章 入门</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/scheme-lib/docs/第二章 入门/2.1 scheme-lib安装.html" class="sidebar-link">1 linux、mac下安装</a></li><li><a href="/scheme-lib/docs/第二章 入门/2.2 win下编译安装.html" class="sidebar-link">0 警告⚠️</a></li></ul></section></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>第三章 输入输出</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/scheme-lib/docs/第三章 输入输出/3.1 输入输出.html" class="sidebar-link">1 输入</a></li></ul></section></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>第四章 GUI库</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/scheme-lib/docs/第四章 GUI库/4.2 gui库使用.html" class="sidebar-link">1 gui库使用</a></li></ul></section></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>第五章 FFI库</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/scheme-lib/docs/第五章 FFI库/5.0 ffi库的概述.html" class="sidebar-link">什么是 ffi ？</a></li><li><a href="/scheme-lib/docs/第五章 FFI库/5.1 cffi库使用.html" class="sidebar-link">1 cffi库使用</a></li></ul></section></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>附录 例子</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/scheme-lib/docs/附录 例子/2D物理引擎.html" class="sidebar-link">/docs/附录 例子/2D物理引擎.html</a></li><li><a href="/scheme-lib/docs/附录 例子/打飞机游戏.html" class="active sidebar-link">/docs/附录 例子/打飞机游戏.html</a></li><li><a href="/scheme-lib/docs/附录 例子/计算器.html" class="sidebar-link">/docs/附录 例子/计算器.html</a></li><li><a href="/scheme-lib/docs/附录 例子/远程解释器.html" class="sidebar-link">/docs/附录 例子/远程解释器.html</a></li><li><a href="/scheme-lib/docs/附录 例子/GUI图形库.html" class="sidebar-link">/docs/附录 例子/GUI图形库.html</a></li><li><a href="/scheme-lib/docs/附录 例子/Http下载.html" class="sidebar-link">/docs/附录 例子/Http下载.html</a></li><li><a href="/scheme-lib/docs/附录 例子/mysql数据库连接例子.html" class="sidebar-link">/docs/附录 例子/mysql数据库连接例子.html</a></li><li><a href="/scheme-lib/docs/附录 例子/OpenGL开发.html" class="sidebar-link">/docs/附录 例子/OpenGL开发.html</a></li><li><a href="/scheme-lib/docs/附录 例子/web服务器.html" class="sidebar-link">/docs/附录 例子/web服务器.html</a></li></ul></section></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>鸭子实验室</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/scheme-lib/docs/%E9%B8%AD%E5%AD%90%E5%AE%9E%E9%AA%8C%E5%AE%A4/" class="sidebar-link">/docs/%E9%B8%AD%E5%AD%90%E5%AE%9E%E9%AA%8C%E5%AE%A4/</a></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><p>400多行的打飞机游戏</p> <div class="language-scheme extra-class"><pre class="language-scheme"><code><span class="token comment">;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;</span>
+<span class="token comment">;作者:evilbinary on 11/19/16.</span>
+<span class="token comment">;邮箱:rootdebug@163.com</span>
+<span class="token comment">;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;</span>
+<span class="token punctuation">(</span><span class="token keyword">import</span>
+ <span class="token punctuation">(</span><span class="token function">scheme</span><span class="token punctuation">)</span> 
+ <span class="token punctuation">(</span><span class="token function">gles</span> gles1<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">glut</span> glut<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">gui</span> imgui<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">utils</span> libutil<span class="token punctuation">)</span> 
+ <span class="token punctuation">(</span><span class="token function">box2d-lite</span> util math<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">box2d-lite</span> vec<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">box2d-lite</span> world<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">box2d-lite</span> mat<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">box2d-lite</span> body<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">box2d-lite</span> joint<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">box2d-lite</span> arbiter<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">dharmalab</span> misc is-vector<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">box2d-lite</span> contact<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">sound</span> alut<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">sound</span> al<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> x <span class="token number">0.0</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> y <span class="token number">-0.8</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> deltax <span class="token number">0.0</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> deltay <span class="token number">0.0</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> bgpos <span class="token number">2.0</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> world <span class="token punctuation">(</span><span class="token function">make-world</span> <span class="token boolean">#f</span> <span class="token boolean">#f</span> <span class="token boolean">#f</span> <span class="token punctuation">(</span><span class="token function">make-vec</span> <span class="token number">0.0</span> <span class="token number">0.0</span><span class="token punctuation">)</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token function">is-world</span> world<span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token function">world.clear</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> time-step <span class="token number">0.008</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> rotation <span class="token number">0.2</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> bg <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> me <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> p1 <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> p2 <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> p3 <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> shot <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> objects <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
+<span class="token punctuation">(</span><span class="token keyword">define</span> mplay <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
+<span class="token punctuation">(</span><span class="token keyword">define</span> objects-hash <span class="token punctuation">(</span><span class="token function">make-eq-hashtable</span><span class="token punctuation">)</span> <span class="token punctuation">)</span>
+<span class="token comment">;;资源文件目录设置</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> res-dir 
+         <span class="token punctuation">(</span><span class="token keyword">case</span> <span class="token punctuation">(</span><span class="token function">machine-type</span><span class="token punctuation">)</span>
+           <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">arm32le</span><span class="token punctuation">)</span> <span class="token string">&quot;/sdcard/org.evilbinary.chez/&quot;</span><span class="token punctuation">)</span>
+           <span class="token punctuation">(</span><span class="token keyword">else</span> <span class="token string">&quot;./&quot;</span><span class="token punctuation">)</span>
+            <span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> scale-w
+    <span class="token punctuation">(</span><span class="token keyword">case</span> <span class="token punctuation">(</span><span class="token function">machine-type</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">arm32le</span><span class="token punctuation">)</span> <span class="token number">1</span> <span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">a6nt</span> i3nt<span class="token punctuation">)</span>  <span class="token number">1</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">a6osx</span> i3osx<span class="token punctuation">)</span>  <span class="token number">2</span> <span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">a6le</span> i3le<span class="token punctuation">)</span> <span class="token number">1</span> <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> scale-h
+    <span class="token punctuation">(</span><span class="token keyword">case</span> <span class="token punctuation">(</span><span class="token function">machine-type</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">arm32le</span><span class="token punctuation">)</span> <span class="token number">2</span> <span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">a6nt</span> i3nt<span class="token punctuation">)</span>  <span class="token number">1</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">a6osx</span> i3osx<span class="token punctuation">)</span>  <span class="token number">2</span> <span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">a6le</span> i3le<span class="token punctuation">)</span> <span class="token number">1</span> <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> fixed <span class="token boolean">#t</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> fixed-w <span class="token number">1600</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> fixed-h <span class="token number">1700</span><span class="token punctuation">)</span>
+
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> bgmusic <span class="token punctuation">(</span><span class="token builtin">string-append</span> res-dir <span class="token string">&quot;game_bg.wav&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> shot-snd  <span class="token punctuation">(</span><span class="token builtin">string-append</span> res-dir <span class="token string">&quot;bullet.wav&quot;</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">define</span> <span class="token punctuation">(</span><span class="token function">draw-img</span> texture-id vec<span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">texture-array</span>
+	 <span class="token punctuation">(</span><span class="token function">glut-vector</span> <span class="token symbol">'float</span> 
+		      <span class="token punctuation">(</span><span class="token builtin">vector</span> 
+		       <span class="token number">0.0</span> <span class="token number">1.0</span> 
+		       <span class="token number">1.0</span> <span class="token number">1.0</span>  
+		       <span class="token number">0.0</span> <span class="token number">0.0</span> 
+		       <span class="token number">1.0</span> <span class="token number">0.0</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token function">square-vertices</span>
+	 <span class="token punctuation">(</span><span class="token function">glut-vector</span> <span class="token symbol">'float</span> 
+		      vec<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">glEnable</span> GL_TEXTURE_2D<span class="token punctuation">)</span><span class="token comment">;;启用纹理映射 </span>
+    <span class="token punctuation">(</span><span class="token function">glBindTexture</span> GL_TEXTURE_2D texture-id<span class="token punctuation">)</span><span class="token comment">;</span>
+    <span class="token punctuation">(</span><span class="token function">glEnableClientState</span> GL_TEXTURE_COORD_ARRAY<span class="token punctuation">)</span><span class="token comment">; </span>
+    <span class="token punctuation">(</span><span class="token function">glEnableClientState</span> GL_VERTEX_ARRAY<span class="token punctuation">)</span><span class="token comment">;</span>
+    <span class="token punctuation">(</span><span class="token function">glVertexPointer</span> <span class="token number">2</span>  GL_FLOAT  <span class="token number">0</span>  square-vertices<span class="token punctuation">)</span><span class="token comment">;</span>
+    <span class="token punctuation">(</span><span class="token function">glTexCoordPointer</span> <span class="token number">2</span> GL_FLOAT <span class="token number">0</span> texture-array<span class="token punctuation">)</span><span class="token comment">;</span>
+    <span class="token punctuation">(</span><span class="token function">glDrawArrays</span> GL_TRIANGLE_STRIP  <span class="token number">0</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token comment">;</span>
+    <span class="token punctuation">(</span><span class="token function">glDisableClientState</span> GL_VERTEX_ARRAY<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">glDisable</span> GL_TEXTURE_2D<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">glDisable</span> GL_TEXTURE_COORD_ARRAY<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">glut-unvector</span> texture-array<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">glut-unvector</span> square-vertices<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> <span class="token punctuation">(</span><span class="token function">draw-life</span> x y l<span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">let*</span> <span class="token punctuation">(</span> <span class="token punctuation">(</span><span class="token function">life</span> <span class="token punctuation">(</span><span class="token operator">/</span> l <span class="token number">1000.0</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+          <span class="token punctuation">(</span><span class="token function">p</span> <span class="token punctuation">(</span><span class="token function">glut-vector</span> <span class="token symbol">'float</span> 
+                <span class="token punctuation">(</span><span class="token builtin">vector</span> <span class="token punctuation">(</span><span class="token operator">-</span> <span class="token number">0.104</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">-</span> <span class="token number">0.2</span><span class="token punctuation">)</span> 
+                    <span class="token punctuation">(</span><span class="token operator">+</span> <span class="token number">0.0</span> life<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">-</span> <span class="token number">0.2</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token function">glPushMatrix</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token function">glPointSize</span> <span class="token number">20.0</span><span class="token punctuation">)</span>
+      <span class="token comment">;(glClear (+ GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT) )</span>
+      <span class="token comment">;(color '( 1.0 0.0 0.0 1.0) )</span>
+      <span class="token punctuation">(</span><span class="token function">glTranslatef</span> <span class="token punctuation">(</span><span class="token operator">+</span> x <span class="token number">0.1</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">+</span> y <span class="token number">0.4</span><span class="token punctuation">)</span> <span class="token number">0.0</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token function">glVertexPointer</span> <span class="token number">2</span>  GL_FLOAT  <span class="token number">0</span>  p<span class="token punctuation">)</span><span class="token comment">;</span>
+      <span class="token punctuation">(</span><span class="token function">glEnableClientState</span> GL_VERTEX_ARRAY<span class="token punctuation">)</span><span class="token comment">;</span>
+      <span class="token punctuation">(</span><span class="token function">glDrawArrays</span> GL_LINES  <span class="token number">0</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token comment">;</span>
+      <span class="token punctuation">(</span><span class="token function">glDisableClientState</span> GL_VERTEX_ARRAY<span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token function">glut-unvector</span> p<span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token function">glPopMatrix</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> <span class="token punctuation">(</span><span class="token function">draw-objects</span> objects<span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">let</span> loop <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">p</span> objects<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token builtin">pair?</span> p<span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token keyword">begin</span>
+	  <span class="token punctuation">(</span><span class="token function">glPushMatrix</span><span class="token punctuation">)</span>
+	  <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">body</span> <span class="token punctuation">(</span><span class="token function">cadar</span> p<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">(</span><span class="token function">is-body</span>  body<span class="token punctuation">)</span>
+
+            <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">R</span> <span class="token punctuation">(</span><span class="token function">angle-&gt;mat</span> body.rotation<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                  <span class="token punctuation">(</span><span class="token function">x</span> body.position<span class="token punctuation">)</span>
+                  <span class="token punctuation">(</span><span class="token function">h</span> <span class="token punctuation">(</span><span class="token function">n*v</span> <span class="token number">0.5</span> body.width<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+	      <span class="token punctuation">(</span><span class="token function">is-vec</span> h<span class="token punctuation">)</span>
+					<span class="token comment">;(display (format &quot;width=~a h.x=~a h.y~a \n&quot; body.width h.x h.y ) )</span>
+
+	      <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">v1</span> <span class="token punctuation">(</span><span class="token function">v+</span> x <span class="token punctuation">(</span><span class="token function">m*v</span> R <span class="token punctuation">(</span><span class="token function">make-vec</span> <span class="token punctuation">(</span><span class="token operator">-</span> h.x<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">-</span> h.y<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		    <span class="token punctuation">(</span><span class="token function">v2</span> <span class="token punctuation">(</span><span class="token function">v+</span> x <span class="token punctuation">(</span><span class="token function">m*v</span> R <span class="token punctuation">(</span><span class="token function">make-vec</span>    h.x  <span class="token punctuation">(</span><span class="token operator">-</span> h.y<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		    <span class="token punctuation">(</span><span class="token function">v3</span> <span class="token punctuation">(</span><span class="token function">v+</span> x <span class="token punctuation">(</span><span class="token function">m*v</span> R <span class="token punctuation">(</span><span class="token function">make-vec</span>    h.x     h.y <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		    <span class="token punctuation">(</span><span class="token function">v4</span> <span class="token punctuation">(</span><span class="token function">v+</span> x <span class="token punctuation">(</span><span class="token function">m*v</span> R <span class="token punctuation">(</span><span class="token function">make-vec</span> <span class="token punctuation">(</span><span class="token operator">-</span> h.x<span class="token punctuation">)</span>    h.y <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+		<span class="token punctuation">(</span><span class="token function">is-vec</span> v1<span class="token punctuation">)</span>
+		<span class="token punctuation">(</span><span class="token function">is-vec</span> v2<span class="token punctuation">)</span>
+		<span class="token punctuation">(</span><span class="token function">is-vec</span> v3<span class="token punctuation">)</span>
+		<span class="token punctuation">(</span><span class="token function">is-vec</span> v4<span class="token punctuation">)</span>
+		<span class="token punctuation">(</span><span class="token keyword">if</span>  <span class="token punctuation">(</span><span class="token operator">&gt;</span>  <span class="token punctuation">(</span><span class="token builtin">list-ref</span> <span class="token punctuation">(</span><span class="token builtin">car</span> p<span class="token punctuation">)</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token number">0</span> <span class="token punctuation">)</span>
+		     <span class="token punctuation">(</span><span class="token keyword">begin</span> 
+		       <span class="token punctuation">(</span><span class="token function">draw-img</span> <span class="token punctuation">(</span><span class="token builtin">caar</span> p<span class="token punctuation">)</span> 
+				 <span class="token punctuation">(</span><span class="token builtin">vector</span> v1.x v1.y
+					 v2.x v2.y
+					 v4.x v4.y
+					 v3.x v3.y<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		     <span class="token comment">;;(draw-life v1.x v1.y (list-ref (car p) 2) )</span>
+		     <span class="token comment">;;remove body,draw bomb</span>
+		     <span class="token punctuation">(</span><span class="token function">world.remove-body</span> body<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	  <span class="token punctuation">(</span><span class="token function">glPopMatrix</span><span class="token punctuation">)</span>
+	  <span class="token comment">;;(set-car! (cdr (car p) ) (+ (cadr (car p) ) 0.01 )) ;x</span>
+	  <span class="token comment">;;(set-car! (cddr (car p) ) (- (caddr (car p) ) (cadddr (car p) ) )) ;y</span>
+	  <span class="token punctuation">(</span><span class="token function">loop</span> <span class="token punctuation">(</span><span class="token builtin">cdr</span> p<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> <span class="token punctuation">(</span><span class="token function">draw-joint</span> joint<span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">is-joint</span> joint<span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">b1</span> joint.body-1<span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token function">b2</span> joint.body-2<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">is-body</span> b1<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">is-body</span> b2<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">x1</span> b1.position<span class="token punctuation">)</span>
+	  <span class="token punctuation">(</span><span class="token function">x2</span> b2.position<span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token function">is-vec</span> x1<span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token function">is-vec</span> x2<span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">p1</span> <span class="token punctuation">(</span><span class="token function">v+</span> x1 <span class="token punctuation">(</span><span class="token function">m*v</span> <span class="token punctuation">(</span><span class="token function">angle-&gt;mat</span> b1.rotation<span class="token punctuation">)</span> joint.local-anchor-1<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	    <span class="token punctuation">(</span><span class="token function">p2</span> <span class="token punctuation">(</span><span class="token function">v+</span> x2 <span class="token punctuation">(</span><span class="token function">m*v</span> <span class="token punctuation">(</span><span class="token function">angle-&gt;mat</span> b2.rotation<span class="token punctuation">)</span> joint.local-anchor-2<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token function">is-vec</span> p1<span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token function">is-vec</span> p2<span class="token punctuation">)</span>
+	<span class="token comment">;;(glColor3f 0.5 0.5 0.8)</span>
+	<span class="token punctuation">(</span><span class="token function">glColor4f</span> <span class="token number">0.5</span> <span class="token number">0.5</span> <span class="token number">0.8</span> <span class="token number">1.0</span><span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">p</span> <span class="token punctuation">(</span><span class="token function">glut-vector</span> <span class="token symbol">'float</span> <span class="token punctuation">(</span><span class="token builtin">vector</span> 
+				      x1.x x1.y
+				      p1.x p1.y
+				      x2.x x2.y
+				      p2.x p2.y<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+	  <span class="token punctuation">(</span><span class="token function">glVertexPointer</span> <span class="token number">2</span>  GL_FLOAT  <span class="token number">0</span>  p<span class="token punctuation">)</span><span class="token comment">;</span>
+	  <span class="token punctuation">(</span><span class="token function">glEnableClientState</span> GL_VERTEX_ARRAY<span class="token punctuation">)</span><span class="token comment">;</span>
+	  <span class="token punctuation">(</span><span class="token function">glDrawArrays</span> GL_LINES  <span class="token number">0</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token comment">;</span>
+	  <span class="token punctuation">(</span><span class="token function">glDisableClientState</span> GL_VERTEX_ARRAY<span class="token punctuation">)</span>
+	  <span class="token punctuation">(</span><span class="token function">glut-unvector</span> p<span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> <span class="token punctuation">(</span><span class="token function">color</span> l<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">=</span> <span class="token punctuation">(</span><span class="token builtin">length</span> l<span class="token punctuation">)</span> <span class="token number">4</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token keyword">begin</span> 
+        <span class="token punctuation">(</span><span class="token function">glColor4f</span> <span class="token punctuation">(</span><span class="token builtin">car</span> l<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">cadr</span> l<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token function">caddr</span> l<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token function">cadddr</span> l<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> <span class="token punctuation">(</span><span class="token builtin">list-set!</span> l k obj<span class="token punctuation">)</span> 
+  <span class="token punctuation">(</span><span class="token keyword">cond</span>  <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token builtin">or</span> <span class="token punctuation">(</span><span class="token operator">&lt;</span> k <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">null?</span> l<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token boolean">#f</span><span class="token punctuation">)</span>
+         <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token operator">=</span> k <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">set-car!</span> l obj<span class="token punctuation">)</span><span class="token punctuation">)</span>   
+         <span class="token punctuation">(</span><span class="token keyword">else</span>  <span class="token punctuation">(</span><span class="token builtin">list-set!</span> <span class="token punctuation">(</span><span class="token builtin">cdr</span> l<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">-</span> k <span class="token number">1</span><span class="token punctuation">)</span> obj<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> <span class="token punctuation">(</span><span class="token function">draw-body</span> . args<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">body</span> <span class="token punctuation">(</span><span class="token builtin">car</span> args<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">is-body</span> body<span class="token punctuation">)</span>
+
+  <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">R</span> <span class="token punctuation">(</span><span class="token function">angle-&gt;mat</span> body.rotation<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token function">x</span> body.position<span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token function">h</span> <span class="token punctuation">(</span><span class="token function">n*v</span> <span class="token number">0.5</span> body.width<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+  <span class="token punctuation">(</span><span class="token function">is-vec</span> h<span class="token punctuation">)</span>
+  <span class="token comment">;;(display (format &quot;width=~a h.x=~a h.y~a \n&quot; body.width h.x h.y ) )</span>
+
+  <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">v1</span> <span class="token punctuation">(</span><span class="token function">v+</span> x <span class="token punctuation">(</span><span class="token function">m*v</span> R <span class="token punctuation">(</span><span class="token function">make-vec</span> <span class="token punctuation">(</span><span class="token operator">-</span> h.x<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">-</span> h.y<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">v2</span> <span class="token punctuation">(</span><span class="token function">v+</span> x <span class="token punctuation">(</span><span class="token function">m*v</span> R <span class="token punctuation">(</span><span class="token function">make-vec</span>    h.x  <span class="token punctuation">(</span><span class="token operator">-</span> h.y<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">v3</span> <span class="token punctuation">(</span><span class="token function">v+</span> x <span class="token punctuation">(</span><span class="token function">m*v</span> R <span class="token punctuation">(</span><span class="token function">make-vec</span>    h.x     h.y <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">v4</span> <span class="token punctuation">(</span><span class="token function">v+</span> x <span class="token punctuation">(</span><span class="token function">m*v</span> R <span class="token punctuation">(</span><span class="token function">make-vec</span> <span class="token punctuation">(</span><span class="token operator">-</span> h.x<span class="token punctuation">)</span>    h.y <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token punctuation">(</span><span class="token function">is-vec</span> v1<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">is-vec</span> v2<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">is-vec</span> v3<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">is-vec</span> v4<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">=</span> <span class="token punctuation">(</span><span class="token builtin">length</span> args<span class="token punctuation">)</span> <span class="token number">2</span><span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token function">color</span> <span class="token punctuation">(</span><span class="token builtin">cadr</span> args<span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token comment">; (display (vector v1.x v1.y</span>
+    <span class="token comment">;                    v2.x v2.y</span>
+    <span class="token comment">;                    v3.x v3.y</span>
+    <span class="token comment">;                    v4.x v4.y) )</span>
+    <span class="token comment">; (newline)</span>
+
+    <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">p</span> <span class="token punctuation">(</span><span class="token function">glut-vector</span> <span class="token symbol">'float</span> <span class="token punctuation">(</span><span class="token builtin">vector</span> v1.x v1.y
+                       v2.x v2.y
+                       v3.x v3.y
+                       v4.x v4.y<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token comment">;(glPushMatrix)</span>
+     <span class="token punctuation">(</span><span class="token function">glVertexPointer</span> <span class="token number">2</span>  GL_FLOAT  <span class="token number">0</span>  p<span class="token punctuation">)</span><span class="token comment">;</span>
+     <span class="token punctuation">(</span><span class="token function">glEnableClientState</span> GL_VERTEX_ARRAY<span class="token punctuation">)</span><span class="token comment">;</span>
+     <span class="token punctuation">(</span><span class="token function">glDrawArrays</span> GL_LINE_LOOP  <span class="token number">0</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token comment">;</span>
+     <span class="token punctuation">(</span><span class="token function">glDisableClientState</span> GL_VERTEX_ARRAY<span class="token punctuation">)</span>
+     <span class="token comment">;(glPopMatrix) </span>
+     <span class="token punctuation">(</span><span class="token function">glut-unvector</span> p<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> <span class="token punctuation">(</span><span class="token function">draw-arbiter</span> arbite<span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">is-arbiter</span> arbite<span class="token punctuation">)</span>
+  <span class="token comment">;;(display (format &quot;~a num=~a\n&quot; arbite.body-1 arbite.num-contacts ) )</span>
+  <span class="token punctuation">(</span><span class="token keyword">let*</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">v</span> <span class="token punctuation">(</span><span class="token builtin">list</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+	 <span class="token punctuation">(</span><span class="token function">t</span> <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	 <span class="token punctuation">(</span><span class="token function">number</span> arbite.num-contacts<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token keyword">do</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">i</span> <span class="token number">0</span> <span class="token punctuation">(</span><span class="token operator">+</span> i <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token operator">&gt;=</span> i arbite.num-contacts<span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+        <span class="token punctuation">(</span><span class="token function">is-vector</span>  arbite.contacts i<span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token function">is-contact</span> arbite.contacts.i<span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token function">is-vec</span>     arbite.contacts.i.position<span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token keyword">set!</span> v <span class="token punctuation">(</span><span class="token builtin">append</span> v <span class="token punctuation">(</span><span class="token builtin">list</span> arbite.contacts.i.position.x arbite.contacts.i.position.y <span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    
+    <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">=</span> number <span class="token number">1</span><span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token keyword">set!</span> number <span class="token punctuation">(</span><span class="token operator">+</span> <span class="token number">1</span> number<span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token keyword">set!</span> v <span class="token punctuation">(</span><span class="token builtin">append</span> v v<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">&gt;</span> number <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token keyword">begin</span>
+          <span class="token punctuation">(</span><span class="token function">glPushMatrix</span><span class="token punctuation">)</span>
+	  <span class="token comment">;;(glColor4f 1.0 0.0 0.0 1.0)</span>
+          <span class="token punctuation">(</span><span class="token keyword">set!</span> t <span class="token punctuation">(</span><span class="token function">glut-vector</span> <span class="token symbol">'float</span> v <span class="token punctuation">)</span><span class="token punctuation">)</span>
+          <span class="token punctuation">(</span><span class="token function">glVertexPointer</span> number GL_FLOAT  <span class="token number">0</span> t  <span class="token punctuation">)</span><span class="token comment">;</span>
+          <span class="token punctuation">(</span><span class="token function">glEnableClientState</span> GL_VERTEX_ARRAY<span class="token punctuation">)</span><span class="token comment">;</span>
+          <span class="token punctuation">(</span><span class="token function">glPointSize</span> <span class="token number">10.0</span><span class="token punctuation">)</span>
+          <span class="token punctuation">(</span><span class="token function">glDrawArrays</span> GL_POINTS  <span class="token number">0</span>  number <span class="token punctuation">)</span>
+          <span class="token punctuation">(</span><span class="token function">glDisableClientState</span> GL_VERTEX_ARRAY<span class="token punctuation">)</span>
+          <span class="token punctuation">(</span><span class="token function">glut-unvector</span> t<span class="token punctuation">)</span> 
+          <span class="token punctuation">(</span><span class="token function">glPopMatrix</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">l</span> <span class="token punctuation">(</span><span class="token function">hashtable-ref</span> objects-hash arbite.body-1 <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token function">l2</span> <span class="token punctuation">(</span><span class="token function">hashtable-ref</span> objects-hash arbite.body-2 <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token builtin">pair?</span> l<span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token keyword">begin</span>
+	  <span class="token punctuation">(</span><span class="token builtin">list-set!</span> l <span class="token number">2</span> <span class="token punctuation">(</span><span class="token operator">-</span> <span class="token punctuation">(</span><span class="token builtin">list-ref</span> l <span class="token number">2</span><span class="token punctuation">)</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token builtin">pair?</span> l2<span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token keyword">begin</span>
+	  <span class="token punctuation">(</span><span class="token builtin">list-set!</span> l2 <span class="token number">2</span> <span class="token punctuation">(</span><span class="token operator">-</span> <span class="token punctuation">(</span><span class="token builtin">list-ref</span> l2 <span class="token number">2</span><span class="token punctuation">)</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> <span class="token punctuation">(</span><span class="token function">create-plane</span> x y v m p l<span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">b</span> <span class="token punctuation">(</span><span class="token function">create-body</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token function">plane</span> <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">is-body</span> b<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">is-vec</span>  b.width<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">b.set</span> <span class="token punctuation">(</span><span class="token function">make-vec</span> <span class="token number">0.24</span> <span class="token number">0.2</span><span class="token punctuation">)</span> m <span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">b.position!</span> <span class="token punctuation">(</span><span class="token function">make-vec</span> x y<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token comment">;;(b.rotation! 0.2 )</span>
+    <span class="token punctuation">(</span><span class="token function">b.velocity!</span> <span class="token punctuation">(</span><span class="token function">make-vec</span> <span class="token number">0.0</span> v<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">b.angular-velocity!</span> <span class="token number">0.0</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">b.friction!</span> <span class="token number">0.0</span> <span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">b.torque!</span> <span class="token number">0.0</span><span class="token punctuation">)</span>
+    <span class="token comment">;;(b.force! (make-vec 10.0 10.0))</span>
+    <span class="token punctuation">(</span><span class="token function">world.add-body</span> b<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token keyword">set!</span> plane <span class="token punctuation">(</span><span class="token builtin">list</span> p b l <span class="token punctuation">)</span> <span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">hashtable-set!</span> objects-hash b plane <span class="token punctuation">)</span>
+    plane<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> <span class="token punctuation">(</span><span class="token function">create-bullet</span> x y v m p l<span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">b</span> <span class="token punctuation">(</span><span class="token function">create-body</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token function">bullet</span> <span class="token punctuation">'</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">is-body</span> b<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">is-vec</span>  b.width<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">b.set</span> <span class="token punctuation">(</span><span class="token function">make-vec</span> <span class="token number">0.03</span> <span class="token number">0.03</span><span class="token punctuation">)</span> m <span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">b.position!</span> <span class="token punctuation">(</span><span class="token function">make-vec</span> x y<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token comment">;;(b.rotation! 0.2 )</span>
+    <span class="token punctuation">(</span><span class="token function">b.velocity!</span> <span class="token punctuation">(</span><span class="token function">make-vec</span> <span class="token number">0.0</span> v<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">b.angular-velocity!</span> <span class="token number">0.0</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">b.friction!</span> <span class="token number">0.0</span> <span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">b.torque!</span> <span class="token number">0.0</span><span class="token punctuation">)</span>
+    <span class="token comment">;;(b.inv-mass! 0.1)</span>
+    <span class="token comment">;;(b.force! (make-vec 10.0 10.0))</span>
+    <span class="token punctuation">(</span><span class="token function">world.add-body</span> b<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token keyword">set!</span> bullet <span class="token punctuation">(</span><span class="token builtin">list</span> p b l <span class="token punctuation">)</span> <span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">hashtable-set!</span> objects-hash b bullet <span class="token punctuation">)</span>
+    bullet<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> <span class="token punctuation">(</span><span class="token function">init</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">imgui-init</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">imgui-reset-style</span> <span class="token number">11</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">imgui-disable-default-color</span><span class="token punctuation">)</span>
+
+  <span class="token punctuation">(</span><span class="token keyword">set!</span> bg <span class="token punctuation">(</span><span class="token function">imgui-load-texture</span> <span class="token punctuation">(</span><span class="token builtin">string-append</span> res-dir <span class="token string">&quot;images/bg2.jpg&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">set!</span> me <span class="token punctuation">(</span><span class="token function">imgui-load-texture</span> <span class="token punctuation">(</span><span class="token builtin">string-append</span> res-dir <span class="token string">&quot;images/me.png&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">set!</span> p1 <span class="token punctuation">(</span><span class="token function">imgui-load-texture</span> <span class="token punctuation">(</span><span class="token builtin">string-append</span> res-dir <span class="token string">&quot;images/e1.png&quot;</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">set!</span> p2 <span class="token punctuation">(</span><span class="token function">imgui-load-texture</span> <span class="token punctuation">(</span><span class="token builtin">string-append</span> res-dir <span class="token string">&quot;images/e2.png&quot;</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">set!</span> p3 <span class="token punctuation">(</span><span class="token function">imgui-load-texture</span> <span class="token punctuation">(</span><span class="token builtin">string-append</span> res-dir <span class="token string">&quot;images/e3.png&quot;</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">set!</span> shot <span class="token punctuation">(</span><span class="token function">imgui-load-texture</span> <span class="token punctuation">(</span><span class="token builtin">string-append</span> res-dir <span class="token string">&quot;images/eshot.png&quot;</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">set!</span> mplay <span class="token punctuation">(</span><span class="token function">create-plane</span> <span class="token number">0.0</span> <span class="token number">-0.9</span> <span class="token number">0.0</span> <span class="token number">0.9</span> me <span class="token number">100</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">set!</span> objects <span class="token punctuation">(</span><span class="token builtin">list</span> 
+         mplay
+         <span class="token punctuation">(</span><span class="token function">create-plane</span> <span class="token number">0.0</span> <span class="token number">0.0</span> <span class="token number">-0.3</span> <span class="token number">0.9</span> p1 <span class="token number">100</span> <span class="token punctuation">)</span> <span class="token comment">;image,body,life,   </span>
+         <span class="token punctuation">(</span><span class="token function">create-plane</span> <span class="token number">0.3</span> <span class="token number">0.0</span> <span class="token number">-0.2</span> <span class="token number">0.9</span> p2 <span class="token number">100</span> <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+         <span class="token comment">;;(create-bullet 0.0 0.6 -1.10 0.1 shot 1)   </span>
+         <span class="token comment">;; (list p3 (create-plane 0.0 0.0 0.0 0.9) )</span>
+         <span class="token comment">;; (list p2 (create-plane 0.0 0.0 0.0 0.9) ) </span>
+
+  <span class="token punctuation">(</span><span class="token function">alut-init</span> <span class="token punctuation">)</span>
+  <span class="token comment">;bg music</span>
+  <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">buffer</span> <span class="token punctuation">(</span><span class="token function">alut-create-buffer-from-file</span> bgmusic<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token function">source</span> <span class="token punctuation">(</span><span class="token function">al-gen-source</span> <span class="token number">1</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">al-source-i</span> source AL-BUFFER buffer<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">al-source-i</span> source AL-LOOPING AL-TRUE<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">al-source-play</span> source<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token keyword">define</span> <span class="token punctuation">(</span><span class="token function">game</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">glut-init</span>
+   <span class="token punctuation">(</span><span class="token keyword">lambda</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token keyword">case</span> <span class="token punctuation">(</span><span class="token function">machine-type</span><span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">arm32le</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token function">glut-init-window-size</span> <span class="token number">600</span> <span class="token number">1800</span><span class="token punctuation">)</span> <span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token keyword">else</span> <span class="token punctuation">(</span><span class="token function">glut-init-window-size</span> <span class="token number">600</span> <span class="token number">600</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+         <span class="token punctuation">)</span>
+
+     <span class="token punctuation">(</span><span class="token function">init</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">glut-set-window-title</span> <span class="token string">&quot;game&quot;</span><span class="token punctuation">)</span>
+  
+  <span class="token comment">;;(imgui-scale 1.5 1.5)</span>
+  <span class="token punctuation">(</span><span class="token function">glut-touch-event</span>
+   <span class="token punctuation">(</span><span class="token keyword">lambda</span> <span class="token punctuation">(</span><span class="token lambda-parameter">type x y</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">imgui-touch-event</span> type x y<span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">glut-log</span> <span class="token punctuation">(</span><span class="token function">format</span> <span class="token string">&quot;~a&quot;</span> type<span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">l</span> <span class="token punctuation">(</span><span class="token function">create-bullet</span> x <span class="token punctuation">(</span><span class="token operator">+</span> y <span class="token number">0.12</span><span class="token punctuation">)</span> <span class="token number">2.0</span> <span class="token number">0.0003</span> shot <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+     		     <span class="token punctuation">(</span><span class="token function">append!</span> objects <span class="token punctuation">(</span><span class="token builtin">list</span> l<span class="token punctuation">)</span> <span class="token punctuation">)</span>
+     		     <span class="token punctuation">(</span><span class="token function">alut-play-file</span>  shot-snd<span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">glut-mouse-event</span>
+   <span class="token punctuation">(</span><span class="token keyword">lambda</span> <span class="token punctuation">(</span><span class="token lambda-parameter">button state</span><span class="token punctuation">)</span>
+     <span class="token comment">;;(glut-log &quot;mouse-event&quot;)</span>
+     <span class="token punctuation">(</span><span class="token function">imgui-mouse-event</span> button state<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">glut-motion-event</span>
+   <span class="token punctuation">(</span><span class="token keyword">lambda</span> <span class="token punctuation">(</span><span class="token lambda-parameter">x y</span><span class="token punctuation">)</span>
+     <span class="token comment">;;(glut-log &quot;motion-event&quot;)</span>
+     <span class="token punctuation">(</span><span class="token function">imgui-motion-event</span> x y<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  
+  <span class="token punctuation">(</span><span class="token function">glut-key-event</span>
+   <span class="token punctuation">(</span><span class="token keyword">lambda</span> <span class="token punctuation">(</span><span class="token lambda-parameter">event</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">imgui-key-event</span>
+      <span class="token punctuation">(</span><span class="token function">glut-event-get</span> event <span class="token symbol">'type</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token function">glut-event-get</span> event <span class="token symbol">'keycode</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token function">glut-event-get</span> event <span class="token symbol">'char</span><span class="token punctuation">)</span>
+      <span class="token punctuation">(</span><span class="token function">glut-event-get</span> event <span class="token symbol">'chars</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">=</span> <span class="token number">4</span> <span class="token punctuation">(</span><span class="token function">glut-event-get</span> event <span class="token symbol">'keycode</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+	 <span class="token punctuation">(</span><span class="token keyword">begin</span> <span class="token punctuation">(</span><span class="token function">imgui-exit</span><span class="token punctuation">)</span>
+		<span class="token punctuation">(</span><span class="token function">glut-exit</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+     
+
+     <span class="token punctuation">(</span><span class="token function">glut-log</span> <span class="token punctuation">(</span><span class="token function">format</span> <span class="token string">&quot;event ~a&quot;</span> event<span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">=</span> <span class="token punctuation">(</span><span class="token function">glut-event-get</span> event <span class="token symbol">'type</span><span class="token punctuation">)</span> <span class="token number">0</span><span class="token punctuation">)</span>
+	 <span class="token punctuation">(</span><span class="token keyword">case</span> <span class="token punctuation">(</span><span class="token function">glut-event-get</span> event <span class="token symbol">'keycode</span><span class="token punctuation">)</span> 
+	   <span class="token punctuation">(</span><span class="token number">97</span> <span class="token punctuation">(</span><span class="token keyword">set!</span> deltax  <span class="token number">-0.01</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	   <span class="token punctuation">(</span><span class="token number">100</span> <span class="token punctuation">(</span><span class="token keyword">set!</span> deltax <span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	   <span class="token punctuation">(</span><span class="token number">119</span> <span class="token punctuation">(</span><span class="token keyword">set!</span> deltay <span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	   <span class="token punctuation">(</span><span class="token number">115</span> <span class="token punctuation">(</span><span class="token keyword">set!</span> deltay <span class="token number">-0.01</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	   <span class="token punctuation">(</span><span class="token number">100</span> <span class="token punctuation">(</span><span class="token keyword">set!</span> deltax <span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	   <span class="token punctuation">(</span><span class="token number">119</span> <span class="token punctuation">(</span><span class="token keyword">set!</span> deltay <span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	   <span class="token punctuation">(</span><span class="token number">115</span> <span class="token punctuation">(</span><span class="token keyword">set!</span> deltay <span class="token number">-0.01</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	   <span class="token punctuation">(</span><span class="token number">32</span> <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">&gt;</span> <span class="token punctuation">(</span><span class="token builtin">list-ref</span> mplay <span class="token number">2</span><span class="token punctuation">)</span> <span class="token number">0</span><span class="token punctuation">)</span>
+		   <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">l</span> <span class="token punctuation">(</span><span class="token function">create-bullet</span> x <span class="token punctuation">(</span><span class="token operator">+</span> y <span class="token number">0.12</span><span class="token punctuation">)</span> <span class="token number">2.0</span> <span class="token number">0.0003</span> shot <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		     <span class="token punctuation">(</span><span class="token function">append!</span> objects <span class="token punctuation">(</span><span class="token builtin">list</span> l<span class="token punctuation">)</span> <span class="token punctuation">)</span>
+		     <span class="token punctuation">(</span><span class="token function">alut-play-file</span>  shot-snd<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	 <span class="token punctuation">(</span><span class="token keyword">begin</span> 
+	   <span class="token punctuation">(</span><span class="token keyword">set!</span> deltax <span class="token number">0.0</span><span class="token punctuation">)</span>
+	   <span class="token punctuation">(</span><span class="token keyword">set!</span> deltay <span class="token number">0.0</span><span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+  <span class="token punctuation">(</span><span class="token function">glut-display</span>
+   <span class="token punctuation">(</span><span class="token keyword">lambda</span> <span class="token punctuation">(</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">collect</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">imgui-render-start</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">glClearColor</span> <span class="token number">1.0</span>  <span class="token number">1.0</span>  <span class="token number">1.0</span>  <span class="token number">1.0</span> <span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">glClear</span> GL_COLOR_BUFFER_BIT<span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token keyword">set!</span> x <span class="token punctuation">(</span><span class="token operator">+</span> x deltax<span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token keyword">set!</span> y <span class="token punctuation">(</span><span class="token operator">+</span> y deltay<span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">glPushMatrix</span><span class="token punctuation">)</span>
+     <span class="token comment">;;(glRotatef rotation 0.0 0.0 0.1)</span>
+     <span class="token punctuation">(</span><span class="token function">glTranslatef</span> <span class="token number">0.0</span> bgpos <span class="token number">0.0</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">draw-img</span> bg <span class="token punctuation">(</span><span class="token builtin">vector</span> 
+		   <span class="token number">-1.0</span> <span class="token number">-3.0</span>
+		   <span class="token number">1.0</span> <span class="token number">-3.0</span>                              
+		   <span class="token number">-1.0</span> <span class="token number">3.0</span>
+		   <span class="token number">1.0</span> <span class="token number">3.0</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token keyword">set!</span> bgpos <span class="token punctuation">(</span><span class="token operator">-</span> bgpos <span class="token number">0.003</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token comment">;;(display (format &quot;~a\n&quot; bgpos))</span>
+     <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">&lt;=</span> bgpos <span class="token number">-2.0</span><span class="token punctuation">)</span>
+	 <span class="token punctuation">(</span><span class="token keyword">set!</span> bgpos <span class="token number">2.0</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">glPopMatrix</span><span class="token punctuation">)</span>
+     <span class="token comment">;;(imgui-test)</span>
+     <span class="token punctuation">(</span><span class="token function">imgui-set-next-window-size</span> <span class="token punctuation">(</span><span class="token function">imgui-make-vec2</span> <span class="token number">200.0</span> <span class="token number">140.0</span><span class="token punctuation">)</span> <span class="token number">0</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">imgui-begin</span> <span class="token string">&quot;evilbinary&quot;</span> <span class="token number">0</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">imgui-text</span> <span class="token punctuation">(</span><span class="token function">format</span> <span class="token string">&quot;objects:~a&quot;</span> <span class="token punctuation">(</span><span class="token builtin">length</span> objects<span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">imgui-text</span> <span class="token punctuation">(</span><span class="token function">format</span> <span class="token string">&quot;my life:~a&quot;</span> <span class="token punctuation">(</span><span class="token builtin">list-ref</span> mplay <span class="token number">2</span><span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">imgui-button</span> <span class="token string">&quot;random&quot;</span> <span class="token punctuation">(</span><span class="token function">imgui-pvec2</span> <span class="token number">50.0</span> <span class="token number">60.0</span><span class="token punctuation">)</span> <span class="token punctuation">)</span>
+	 <span class="token punctuation">(</span><span class="token function">append!</span> objects <span class="token punctuation">(</span><span class="token builtin">list</span> <span class="token punctuation">(</span><span class="token function">create-plane</span> <span class="token number">-0.1</span> <span class="token number">0.2</span> <span class="token number">-0.3</span> <span class="token number">0.9</span> p1 <span class="token number">100</span> <span class="token punctuation">)</span> 
+				<span class="token punctuation">(</span><span class="token function">create-plane</span> <span class="token number">0.2</span> <span class="token number">0.4</span> <span class="token number">-0.3</span> <span class="token number">0.9</span> p2 <span class="token number">100</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">imgui-end</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">draw-objects</span> objects<span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">body</span> <span class="token punctuation">(</span><span class="token builtin">cadr</span> mplay<span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+       <span class="token punctuation">(</span><span class="token function">is-body</span> body<span class="token punctuation">)</span>
+       <span class="token comment">;; (body.torque! 0.0)</span>
+       <span class="token comment">;;(body.angular-velocity! 0.0)</span>
+       <span class="token punctuation">(</span><span class="token function">body.position!</span> <span class="token punctuation">(</span><span class="token function">make-vec</span> x y<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">)</span>
+     <span class="token comment">;;(glPushMatrix)</span>
+     <span class="token punctuation">(</span><span class="token builtin">for-each</span> draw-arbiter world.arbiters<span class="token punctuation">)</span>
+     <span class="token comment">;;(glPopMatrix)</span>
+
+     <span class="token punctuation">(</span><span class="token function">world.step</span> time-step<span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">glPushMatrix</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token builtin">for-each</span> draw-body  world.bodies<span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token builtin">for-each</span> draw-joint world.joints<span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">glPopMatrix</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">imgui-render-end</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+  <span class="token punctuation">(</span><span class="token function">glut-reshape</span>
+   <span class="token punctuation">(</span><span class="token keyword">lambda</span><span class="token punctuation">(</span><span class="token function">w</span> h<span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">imgui-resize</span> w h<span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">glut-log</span> <span class="token punctuation">(</span><span class="token function">format</span> <span class="token string">&quot;reshape ~a ~a&quot;</span> w h<span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token comment">;;(glClearDepthf 1.0)</span>
+     <span class="token punctuation">(</span><span class="token function">glClearColor</span> <span class="token number">0.0</span> <span class="token number">0.0</span> <span class="token number">0.0</span> <span class="token number">0.0</span> <span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">glFrontFace</span> GL_CCW<span class="token punctuation">)</span><span class="token comment">;</span>
+     <span class="token punctuation">(</span><span class="token function">glEnable</span> GL_BLEND<span class="token punctuation">)</span><span class="token comment">;</span>
+     <span class="token punctuation">(</span><span class="token function">glBlendFunc</span> GL_SRC_ALPHA  GL_ONE_MINUS_SRC_ALPHA<span class="token punctuation">)</span><span class="token comment">;</span>
+     <span class="token punctuation">(</span><span class="token keyword">if</span> fixed
+        <span class="token punctuation">(</span><span class="token function">glViewport</span> <span class="token number">0</span> <span class="token number">0</span> fixed-w fixed-h <span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token function">glViewport</span> <span class="token number">0</span> <span class="token number">0</span> <span class="token punctuation">(</span><span class="token operator">*</span> w scale-w<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">*</span> h scale-h<span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">glMatrixMode</span> GL_PROJECTION<span class="token punctuation">)</span>
+     <span class="token punctuation">(</span><span class="token function">glLoadIdentity</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">glut-main-loop</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">imgui-exit</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">alut-exit</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">glut-exit</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span><span class="token function">game</span><span class="token punctuation">)</span>
+</code></pre></div></div> <footer class="page-edit"><!----> <div class="last-updated"><span class="prefix">Last Updated:</span> <span class="time">12/11/2020, 1:11:36 PM</span></div></footer> <!----> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/scheme-lib/docs/附录 例子/2D物理引擎.html" class="prev">
+        /docs/附录 例子/2D物理引擎.html
+      </a></span> <span class="next"><a href="/scheme-lib/docs/附录 例子/计算器.html">
+        /docs/附录 例子/计算器.html
+      </a>
+      →
+    </span></p></div> </main></div><div class="global-ui"><!----></div></div>
+    <script src="/scheme-lib/assets/js/app.7d3796fb.js" defer></script><script src="/scheme-lib/assets/js/2.717986cd.js" defer></script><script src="/scheme-lib/assets/js/3.3680f9a6.js" defer></script><script src="/scheme-lib/assets/js/31.cf140346.js" defer></script>
+  </body>
+</html>

@@ -232,6 +232,8 @@ SCM_API char    *c_strcpy(char *, const char *);
 SCM_API size_t   c_strcspn(const char *, const char *);
 SCM_API char    *c_strdup(const char *);
 SCM_API char    *c_strerror(int);
+SCM_API int    c_errorno();
+
 SCM_API size_t   c_strlen(const char *);
 SCM_API char    *c_strncat(char *, const char *, size_t);
 SCM_API int      c_strncmp(const char *, const char *, size_t);

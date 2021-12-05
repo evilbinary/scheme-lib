@@ -61,7 +61,11 @@ return  div(arg0,arg1);
 
 //char* ecvt(double  ,int  , int*  , int* )
 char* c_ecvt (double arg0,int arg1, int* arg2, int* arg3){
+#ifdef ANDROID
+    return NULL;
+#else
 return  ecvt(arg0,arg1,arg2,arg3);
+#endif
 }
 
 // //double erand48(unsigned )
@@ -76,7 +80,12 @@ void c_exit (int arg0){
 
 //char* fcvt(double  ,int  , int*  , int* )
 char* c_fcvt (double arg0,int arg1, int* arg2, int* arg3){
+#ifdef ANDROID
+    return NULL;
+#else
+
 return  fcvt(arg0,arg1,arg2,arg3);
+#endif
 }
 
 //void free( void* )
@@ -86,7 +95,11 @@ void c_free ( void* arg0){
 
 //char* gcvt(double  ,int  , char* )
 char* c_gcvt (double arg0,int arg1, char* arg2){
+#ifdef ANDROID
+    return NULL;
+#else
 return  gcvt(arg0,arg1,arg2);
+#endif
 }
 
 //char* getenv(const char* )
@@ -141,7 +154,11 @@ return  malloc(arg0);
 
 //int mblen(const char*  ,size_t )
 int c_mblen (const char* arg0,size_t arg1){
+#ifdef ANDROID
+    return 0;
+#else
 return  mblen(arg0,arg1);
+#endif
 }
 
 //size_t mbstowcs( wchar_t*  ,const char*  ,size_t )
@@ -151,7 +168,11 @@ return  mbstowcs(arg0,arg1,arg2);
 
 //int mbtowc( wchar_t*  ,const char*  ,size_t )
 int c_mbtowc ( wchar_t* arg0,const char* arg1,size_t arg2){
+#ifdef ANDROID
+    return 0;
+#else
 return  mbtowc(arg0,arg1,arg2);
+#endif
 }
 
 //char* mktemp( char* )
@@ -271,7 +292,11 @@ return  wcstombs(arg0,arg1,arg2);
 
 //int wctomb( char*  ,wchar_t )
 int c_wctomb ( char* arg0,wchar_t arg1){
+#ifdef ANDROID
+    return 0;
+#else
 return  wctomb(arg0,arg1);
+#endif
 }
 
 //double acos(double )
@@ -687,7 +712,11 @@ return  gets(arg0);
 
 //int getw( FILE* )
 int c_getw ( FILE* arg0){
+#ifdef  ANDROID
+    return 0;
+#else
 return  getw(arg0);
+#endif
 }
 
 //int pclose( FILE* )
@@ -783,8 +812,8 @@ return  setvbuf(arg0,arg1,arg2,arg3);
 int c_snprintf ( char* arg0,size_t arg1,const char* arg2,...){
 	int nret;
 	va_list args; 
-    va_start(args, arg0);  
-    nret = snprintf(arg0,arg1,args); 
+    va_start(args, arg2);
+    nret = snprintf(arg0,arg1,arg2,args);
     va_end(args);
 	return  nret;
 }
@@ -917,6 +946,10 @@ return  strdup(arg0);
 //char* strerror(int )
 char* c_strerror (int arg0){
 return  strerror(arg0);
+}
+
+int c_errorno(){
+  return errno;
 }
 
 //size_t strlen(const char* )

@@ -18,3 +18,4 @@ lib/libscm
 *.txt
 *.o
 *.dll
+*._*

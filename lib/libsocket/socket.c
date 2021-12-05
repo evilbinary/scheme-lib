@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <sys/types.h>
 #define in_addr_t uint32_t
+
+
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -14,14 +16,20 @@
 #include <unistd.h>
 #endif
 
+#ifdef ANDROID
+#include <arpa/inet.h>
+#endif
+
 #include <string.h>
 #include <errno.h>
 #include <signal.h>
 
 #include <stdio.h>
 
-
-
+/* extern int Sactivate_thread(void); */
+/* extern Sdeactivate_thread(void); */
+/* extern Slock_object(void*); */
+/* extern Sunlock_object(void*); */
 
 
 #define __socketcall 
@@ -132,15 +140,24 @@ FILE * _fdopen(int fildes, const char *mode){
 
 int     _accept(int socket, struct sockaddr *address,
 	       socklen_t *address_len){
-  return accept(socket,address,address_len);
+  //Sdeactivate_thread();
+  int ret= accept(socket,address,address_len);
+  //Sactivate_thread();
+  return ret;
 }
 int     _bind(int socket, const struct sockaddr *address,
              socklen_t address_len){
-  return bind(socket,address,address_len);
+  // Sdeactivate_thread();
+  int ret=  bind(socket,address,address_len);
+  //Sactivate_thread();
+  return ret;
 }
 int     _connect(int socket, const struct sockaddr *address,
 		socklen_t address_len){
-  return connect(socket,address,address_len);
+  //Sdeactivate_thread();
+  int ret= connect(socket,address,address_len);
+  //Sactivate_thread();
+  return ret;
 }
 int     _getpeername(int socket, struct sockaddr *address,
 		    socklen_t *address_len){
@@ -158,8 +175,22 @@ int     _getsockopt(int socket, int level, int option_name,
 int     _listen(int socket, int backlog){
   return listen(socket,backlog);
 }
-ssize_t _recv(int socket, void *buffer, size_t length, int flags){
-  return recv(socket, buffer,length,flags);
+ssize_t _recv(int socket, void *buffer, size_t length, int flags){;
+  //printf("recv start====%d %s\n",errno,strerror(errno));
+  /*Slock_object(socket); 
+   Slock_object(buffer); 
+   Slock_object(length); 
+   Slock_object(flags); */
+  //Sdeactivate_thread();
+   ssize_t ret=recv(socket, buffer,length,flags);
+   //Sactivate_thread();
+  /*Sunlock_object(socket);
+   Sunlock_object(buffer);
+   Sunlock_object(length);
+   Sunlock_object(flags);*/
+   //printf("recv end====%d\n",ret);
+
+   return ret;
 }
 ssize_t _recvfrom(int socket, void *buffer, size_t length,
 		 int flags, struct sockaddr *address, socklen_t *address_len){
@@ -174,7 +205,20 @@ ssize_t _recvmsg(int socket, struct msghdr *message, int flags){
   #endif
 }
 ssize_t _send(int socket, const void *message, size_t length, int flags){
-  return  send( socket, message,length,flags);
+  //printf("send start====%d %s\n",errno,strerror(errno));
+  /* Slock_object(socket); */
+  /* Slock_object(message); */
+  /* Slock_object(length); */
+  /* Slock_object(flags); */
+  //Sdeactivate_thread();
+  ssize_t ret=send( socket, message,length,flags);
+  //Sactivate_thread();
+  /*  Sunlock_object(socket); */
+  /* Sunlock_object(message); */
+  /* Sunlock_object(length); */
+  /* Sunlock_object(flags); */
+  //printf("send end====%d\n",ret);
+  return ret;
 }
 ssize_t _sendmsg(int socket, const struct msghdr *message, int flags){
   #ifdef WIN32

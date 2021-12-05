@@ -112,6 +112,7 @@ void video_al_init(video_t* video) {
   if (error != AL_NO_ERROR) {
     fprintf(stderr, "Error init2 %x\n", error);
   }
+  if(video->aCodecCtx==NULL) return ;
 
   int sample_fmt = video->aCodecCtx->sample_fmt;
   int channels = video->aCodecCtx->channels;
@@ -454,6 +455,7 @@ void read_cover(video_t* video) {
   }
 
   for (;;) {
+    if(video->pFormatCtx==NULL) break;
     ret = av_read_frame(video->pFormatCtx, &pkt);
     if (ret < 0) {
       printf("Error av_read_frame frame\n");
@@ -492,6 +494,7 @@ void* read_stream(void* arg) {
   }
   read_cover(video);
   printf("read stream\n");
+  if(video->pFormatCtx==NULL) return NULL;
   do {
     AVPacket* packet = malloc(sizeof(AVPacket));
     // AVPacket *packet = av_packet_alloc();
@@ -941,16 +944,17 @@ int video_init_media(video_t* video) {
   // Retrieve stream information
   if (avformat_find_stream_info(video->pFormatCtx, NULL) < 0) {
     video->erro = -1;
+    fprintf(stderr, "find stream %s error.\n", video->filename);
     return video;
   }
   // Dump information about file onto standard error
-  // av_dump_format(video->pFormatCtx, 0, filename, 0);
+  //av_dump_format(video->pFormatCtx, 0, "video.dump", 0);
 
   // Find the first video stream
   video->videoStream = -1;
   video->audioStream = -1;
   int i;
-  for (i = 0; i < video->pFormatCtx->nb_streams; i++) {
+  for (i= 0; i < video->pFormatCtx->nb_streams; i++) {
     if (video->pFormatCtx->streams[i]->codec->codec_type ==
             AVMEDIA_TYPE_VIDEO &&
         video->videoStream < 0) {
@@ -1118,7 +1122,7 @@ video_t* video_new(char* filename, float width, float height) {
   // gl init
   video_gl_init(video);
   int i;
-  for (i = 0; i < MAX_STREAM; i++) {
+  for (i= 0; i < MAX_STREAM; i++) {
     queue_init(&video->packets[i]);
     // printf("queue %d %p
     // %d\n",i,&video->packets[i],queue_get_length(&video->packets[i]) );

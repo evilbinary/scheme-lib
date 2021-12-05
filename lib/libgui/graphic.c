@@ -165,6 +165,10 @@ void print_array(void* addr, int len) {
   printf("\n\n");
 }
 
+void graphic_set_draw_type(mvp_t* mvp,int type){
+  glUniform1i(glGetUniformLocation(mvp->shader, "type"), type);
+}
+
 void graphic_draw_solid_quad(mvp_t* mvp, float x1, float y1, float x2, float y2,
                              float r, float g, float b, float a) {
   glUseProgram(mvp->shader);

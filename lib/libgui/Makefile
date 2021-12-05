@@ -6,7 +6,7 @@
 
 
 TARGET = libgui.so 
-OBJS = graphic.o edit.o shader.o mat4.o fontstash.o stb_truetype.o utf8-utils.o
+OBJS =  edit.o graphic.o shader.o mat4.o fontstash.o stb_truetype.o utf8-utils.o
 PLATFORM=
 BITS =$(shell getconf LONG_BIT)
 
@@ -18,8 +18,6 @@ CFLAGS = -Wall -Wformat -g  -DGLAD \
 CXXFLAGS= -Wall -Wformat
 
 UNAME_S := $(shell uname -s)
-OS_NAME :=$(shell echo $(UNAME_S)| tr '[A-Z]' '[a-z]')
-
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
 	LIBS += 
@@ -47,7 +45,7 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 #	CXXFLAGS += -D__APPLE__
 endif
 
-ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
+ifeq  ($(findstring MINGW32_NT-, $(UNAME_S)), MINGW32_NT-)
    	ECHO_MESSAGE = "Windows"
 	LIBS += 
 	CXXFLAGS += 
@@ -56,6 +54,17 @@ ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
 	PLATFORM=i3nt
 	TARGET = libgui.dll
 endif
+
+ifeq  ($(findstring MINGW64_NT-, $(UNAME_S)), MINGW64_NT-)
+   	ECHO_MESSAGE = "Windows64"
+	LIBS += 
+	CXXFLAGS += 
+	CXXFLAGS += 
+	CFLAGS +=   -DGLAD  -DGLAD_GLAPI_EXPORT  -DGLAD_GLAPI_EXPORT_BUILD 
+	PLATFORM=ta6nt
+	TARGET = libgui.dll
+endif
+
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c -o $@ $<

@@ -28,7 +28,7 @@
 #define TEXTURE_ROTATE    0
 #define TEXTURE_HALF      0  
 #define NUM_BUFFERS 16
-#ifdef WIN32
+#if (defined _WIN32)|| (defined _WIN64)
 #define QUEUE_NUM_BUFFERS 8
 #else
 #define QUEUE_NUM_BUFFERS 16

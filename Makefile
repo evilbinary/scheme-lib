@@ -13,6 +13,10 @@ OS_NAME :=$(shell echo $(UNAME_S)| tr '[A-Z]' '[a-z]')
 ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
   EXT=.dll
 endif
+
+ifeq ($(findstring mingw64_nt,$(OS_NAME)),mingw64_nt)
+  EXT=.dll
+endif
 SOFILES= lib/libscm/libscm$(EXT) \
 		 lib/libcffi/libcffi$(EXT)  \
 		 lib/libgl/libgles$(EXT)  \

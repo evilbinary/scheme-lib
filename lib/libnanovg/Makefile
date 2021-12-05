@@ -14,8 +14,6 @@ CXXFLAGS= -Wall -Wformat
 OTHERS=
 
 UNAME_S := $(shell uname -s)
-OS_NAME :=$(shell echo $(UNAME_S)| tr '[A-Z]' '[a-z]')
-
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
 	LIBS += 
@@ -33,8 +31,17 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 #	CXXFLAGS += -D__APPLE__
 endif
 
-ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
+ifeq  ($(findstring MINGW32_NT-, $(UNAME_S)), MINGW32_NT-)
    ECHO_MESSAGE = "Windows"
+	LIBS +=  
+	CXXFLAGS += 
+	CFLAGS += -DGLAD
+	OTHERS+= #-Wl,--out-implib,libnanovg.dll.a #-Wl,-verbose 
+	TARGET = libnanovg.dll
+endif
+
+ifeq  ($(findstring MINGW64_NT-, $(UNAME_S)), MINGW64_NT-)
+   ECHO_MESSAGE = "Windows64"
 	LIBS +=  
 	CXXFLAGS += 
 	CFLAGS += -DGLAD

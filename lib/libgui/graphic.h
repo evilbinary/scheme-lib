@@ -80,5 +80,5 @@ void graphic_render_string_immediate(mvp_t* mvp, font_t* font, float size,
                                      float* dy, int color);
 void graphic_render_string(font_t* font, float size, float sx, float sy,
                            char* text, float* dx, float* dy, int color);
-                                                             
+void graphic_set_draw_type(mvp_t* mvp,int type);                                                     
 #endif

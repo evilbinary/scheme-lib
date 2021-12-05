@@ -27,12 +27,10 @@ CXXFLAGS=  -g -std=c++11 	\
 
 
 UNAME_S := $(shell uname -s)
-OS_NAME :=$(shell echo $(UNAME_S)| tr '[A-Z]' '[a-z]')
-
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
 	LIBS += -lglut -lglfw
-	CXXFLAGS +=  -D"__builtin_cpu_supports(x)=1" -DGLAD -I../3rdparty/include -I../libglfw  -I../libglut  -L../libglfw/  -L../libglut/ 
+	CXXFLAGS += -D"__builtin_cpu_supports(x)=1" -DGLAD -I../3rdparty/include -I../libglfw  -I../libglut  -L../libglfw/  -L../libglut/ 
 	CXXFLAGS += -fPIC 
 	CFLAGS +=
 endif
@@ -46,8 +44,17 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 #	CXXFLAGS += -D__APPLE__
 endif
 
-ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
+ifeq  ($(findstring MINGW32_NT-, $(UNAME_S)), MINGW32_NT-)
    ECHO_MESSAGE = "Windows"
+	LIBS += 
+	CXXFLAGS+= -DGLAD -I../3rdparty/include -I../libglfw  -I../libglut  -L../libglfw/  -L../libglut/ -lglut -lglfw
+	CFLAGS += -DNO_IMGUI_OPENGL_GLGENERATEMIPMAP
+	TARGET = libimgui.dll
+endif
+
+
+ifeq  ($(findstring MINGW64_NT-, $(UNAME_S)), MINGW64_NT-)
+   ECHO_MESSAGE = "Windows64"
 	LIBS += 
 	CXXFLAGS+= -DGLAD -I../3rdparty/include -I../libglfw  -I../libglut  -L../libglfw/  -L../libglut/ -lglut -lglfw
 	CFLAGS += -DNO_IMGUI_OPENGL_GLGENERATEMIPMAP

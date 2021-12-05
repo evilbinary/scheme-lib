@@ -46,7 +46,7 @@ typedef struct terminal_t{
 	float x,y;
 	float starx,stary;
 	float scale;
-	mvp_t* mvp;
+	mvp_t* mvp;//font mvp
 	float width;
 	float height;
 }terminal;

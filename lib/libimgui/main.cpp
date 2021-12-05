@@ -33,7 +33,7 @@ SCM_API void imgui_init() {
 #ifdef ANDROID
     io.Fonts->AddFontFromFileTTF("/system/fonts/DroidSansFallback.ttf", 18.0f,NULL,io.Fonts->GetGlyphRangesChinese() );
 
-   io.Fonts->AddFontFromFileTTF("ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+    io.Fonts->AddFontFromFileTTF("ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
 #endif
 
 //    io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyClean.ttf", 13.0f);
@@ -70,7 +70,7 @@ SCM_API void imgui_scale(float x, float y) {
     ImGui_ImplGL_SetScale(x, y);
 }
 SCM_API int is_enable_default_color=1;
-ImVec4 default_clear_color=ImColor(114, 144, 154);
+ImVec4 default_clear_color=ImColor(255, 255, 255);
 
 SCM_API void imgui_disable_default_color(){
     is_enable_default_color=0;

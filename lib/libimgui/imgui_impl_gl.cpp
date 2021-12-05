@@ -234,7 +234,7 @@ bool ImGui_ImplGL_CreateDeviceObjects() {
 
     // Upload texture to graphics system
     GLint last_texture;
-     glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
     glGenTextures(1, &g_FontTexture);
     glBindTexture(GL_TEXTURE_2D, g_FontTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -309,14 +309,18 @@ void ImGui_ImplGL_SetScale(float x, float y) {
 void ImGui_ImplGL_ResizeCallback(int w, int h) {
     ImGuiIO &io = ImGui::GetIO();
     // Setup display size (every frame to accommodate for window resizing)
-    printf("ImGui_ImplGL_ResizeCallback %d,%d\n",w,h);
+    //printf("ImGui_ImplGL_ResizeCallback %d,%d\n",w,h);
 
     int display_w, display_h;
     #ifdef GLAD
-        display_w = glutGet(GLUT_WINDOW_FRAMBUFFER_WIDTH);
-        display_h = glutGet(GLUT_WINDOW_FRAMBUFFER_HEIGHT);
-        printf("ImGui_ImplGL_ResizeCallback display_w=%d,%d\n",display_w,display_h);
-
+        #ifdef ANDROID
+            display_w = w;
+            display_h = h;
+        #else
+            display_w = glutGet(GLUT_WINDOW_FRAMBUFFER_WIDTH);
+            display_h = glutGet(GLUT_WINDOW_FRAMBUFFER_HEIGHT);
+        #endif
+        //printf("ImGui_ImplGL_ResizeCallback display_w=%d,%d\n",display_w,display_h);
     #else
         display_w = w;
         display_h = h;
@@ -393,8 +397,9 @@ void ImGui_ImplGL_NewFrame() {
     ImGui::NewFrame();
 }
 
-
- #include "glad/glad.h"
+#ifdef GLAD
+#include "glad/glad.h"
+#endif
 
 void ImImpl_FreeTexture(ImTextureID& imtexid) {
     GLuint& texid = reinterpret_cast<GLuint&>(imtexid);

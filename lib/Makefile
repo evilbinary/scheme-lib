@@ -49,6 +49,21 @@ ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
 
 endif
 
+ifeq ($(findstring mingw64_nt,$(OS_NAME)),mingw64_nt)
+  OS_NAME:=windows
+  LIBSCM =./libscm/libscm.dll
+  LIBGLUT =./libglut/libglut.dll
+  LIBFFI = ./libcffi/libcffi.dll
+  LIBGLFW = ./libglfw/libglfw.dll
+  LIBGLES= ./libgl/libgles.dll
+  LIBSOCKET=./libsocket/libsocket.dll
+  LIBC=./libc/libc.dll
+  LIBGUI =./libgui/libgui.dll
+  LIBCC =./libc/libcc.dll
+  LIBALUT =./libalut/libalut.dll
+
+endif
+
 all: $(TARGET)	
 	@echo Build complete for $(TARGET)
 $(TARGET): $(OS_NAME) $(LIBS_ALL)

@@ -5,7 +5,10 @@
 ********************************************************/
 #ifdef GLAD
   #include "glad/glad.h"
+#ifdef ANDROID
+#else
   #include "glfw.h"
+#endif
   #include "glut.h"
 #else
 

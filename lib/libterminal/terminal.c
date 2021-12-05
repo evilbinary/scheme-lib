@@ -54,6 +54,7 @@ static int draw_cb(struct tsm_screen *screen, uint32_t id, const uint32_t *ch,
   float dx, dy;
   uint8_t fr, fg, fb, br, bg, bb;
   unsigned int color;
+  float bx, by;
   if (attr->inverse) {
     fr = attr->br;
     fg = attr->bg;
@@ -70,18 +71,8 @@ static int draw_cb(struct tsm_screen *screen, uint32_t id, const uint32_t *ch,
     bb = attr->bb;
   }
 
-  if (!len) {
-    // graphic_draw_solid_quad(
-    // glColor4ub(br,bg,bb,255);
-    // glPolygonMode(GL_FRONT, GL_FILL);
-    // glRectf(dx+lw,dy,dx,dy+lh);
-  } else {
-    // glColor4ub(br,bg,bb,255);
-    // glPolygonMode(GL_FRONT, GL_FILL);
-    // glRectf(dx+lw,dy,dx,dy+lh);
-  }
-  // color = glfonsRGBA(fr,fg,fb,255);
-  // fonsSetColor(data, color);
+  bx = term->x;
+  by = term->y;
 
   sth_draw_text(term->font->stash, term->font->id, term->font->size, term->x,
                 term->y, tsm_screen_get_width(term->console), -1, ch, fr, fg,
@@ -93,6 +84,16 @@ static int draw_cb(struct tsm_screen *screen, uint32_t id, const uint32_t *ch,
     term->y = dy + term->lineh;
   } else {
     term->x = dx;
+  }
+
+  if (!len) {
+    // graphic_set_draw_type(term->mvp,0);
+    // graphic_draw_solid_quad(term->mvp,bx,by,term->x,term->y,br,bg,bb,1.0);
+    // graphic_set_draw_type(term->mvp,1);
+  } else {
+    // graphic_set_draw_type(term->mvp,0);
+    // graphic_draw_solid_quad(term->mvp,bx,by,term->x,term->y,br,bg,bb,1.0);
+    // graphic_set_draw_type(term->mvp,1);
   }
 
   if (posy > (screen->size_y - 1)) {
@@ -117,12 +118,16 @@ void init_pty(terminal *term) {
     unsigned oflags = 0;
     /* enable SIGIO signal for this process when it has a ready file descriptor
      */
+    #if (defined _WIN32)||(defined _WIN64)
+
+    #else
     signal(SIGIO, &io_handler);
     fcntl(fd, F_SETOWN, getpid());
     oflags = fcntl(fd, F_GETFL);
     fcntl(fd, F_SETFL, oflags | FASYNC);
     /* watch for SIGHUP */
     signal(SIGCHLD, &hup_handler);
+    #endif
   } else {
     /* child, shell */
     char *shell = getenv("SHELL") ?: "/bin/bash";
@@ -135,10 +140,11 @@ void init_pty(terminal *term) {
 }
 
 void terminal_resize(terminal *term, float width, float height) {
-  if(width<0||height<0) return;
+  if (width < 0 || height < 0) return;
   float w = measure_text(term->font, term->font->size, "W", -1);
   float h = graphic_get_font_height(term->font, term->font->size);
-  tsm_screen_resize(term->console, (width* term->scale / w) - 1, (height* term->scale / (h+term->lineh )+2 ));
+  tsm_screen_resize(term->console, (width * term->scale / w) - 1,
+                    (height * term->scale / (h + term->lineh) + 2));
   shl_pty_resize(term->pty, tsm_screen_get_width(term->console),
                  tsm_screen_get_height(term->console));
 }
@@ -166,13 +172,13 @@ terminal *terminal_create(font_t *font, float size, float width, float height) {
   term->x = 0;
   term->y = 0;
   term->mvp = malloc(sizeof(mvp_t));
-  term->width=width;
-  term->height=height;
+  term->width = width;
+  term->height = height;
   tsm_screen_new(&term->console, log_tsm, 0);
   tsm_vte_new(&term->vte, term->console, term_write_cb, term, log_tsm, 0);
   init_pty(term);
 
-  terminal_resize(term, (int)width , (int)height );
+  terminal_resize(term, (int)width, (int)height);
   printf("console width: %d\n", tsm_screen_get_width(term->console));
   printf("console height: %d\n", tsm_screen_get_height(term->console));
   tsm_vte_get_def_attr(term->vte, &term->attr);
@@ -180,6 +186,18 @@ terminal *terminal_create(font_t *font, float size, float width, float height) {
   // char* test="\033[31m red \033[0m \n\033[32m green \033[0m\n\033[33m yellow
   // \033[0m"; tsm_vte_input(term->vte, test, strlen(test));
   return term;
+}
+
+void terminal_draw_cursor(terminal *term) {
+  int flags = tsm_screen_get_flags(term->console);
+  if (!(flags & TSM_SCREEN_HIDE_CURSOR)) {
+    graphic_set_draw_type(term->mvp, 0);
+    float cursor_x = (float)tsm_screen_get_cursor_x(term->console);
+    float cursor_y = (float)tsm_screen_get_cursor_y(term->console);
+    graphic_draw_solid_quad(term->mvp, cursor_x, cursor_y, cursor_x + 10.0,
+                            cursor_y + 10.0, 255, 0, 0, 1.0);
+    graphic_set_draw_type(term->mvp, 1);
+  }
 }
 
 void terminal_draw(terminal *term, float x, float y) {
@@ -191,6 +209,7 @@ void terminal_draw(terminal *term, float x, float y) {
   graphic_set_mvp(term->mvp);
   sth_begin_draw(term->font->stash);
   tsm_screen_draw(term->console, draw_cb, term);
+  //terminal_draw_cursor(term);
   sth_end_draw(term->font->stash);
 }
 void terminal_render(terminal *term, float x, float y) {
@@ -213,10 +232,10 @@ void terminal_key_event(terminal *term, int key, int scancode, int action,
     if (key == 263) scancode = XKB_KEY_Left;
     if (key == 262) scancode = XKB_KEY_Right;
     if (key == 257) scancode = XKB_KEY_Return;
-    if (key == 259) scancode = XKB_KEY_Delete;
+    if (key == 259) scancode = XKB_KEY_BackSpace;
     if (scancode == XKB_KEY_Up || scancode == XKB_KEY_Down ||
         scancode == XKB_KEY_Left || scancode == XKB_KEY_Right ||
-        scancode == XKB_KEY_Return || scancode == XKB_KEY_Delete) {
+        scancode == XKB_KEY_Return || scancode == XKB_KEY_BackSpace) {
       printf("mode %d key=%d scancode=%0x\n", mod, key, scancode);
       tsm_vte_handle_keyboard(term->vte, scancode, key, mod, key);
       //   terminal_draw(term);

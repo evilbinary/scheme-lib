@@ -11,26 +11,23 @@ PLATFORM=
 BITS =$(shell getconf LONG_BIT)
 
 
+LIBS = 	-L../libgui -lgui \
+	-L../libgl -lgles \
+	-L../3rdparty/lib \
+	-lavformat -lavcodec -lswscale -lswresample -lz -lm -lavutil \
+	-L../libalut -lalut 
 
 CFLAGS = -Wall -Wformat -g  -DGLAD \
 	-I../libgl \
 	-I../3rdparty/include/ \
 	-I../libgui \
-	-L../libgui -lgui \
-	-L../libgl -lgles \
-	-L../3rdparty/lib \
-	-lz -lm -lavformat -lavcodec -lswscale -lswresample  -lavutil \
 	-I../libalut \
 	-I../libscm \
-	-L../libalut -lalut \
-	-I/opt/local/include\
-	-L/opt/local/lib
+
 
 CXXFLAGS= -Wall -Wformat
 
 UNAME_S := $(shell uname -s)
-OS_NAME :=$(shell echo $(UNAME_S)| tr '[A-Z]' '[a-z]')
-
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
 	LIBS += 
@@ -52,34 +49,44 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 	LIBS += $(extralibs_avcodec) $(extralibs_avformat)
 	CXXFLAGS += 
 	CXXFLAGS += 
-	CFLAGS += $(extralibs_avcodec) $(extralibs_avformat) -framework OpenAL
+	CFLAGS += -framework OpenAL  $(extralibs_avcodec) $(extralibs_avformat)
 	ifeq ($(BITS), 32)
 		PLATFORM=i3osx
 	else
-		PLATFORM=a6osx
+		PLATFORM=ta6osx
 	endif
 #	CXXFLAGS += -D__APPLE__
 endif
 
-ifeq ($(findstring mingw32_nt,$(OS_NAME)),mingw32_nt)
+ifeq  ($(findstring MINGW32_NT-, $(UNAME_S)), MINGW32_NT-)
    	ECHO_MESSAGE = "Windows"
-	LIBS += 
+	LIBS += -lopenal
 	CXXFLAGS += 
 	CXXFLAGS += 
-	CFLAGS +=
-	PLATFORM=i3nt
-	TARGET = libgui.dll
+	CFLAGS +=  -I/mingw32/include -L/mingw32/lib/
+	PLATFORM=ti3nt
+	TARGET = libvideo.dll
+endif
+
+ifeq  ($(findstring MINGW64_NT-, $(UNAME_S)), MINGW64_NT-)
+   	ECHO_MESSAGE = "Windows64"
+	LIBS += -lopenal
+	CXXFLAGS += 
+	CXXFLAGS += 
+	CFLAGS +=  -I/mingw64/include -L/mingw64/lib/
+	PLATFORM=ta6nt
+	TARGET = libvideo.dll
 endif
 
 .cpp.o:
-	$(CXX) $(CXXFLAGS) $(LIBS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS)  -c -o $@ $<
 .c.o:
-	$(CC) $(CFLAGS) $(LIBS) -c -o $@ $<
+	$(CC) $(CFLAGS)  -c -o $@ $<
 all: $(TARGET)
 	@echo Build complete for $(ECHO_MESSAGE)
 
 $(TARGET): $(OBJS)
-	$(CC)  $(CFLAGS) $(OBJS) -shared  -o $(TARGET) 
+	$(CC)  $(CFLAGS) $(OBJS) -shared  -o $(TARGET)  $(LIBS)
 
 boot:
 	cp ../libchez/$(PLATFORM)/*.boot .

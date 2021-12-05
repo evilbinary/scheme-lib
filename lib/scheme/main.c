@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include "scm.h"
 
-#define VERSION 2.1
-char *ver="Scheme Version 2.1\n\
+#define VERSION 2.2
+char *ver="Scheme Version 2.2\n\
 Copyright 2016-2020 evilbinary.\n\n";
 
 void repl(){

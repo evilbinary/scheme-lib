@@ -10,6 +10,7 @@ bin/scheme
 bin/*.boot
 bin/imgui.ini
 lib/scheme/scheme
+lib/*/*.so
 
 lib/libglut
 lib/libscm
@@ -19,3 +20,4 @@ lib/libscm
 *.o
 *.dll
 *._*
+
